@@ -23,6 +23,7 @@ interface PlaybackActions {
   setWanderActive: (active: boolean) => Promise<void>
   steerTo: (nodeId: string) => Promise<void>
   teleportTo: (nodeId: string) => Promise<void>
+  setVolume: (gain: number) => void
   reset: () => void
 }
 
@@ -60,8 +61,13 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
 
   // ── Actions ──────────────────────────────────────────────────────────────
 
+  setVolume: (gain) => {
+    _audioManager?.setVolume(gain)
+  },
+
   reset: () => {
     cancelWanderTimer()
+    _audioManager?.fadeOut(0.5).catch(() => {})
     set({
       sessionId: null,
       graph: null,
