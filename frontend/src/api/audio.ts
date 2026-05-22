@@ -1,5 +1,5 @@
 import client from './client'
-import type { AudioUploadResponse } from '../types'
+import type { AudioUploadResponse, LoopAnalysisResult } from '../types'
 
 /**
  * Build the streaming URL for an audio file given its relative path
@@ -19,3 +19,6 @@ export const uploadAudio = (graphId: string, file: File): Promise<AudioUploadRes
 
 export const deleteAudio = (graphId: string, filename: string): Promise<void> =>
   client.delete(`/api/audio/${graphId}/${filename}`).then(() => undefined)
+
+export const analyzeAudioLoop = (graphId: string, filename: string): Promise<LoopAnalysisResult> =>
+  client.post(`/api/audio/${graphId}/${filename}/analyze`).then(r => r.data)

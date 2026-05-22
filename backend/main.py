@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import inspect, text
 
 from backend.config import settings
 from backend.db.base import Base
@@ -29,8 +30,26 @@ app.include_router(sessions.router, prefix="/api")
 
 
 @app.on_event("startup")
-def create_tables():
+def startup():
+    # Create any missing tables
     Base.metadata.create_all(bind=engine)
+
+    # Lightweight column migrations for SQLite (create_all won't add new columns)
+    _ensure_columns("nodes", {
+        "loop_start": "REAL",
+        "loop_end": "REAL",
+    })
+
+
+def _ensure_columns(table: str, columns: dict[str, str]) -> None:
+    """Add any missing columns to an existing SQLite table."""
+    with engine.connect() as conn:
+        inspector = inspect(engine)
+        existing = {c["name"] for c in inspector.get_columns(table)}
+        for col, col_type in columns.items():
+            if col not in existing:
+                conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {col} {col_type}"))
+        conn.commit()
 
 
 @app.get("/api/health")

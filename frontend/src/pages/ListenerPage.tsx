@@ -11,6 +11,7 @@ export default function ListenerPage() {
 
   const {
     sessionId, graph, currentNode, wanderActive, transitioning, nominatedNextNodeId,
+    wanderHistory,
     startSession, advance, setWanderActive, steerTo, teleportTo, reset, setVolume,
   } = usePlayback()
 
@@ -245,6 +246,32 @@ export default function ListenerPage() {
             ⏭  Skip
           </button>
         </div>
+
+        {/* ── Wander trail ─────────────────────────────────────────────────── */}
+        {wanderHistory.length > 1 && (
+          <div style={{ width: '100%', maxWidth: 580, marginBottom: 28 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+              <span style={{ fontSize: 10, color: '#4a6a8a', letterSpacing: 3, textTransform: 'uppercase', flexShrink: 0 }}>
+                Trail
+              </span>
+              <div style={{ height: 1, flex: 1, background: '#1a2a3a' }} />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap', fontSize: 11, color: '#4a6a8a', fontFamily: MONO }}>
+              {wanderHistory.slice(-7).map((id, i, arr) => {
+                const nodeName = graph?.nodes.find(n => n.id === id)?.name ?? id.slice(0, 8)
+                const isLast = i === arr.length - 1
+                return (
+                  <span key={`${id}-${i}`} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <span style={{ color: isLast ? '#8a9bb0' : '#2d4a6e' }}>{nodeName}</span>
+                    {!isLast && <span style={{ color: '#1a2a3a' }}>→</span>}
+                  </span>
+                )
+              })}
+              <span style={{ color: '#2d4a6e' }}>→</span>
+              <span style={{ color: '#90b8e8', fontWeight: 700 }}>{currentNode?.name}</span>
+            </div>
+          </div>
+        )}
 
         {/* ── Steer ────────────────────────────────────────────────────────── */}
         {neighbors.length > 0 && (

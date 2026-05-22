@@ -1,5 +1,5 @@
 import client from './client'
-import type { Graph, GraphListItem, Node, Edge } from '../types'
+import type { Graph, GraphListItem, GraphExport, Node, Edge } from '../types'
 
 // Graphs
 export const listGraphs = (): Promise<GraphListItem[]> =>
@@ -45,3 +45,10 @@ export const updateEdge = (
 
 export const deleteEdge = (edgeId: string): Promise<void> =>
   client.delete(`/api/edges/${edgeId}`).then(() => undefined)
+
+// Export / Import
+export const exportGraph = (graphId: string): Promise<GraphExport> =>
+  client.get(`/api/graphs/${graphId}/export`).then(r => r.data)
+
+export const importGraph = (data: GraphExport): Promise<Graph> =>
+  client.post('/api/graphs/import', data).then(r => r.data)

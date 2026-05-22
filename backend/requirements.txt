@@ -10,3 +10,7 @@ python-dotenv
 pytest
 pytest-asyncio
 httpx
+# Audio analysis (loop-point detection)
+librosa
+numpy
+scipy

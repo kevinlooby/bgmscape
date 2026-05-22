@@ -7,6 +7,8 @@ export interface Node {
   region: string | null
   canvas_x: number
   canvas_y: number
+  loop_start: number | null
+  loop_end: number | null
 }
 
 export interface Edge {
@@ -56,4 +58,34 @@ export interface AudioUploadResponse {
   file_path: string
   filename: string
   size_bytes: number
+}
+
+export interface LoopAnalysisResult {
+  loop_start: number
+  loop_end: number
+  duration: number
+  confidence: number
+}
+
+export interface GraphExport {
+  version: string
+  name: string
+  game_title: string
+  nodes: Array<{
+    id: string
+    name: string
+    stay_probability: number
+    region: string | null
+    canvas_x: number
+    canvas_y: number
+    loop_start: number | null
+    loop_end: number | null
+  }>
+  edges: Array<{
+    id: string
+    source_node_id: string
+    target_node_id: string
+    weight: number
+    bidirectional: boolean
+  }>
 }

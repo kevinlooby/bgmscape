@@ -13,6 +13,8 @@ class NodeBase(BaseModel):
     region: Optional[str] = None
     canvas_x: float = 0.0
     canvas_y: float = 0.0
+    loop_start: Optional[float] = None
+    loop_end: Optional[float] = None
 
 
 class NodeCreate(NodeBase):
@@ -26,6 +28,8 @@ class NodeUpdate(BaseModel):
     region: Optional[str] = None
     canvas_x: Optional[float] = None
     canvas_y: Optional[float] = None
+    loop_start: Optional[float] = None
+    loop_end: Optional[float] = None
 
 
 class NodeSchema(NodeBase):
@@ -123,3 +127,41 @@ class AudioUploadResponse(BaseModel):
     file_path: str
     filename: str
     size_bytes: int
+
+
+class LoopAnalysisResult(BaseModel):
+    loop_start: float
+    loop_end: float
+    duration: float
+    confidence: float
+
+
+# ── Graph export / import ────────────────────────────────────────────────────
+
+class NodeExport(BaseModel):
+    """Node representation for export (omits audio path — files are local)."""
+    id: str
+    name: str
+    stay_probability: float
+    region: Optional[str] = None
+    canvas_x: float
+    canvas_y: float
+    loop_start: Optional[float] = None
+    loop_end: Optional[float] = None
+
+
+class EdgeExport(BaseModel):
+    id: str
+    source_node_id: str
+    target_node_id: str
+    weight: float
+    bidirectional: bool
+
+
+class GraphExport(BaseModel):
+    """Self-contained graph definition for JSON export/import."""
+    version: str = "1"
+    name: str
+    game_title: str
+    nodes: list[NodeExport]
+    edges: list[EdgeExport]

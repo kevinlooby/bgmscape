@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from backend.api.deps import get_db
 from backend.config import settings
 from backend.models.graph import Graph
-from backend.schemas.graph import AudioUploadResponse
+from backend.schemas.graph import AudioUploadResponse, LoopAnalysisResult
 
 router = APIRouter(prefix="/audio", tags=["audio"])
 
@@ -108,3 +108,34 @@ async def delete_audio(graph_id: str, filename: str):
     if not file_path.exists():
         raise HTTPException(status_code=404, detail="Audio file not found")
     file_path.unlink()
+
+
+@router.post("/{graph_id}/{filename}/analyze", response_model=LoopAnalysisResult)
+async def analyze_loop(graph_id: str, filename: str):
+    """
+    Run loop-point detection on an uploaded audio file.
+    Returns loop_start, loop_end (seconds), duration, and confidence (0–1).
+    Requires librosa to be installed in the backend environment.
+    """
+    file_path = Path(settings.AUDIO_STORAGE_PATH) / graph_id / filename
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="Audio file not found")
+
+    try:
+        from backend.services.loop_detector import find_loop_point  # noqa: PLC0415
+        result = await _run_in_thread(find_loop_point, str(file_path))
+        return LoopAnalysisResult(**result)
+    except ImportError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Loop detection unavailable: {exc}. Install librosa in the backend venv.",
+        ) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Analysis failed: {exc}") from exc
+
+
+async def _run_in_thread(fn, *args):
+    """Run a blocking function in a thread pool so it doesn't block the event loop."""
+    import asyncio
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, fn, *args)

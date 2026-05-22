@@ -36,6 +36,9 @@ class Node(Base):
     region: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     canvas_x: Mapped[float] = mapped_column(Float, default=0.0)
     canvas_y: Mapped[float] = mapped_column(Float, default=0.0)
+    # Loop points in seconds (set manually or via auto-detection)
+    loop_start: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    loop_end: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
 
     graph: Mapped[Graph] = relationship("Graph", back_populates="nodes", foreign_keys=[graph_id])
 

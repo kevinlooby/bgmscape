@@ -15,6 +15,8 @@ interface PlaybackState {
   wanderActive: boolean
   transitioning: boolean
   nominatedNextNodeId: string | null
+  /** Local wander trail — node IDs in visit order, most recent last. Capped at 20. */
+  wanderHistory: string[]
 }
 
 interface PlaybackActions {
@@ -58,6 +60,7 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
   wanderActive: false,
   transitioning: false,
   nominatedNextNodeId: null,
+  wanderHistory: [],
 
   // ── Actions ──────────────────────────────────────────────────────────────
 
@@ -75,6 +78,7 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
       wanderActive: false,
       transitioning: false,
       nominatedNextNodeId: null,
+      wanderHistory: [],
     })
   },
 
@@ -90,15 +94,18 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
     const startNode = graph.nodes.find(n => n.id === session.current_node_id) ?? graph.nodes[0]
     if (!startNode) throw new Error('Graph has no nodes')
 
-    set({ sessionId: session.id, graph, currentNode: startNode })
+    set({ sessionId: session.id, graph, currentNode: startNode, wanderHistory: [startNode.id] })
 
     if (startNode.audio_file_path) {
-      await audio.play(audioUrl(startNode.audio_file_path))
+      await audio.play(audioUrl(startNode.audio_file_path), {
+        loopStart: startNode.loop_start ?? 0,
+        loopEnd: startNode.loop_end ?? undefined,
+      })
     }
   },
 
   advance: async () => {
-    const { sessionId, graph } = get()
+    const { sessionId, graph, currentNode, wanderHistory } = get()
     if (!sessionId || get().transitioning) return
     set({ transitioning: true })
 
@@ -107,14 +114,22 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
       const result = await sessionsApi.advanceSession(sessionId)
       const nextNode = graph?.nodes.find(n => n.id === result.next_node_id) ?? null
 
-      // Preload and crossfade
+      // Preload and crossfade (pass loop points so AudioManager loops correctly)
       if (result.audio_file_path) {
         const url = audioUrl(result.audio_file_path)
         await audio.loadTrack(url)
-        await audio.crossfadeTo(url)
+        await audio.crossfadeTo(url, {
+          loopStart: nextNode?.loop_start ?? 0,
+          loopEnd: nextNode?.loop_end ?? undefined,
+        })
       }
 
-      set({ currentNode: nextNode, nominatedNextNodeId: null })
+      // Append to local wander trail (cap at 20)
+      const prev = currentNode?.id
+      const newHistory = prev
+        ? [...wanderHistory.slice(-19), prev]
+        : wanderHistory
+      set({ currentNode: nextNode, nominatedNextNodeId: null, wanderHistory: newHistory })
     } finally {
       set({ transitioning: false })
     }
@@ -154,7 +169,7 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
   },
 
   teleportTo: async (nodeId) => {
-    const { sessionId, graph } = get()
+    const { sessionId, graph, currentNode, wanderHistory } = get()
     if (!sessionId) return
     const audio = getAudio()
 
@@ -166,9 +181,14 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
       await sessionsApi.teleportSession(sessionId, nodeId)
       await audio.fadeOut()
       if (targetNode.audio_file_path) {
-        await audio.play(audioUrl(targetNode.audio_file_path))
+        await audio.play(audioUrl(targetNode.audio_file_path), {
+          loopStart: targetNode.loop_start ?? 0,
+          loopEnd: targetNode.loop_end ?? undefined,
+        })
       }
-      set({ currentNode: targetNode, nominatedNextNodeId: null })
+      const prev = currentNode?.id
+      const newHistory = prev ? [...wanderHistory.slice(-19), prev] : wanderHistory
+      set({ currentNode: targetNode, nominatedNextNodeId: null, wanderHistory: newHistory })
     } finally {
       set({ transitioning: false })
     }
