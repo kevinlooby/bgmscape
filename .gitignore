@@ -127,3 +127,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# bgmscape runtime artifacts
+bgmscape.db
+bgmscape.db-journal
+audio_files/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
