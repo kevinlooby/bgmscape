@@ -21,11 +21,10 @@ function NodeRow({ node }: { node: Node }) {
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState(node.name)
   const [region, setRegion] = useState(node.region ?? '')
-  const [stay, setStay] = useState(node.stay_probability)
   const [confirm, setConfirm] = useState(false)
 
   const save = () => {
-    updateNode(node.id, { name, region: region || null, stay_probability: stay })
+    updateNode(node.id, { name, region: region || null })
     setEditing(false)
   }
 
@@ -34,7 +33,6 @@ function NodeRow({ node }: { node: Node }) {
       <tr style={{ background: '#0f1923' }}>
         <td style={s.td}><input style={s.input} value={name} onChange={e => setName(e.target.value)} autoFocus /></td>
         <td style={s.td}><input style={s.input} value={region} placeholder="none" onChange={e => setRegion(e.target.value)} /></td>
-        <td style={s.td}><input type="number" min={0} max={1} step={0.05} style={{ ...s.input, width: 60 }} value={stay} onChange={e => setStay(parseFloat(e.target.value))} /></td>
         <td style={s.td}><span style={s.dot(!!node.audio_file_path)} /></td>
         <td style={s.td}>
           <button style={s.btn('primary')} onClick={save}>Save</button>
@@ -48,7 +46,6 @@ function NodeRow({ node }: { node: Node }) {
     <tr style={{ cursor: 'pointer' }} onDoubleClick={() => { selectNode(node.id); setEditing(true) }}>
       <td style={s.td}>{node.name}</td>
       <td style={s.td}>{node.region ?? <span style={{ color: '#4a6a8a' }}>—</span>}</td>
-      <td style={s.td}>{Math.round(node.stay_probability * 100)}%</td>
       <td style={s.td}><span style={s.dot(!!node.audio_file_path)} /></td>
       <td style={s.td}>
         <button style={s.btn('muted')} onClick={() => setEditing(true)}>Edit</button>
@@ -162,7 +159,6 @@ export default function FormView() {
             <tr>
               <th style={s.th}>Name</th>
               <th style={s.th}>Region</th>
-              <th style={s.th}>Stay</th>
               <th style={s.th}>Audio</th>
               <th style={s.th}>Actions</th>
             </tr>
@@ -170,7 +166,7 @@ export default function FormView() {
           <tbody>
             {graph.nodes.map(n => <NodeRow key={n.id} node={n} />)}
             {graph.nodes.length === 0 && (
-              <tr><td colSpan={5} style={{ ...s.td, color: '#4a6a8a', textAlign: 'center' }}>No nodes yet.</td></tr>
+              <tr><td colSpan={4} style={{ ...s.td, color: '#4a6a8a', textAlign: 'center' }}>No nodes yet.</td></tr>
             )}
           </tbody>
         </table>

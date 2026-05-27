@@ -39,6 +39,9 @@ def startup():
         "loop_start": "REAL",
         "loop_end": "REAL",
     })
+    _ensure_columns("playback_sessions", {
+        "lookahead_queue": "JSON",
+    })
 
 
 def _ensure_columns(table: str, columns: dict[str, str]) -> None:

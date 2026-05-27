@@ -3,7 +3,6 @@ export interface Node {
   graph_id: string
   name: string
   audio_file_path: string | null
-  stay_probability: number
   region: string | null
   canvas_x: number
   canvas_y: number
@@ -67,6 +66,16 @@ export interface LoopAnalysisResult {
   confidence: number
 }
 
+export interface LookaheadStep {
+  node_id: string
+  node_name: string
+  region: string | null
+}
+
+export interface LookaheadResponse {
+  steps: LookaheadStep[]
+}
+
 export interface GraphExport {
   version: string
   name: string
@@ -74,7 +83,6 @@ export interface GraphExport {
   nodes: Array<{
     id: string
     name: string
-    stay_probability: number
     region: string | null
     canvas_x: number
     canvas_y: number

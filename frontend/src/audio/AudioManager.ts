@@ -1,7 +1,6 @@
 // AudioManager — Web Audio API based audio engine for bgmscape.
 // Framework-agnostic: no React imports. Wrap with useAudio.ts for React usage.
 
-const DEFAULT_CROSSFADE_DURATION = 3    // seconds
 const DEFAULT_FADE_IN_DURATION   = 1    // seconds
 const DEFAULT_FADE_OUT_DURATION  = 1.5  // seconds
 
@@ -15,6 +14,10 @@ export class AudioManager {
 
   // Buffer cache keyed by URL
   private bufferCache: Map<string, AudioBuffer> = new Map()
+
+  // Master volume tracking (separate from the muted state)
+  private _volume = 1
+  private _muted = false
 
   // ── Context lifecycle ────────────────────────────────────────────────────
 
@@ -107,41 +110,32 @@ export class AudioManager {
   }
 
   /**
-   * Crossfade from the currently playing track to a new one.
-   * Outgoing: gain 1 → 0 over crossfadeDuration.
-   * Incoming: gain 0 → 1 over crossfadeDuration (starts simultaneously).
+   * Fade the current track to silence, optionally wait for a silent "travel"
+   * period, then fade in the next track. Loading the next track overlaps the
+   * fade-out (and the silence period) so audio is ready when the silence ends.
    */
-  async crossfadeTo(
+  async transitionTo(
     url: string,
-    options: { crossfadeDuration?: number; loopStart?: number; loopEnd?: number } = {}
+    options: { fadeOutDuration?: number; fadeInDuration?: number; silenceDuration?: number; loopStart?: number; loopEnd?: number } = {}
   ): Promise<void> {
-    const { crossfadeDuration = DEFAULT_CROSSFADE_DURATION, loopStart = 0, loopEnd } = options
-    const ctx = this.getContext()
+    const { fadeOutDuration = DEFAULT_FADE_OUT_DURATION, fadeInDuration = DEFAULT_FADE_IN_DURATION, silenceDuration = 0, loopStart = 0, loopEnd } = options
 
-    // Preload next track before starting any fade
-    const buffer = await this.loadTrack(url)
+    // Load next track in parallel with the fade-out (and the silence period)
+    const bufferPromise = this.loadTrack(url)
+    await this._teardownCurrent(fadeOutDuration)
 
-    const now = ctx.currentTime
-    const fadeEnd = now + crossfadeDuration
-
-    // ── Fade out outgoing ────────────────────────────────────────────────
-    if (this.currentGain) {
-      const outGain = this.currentGain
-      const outSource = this.currentSource
-      outGain.gain.cancelScheduledValues(now)
-      outGain.gain.setValueAtTime(outGain.gain.value, now)
-      outGain.gain.linearRampToValueAtTime(0, fadeEnd)
-      // Disconnect after fade
-      setTimeout(() => {
-        try { outSource?.stop() } catch (_) { /* already stopped */ }
-        outGain.disconnect()
-      }, crossfadeDuration * 1000 + 50)
+    // Optional silent travel period between tracks. Buffer continues loading
+    // in the background during this wait.
+    if (silenceDuration > 0) {
+      await new Promise(resolve => setTimeout(resolve, silenceDuration * 1000))
     }
 
-    // ── Fade in incoming ─────────────────────────────────────────────────
+    const buffer = await bufferPromise
+
+    const ctx = this.getContext()
     const inGain = ctx.createGain()
-    inGain.gain.setValueAtTime(0, now)
-    inGain.gain.linearRampToValueAtTime(1, fadeEnd)
+    inGain.gain.setValueAtTime(0, ctx.currentTime)
+    inGain.gain.linearRampToValueAtTime(1, ctx.currentTime + fadeInDuration)
     inGain.connect(this.getMasterGain())
 
     const inSource = this.createLoopingSource(buffer, loopStart, loopEnd)
@@ -151,8 +145,7 @@ export class AudioManager {
     this.currentSource = inSource
     this.currentGain = inGain
 
-    // Resolve after the crossfade completes
-    return new Promise(resolve => setTimeout(resolve, crossfadeDuration * 1000))
+    return new Promise(resolve => setTimeout(resolve, fadeInDuration * 1000))
   }
 
   /**
@@ -163,14 +156,34 @@ export class AudioManager {
     await this._teardownCurrent(duration)
   }
 
-  /** Set master output volume (0.0 – 1.0). */
+  /** Set master output volume (0.0 – 1.0). Remembered across pause/unpause. */
   setVolume(gain: number): void {
-    if (this.masterGain) {
-      this.masterGain.gain.setValueAtTime(
-        Math.max(0, Math.min(1, gain)),
-        this.getContext().currentTime
-      )
+    this._volume = Math.max(0, Math.min(1, gain))
+    if (!this._muted && this.masterGain) {
+      this.masterGain.gain.setValueAtTime(this._volume, this.getContext().currentTime)
     }
+  }
+
+  /** Fade master gain to silence quickly. Audio processing continues underneath. */
+  pause(): void {
+    this._muted = true
+    if (!this.masterGain) return
+    const ctx = this.getContext()
+    const now = ctx.currentTime
+    this.masterGain.gain.cancelScheduledValues(now)
+    this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now)
+    this.masterGain.gain.linearRampToValueAtTime(0, now + 0.15)
+  }
+
+  /** Fade master gain back to the stored volume. */
+  unpause(): void {
+    this._muted = false
+    if (!this.masterGain) return
+    const ctx = this.getContext()
+    const now = ctx.currentTime
+    this.masterGain.gain.cancelScheduledValues(now)
+    this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now)
+    this.masterGain.gain.linearRampToValueAtTime(this._volume, now + 0.15)
   }
 
   // ── Internal helpers ─────────────────────────────────────────────────────

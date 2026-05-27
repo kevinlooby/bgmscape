@@ -34,6 +34,9 @@ interface EditorActions {
   updateEdge: (edgeId: string, data: { weight?: number; bidirectional?: boolean }) => Promise<void>
   deleteEdge: (edgeId: string) => Promise<void>
 
+  // Layout
+  batchUpdateNodePositions: (positions: { id: string; x: number; y: number }[]) => Promise<void>
+
   // Selection
   selectNode: (id: string | null) => void
   selectEdge: (id: string | null) => void
@@ -173,6 +176,22 @@ export const useEditor = create<EditorState & EditorActions>((set, get) => ({
       },
       selectedEdgeId: get().selectedEdgeId === edgeId ? null : get().selectedEdgeId,
     })
+  },
+
+  // ── Layout ──────────────────────────────────────────────────────────────
+
+  batchUpdateNodePositions: async (positions) => {
+    const { graph } = get()
+    if (!graph) return
+    const posMap = new Map(positions.map(p => [p.id, p]))
+    const updatedNodes = graph.nodes.map(n => {
+      const p = posMap.get(n.id)
+      return p ? { ...n, canvas_x: p.x, canvas_y: p.y } : n
+    })
+    set({ graph: { ...graph, nodes: updatedNodes } })
+    await Promise.all(
+      positions.map(p => graphsApi.updateNode(p.id, { canvas_x: p.x, canvas_y: p.y }))
+    )
   },
 
   // ── Selection ───────────────────────────────────────────────────────────

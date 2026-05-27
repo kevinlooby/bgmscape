@@ -94,7 +94,6 @@ def export_graph(graph_id: str, db: Session = Depends(get_db)):
         NodeExport(
             id=n.id,
             name=n.name,
-            stay_probability=n.stay_probability,
             region=n.region,
             canvas_x=n.canvas_x,
             canvas_y=n.canvas_y,
@@ -135,7 +134,6 @@ def import_graph(payload: GraphExport, db: Session = Depends(get_db)):
             id=node_id_map[n.id],
             graph_id=graph.id,
             name=n.name,
-            stay_probability=n.stay_probability,
             region=n.region,
             canvas_x=n.canvas_x,
             canvas_y=n.canvas_y,

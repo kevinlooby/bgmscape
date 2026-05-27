@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { usePlayback } from '../store/playback'
+import DebugPanel from '../components/listener/DebugPanel'
+import ListenerGraphView from '../components/listener/ListenerGraphView'
+import LookaheadQueue from '../components/listener/LookaheadQueue'
 import type { Node } from '../types'
 
 const MONO = 'monospace'
@@ -10,9 +13,9 @@ export default function ListenerPage() {
   const navigate = useNavigate()
 
   const {
-    sessionId, graph, currentNode, wanderActive, transitioning, nominatedNextNodeId,
+    sessionId, graph, currentNode, playing, wanderActive, transitioning, nominatedNextNodeId,
     wanderHistory,
-    startSession, advance, setWanderActive, steerTo, teleportTo, reset, setVolume,
+    startSession, advance, setPlaying, setWanderActive, steerTo, teleportTo, reset, setVolume,
   } = usePlayback()
 
   const [loading, setLoading] = useState(false)
@@ -214,36 +217,74 @@ export default function ListenerPage() {
         </div>
 
         {/* ── Controls ─────────────────────────────────────────────────────── */}
-        <div style={{ display: 'flex', gap: 12, marginBottom: 44, alignItems: 'center' }}>
-          {/* Wander toggle */}
+        <div style={{ display: 'flex', gap: 10, marginBottom: 44, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+          {/* Play */}
           <button
-            onClick={() => setWanderActive(!wanderActive)}
-            disabled={transitioning}
+            onClick={() => setPlaying(true)}
+            disabled={playing || transitioning}
+            title="Resume audio"
             style={{
-              padding: '9px 22px', borderRadius: 20, fontFamily: MONO, fontSize: 13, fontWeight: 700,
-              border: `2px solid ${wanderActive ? '#4a90d9' : '#2d4a6e'}`,
-              background: wanderActive ? '#1e4a8a' : '#1e2a3a',
-              color: wanderActive ? '#90b8e8' : '#8a9bb0',
-              cursor: transitioning ? 'not-allowed' : 'pointer',
-              minWidth: 148, transition: 'background 0.15s, color 0.15s, border-color 0.15s',
+              padding: '9px 20px', borderRadius: 20, fontFamily: MONO, fontSize: 13, fontWeight: 700,
+              border: `2px solid ${!playing && !transitioning ? '#4a90d9' : '#2d4a6e'}`,
+              background: !playing && !transitioning ? '#1e4a8a' : '#1e2a3a',
+              color: !playing && !transitioning ? '#90b8e8' : '#2d4a6e',
+              cursor: playing || transitioning ? 'not-allowed' : 'pointer',
+              transition: 'background 0.15s, color 0.15s, border-color 0.15s',
             }}
           >
-            {wanderActive ? '⟳  Wander ON' : '◼  Wander OFF'}
+            ▶  Play
+          </button>
+
+          {/* Pause */}
+          <button
+            onClick={() => setPlaying(false)}
+            disabled={!playing || transitioning}
+            title="Pause audio"
+            style={{
+              padding: '9px 20px', borderRadius: 20, fontFamily: MONO, fontSize: 13, fontWeight: 700,
+              border: `2px solid ${playing && !transitioning ? '#4a90d9' : '#2d4a6e'}`,
+              background: playing && !transitioning ? '#1e4a8a' : '#1e2a3a',
+              color: playing && !transitioning ? '#90b8e8' : '#2d4a6e',
+              cursor: !playing || transitioning ? 'not-allowed' : 'pointer',
+              transition: 'background 0.15s, color 0.15s, border-color 0.15s',
+            }}
+          >
+            ⏸  Pause
           </button>
 
           {/* Skip / manual advance */}
           <button
             onClick={() => advance()}
-            disabled={transitioning}
+            disabled={!playing || transitioning}
             title="Advance to next location now"
             style={{
-              padding: '9px 22px', borderRadius: 20, fontFamily: MONO, fontSize: 13,
+              padding: '9px 20px', borderRadius: 20, fontFamily: MONO, fontSize: 13,
               border: '1px solid #2d4a6e', background: '#1e2a3a',
-              color: transitioning ? '#2d4a6e' : '#8a9bb0',
-              cursor: transitioning ? 'not-allowed' : 'pointer',
+              color: !playing || transitioning ? '#2d4a6e' : '#8a9bb0',
+              cursor: !playing || transitioning ? 'not-allowed' : 'pointer',
             }}
           >
             ⏭  Skip
+          </button>
+
+          {/* Divider */}
+          <div style={{ width: 1, height: 28, background: '#1a2a3a', margin: '0 4px' }} />
+
+          {/* Wander toggle */}
+          <button
+            onClick={() => setWanderActive(!wanderActive)}
+            disabled={transitioning}
+            title={wanderActive ? 'Turn off auto-wander' : 'Turn on auto-wander'}
+            style={{
+              padding: '9px 20px', borderRadius: 20, fontFamily: MONO, fontSize: 13,
+              border: `1px solid ${wanderActive && !transitioning ? '#4a90d9' : '#2d4a6e'}`,
+              background: wanderActive && !transitioning ? '#152a3a' : '#1e2a3a',
+              color: wanderActive && !transitioning ? '#6aaccc' : '#4a6a8a',
+              cursor: transitioning ? 'not-allowed' : 'pointer',
+              transition: 'background 0.15s, color 0.15s, border-color 0.15s',
+            }}
+          >
+            ⟳  Wander {wanderActive ? '●' : '○'}
           </button>
         </div>
 
@@ -270,6 +311,24 @@ export default function ListenerPage() {
               <span style={{ color: '#2d4a6e' }}>→</span>
               <span style={{ color: '#90b8e8', fontWeight: 700 }}>{currentNode?.name}</span>
             </div>
+          </div>
+        )}
+
+        {/* ── Graph view ───────────────────────────────────────────────────── */}
+        {graph && sessionId && currentNode && (
+          <div style={{ width: '100%', maxWidth: 800, marginBottom: 16 }}>
+            <ListenerGraphView />
+          </div>
+        )}
+
+        {/* ── Lookahead queue (sits directly beneath the graph) ────────────── */}
+        {sessionId && currentNode && (
+          <div style={{ width: '100%', maxWidth: 580, marginBottom: 32 }}>
+            <LookaheadQueue
+              sessionId={sessionId}
+              currentNodeId={currentNode.id}
+              currentNodeName={currentNode.name}
+            />
           </div>
         )}
 
@@ -359,6 +418,9 @@ export default function ListenerPage() {
             </div>
           )}
         </div>
+
+        {/* ── Debug panel ──────────────────────────────────────────────────── */}
+        {sessionId && currentNode && <DebugPanel />}
 
       </div>
     </div>
