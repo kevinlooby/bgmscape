@@ -16,11 +16,15 @@ interface PlaybackState {
   /** Local wander trail — node IDs in visit order, most recent last. Capped at 20. */
   wanderHistory: string[]
 
-  // ── Tunable parameters (live-editable via debug panel) ───────────────────
+  // ── Tunable parameters (live-editable via tuning panel) ──────────────────
   minDwellMs: number
   dwellVarianceMs: number
   fadeOutDuration: number
   fadeInDuration: number
+  /** Minimum silent travel period between wander transitions, in ms. */
+  travelMinMs: number
+  /** Random additional travel time on top of the minimum, in ms. */
+  travelVarianceMs: number
 
   /** Timestamp (Date.now()) when the next wander advance will fire. Null when wander is off. */
   nextAdvanceAt: number | null
@@ -41,6 +45,8 @@ interface PlaybackActions {
   setDwellVarianceMs: (v: number) => void
   setFadeOutDuration: (v: number) => void
   setFadeInDuration: (v: number) => void
+  setTravelMinMs: (v: number) => void
+  setTravelVarianceMs: (v: number) => void
 }
 
 let _audioManager: AudioManager | null = null
@@ -97,6 +103,8 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
   dwellVarianceMs: 20_000,
   fadeOutDuration: 1.5,
   fadeInDuration: 1,
+  travelMinMs: 3_000,
+  travelVarianceMs: 3_000,
 
   // ── Tunable setters ──────────────────────────────────────────────────────
 
@@ -104,6 +112,8 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
   setDwellVarianceMs: (v) => set({ dwellVarianceMs: v }),
   setFadeOutDuration: (v) => set({ fadeOutDuration: v }),
   setFadeInDuration: (v) => set({ fadeInDuration: v }),
+  setTravelMinMs: (v) => set({ travelMinMs: v }),
+  setTravelVarianceMs: (v) => set({ travelVarianceMs: v }),
 
   // ── Actions ──────────────────────────────────────────────────────────────
 
@@ -163,7 +173,7 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
   },
 
   advance: async () => {
-    const { sessionId, graph, currentNode, wanderHistory, fadeOutDuration, fadeInDuration } = get()
+    const { sessionId, graph, currentNode, wanderHistory, fadeOutDuration, fadeInDuration, travelMinMs, travelVarianceMs } = get()
     if (!sessionId || get().transitioning) return
     set({ transitioning: true, nextAdvanceAt: null })
 
@@ -174,11 +184,15 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
 
       if (result.audio_file_path) {
         const url = audioUrl(result.audio_file_path)
+        // Random silent travel period between this transition's tracks.
+        // Teleport intentionally does not use this — teleport stays instant.
+        const silenceDuration = (travelMinMs + Math.random() * travelVarianceMs) / 1000
         await audio.transitionTo(url, {
           loopStart: nextNode?.loop_start ?? 0,
           loopEnd: nextNode?.loop_end ?? undefined,
           fadeOutDuration,
           fadeInDuration,
+          silenceDuration,
         })
       }
 
