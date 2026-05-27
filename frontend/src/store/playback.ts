@@ -60,6 +60,64 @@ function getAudio(): AudioManager {
   return _audioManager
 }
 
+// ── Persistence: saved defaults for tuning sliders ───────────────────────────
+//
+// All six tuning sliders can be persisted as defaults via the "Save as defaults"
+// button in the Tuning panel. We store them in localStorage under bgmscape:tuning:*
+// keys; on store init we read them back and override the hardcoded defaults
+// when a saved value is present.
+//
+// Per-browser, not per-user — when bgmscape becomes multi-user (Phase 3) this
+// should migrate to a UserPreferences model in the backend. Keys are namespaced
+// to make that migration straightforward.
+
+const TUNING_KEYS = [
+  'minDwellMs',
+  'dwellVarianceMs',
+  'fadeOutDuration',
+  'fadeInDuration',
+  'travelMinMs',
+  'travelVarianceMs',
+] as const
+
+type TuningKey = typeof TUNING_KEYS[number]
+type TuningValues = Partial<Record<TuningKey, number>>
+
+function _storageKey(key: TuningKey): string {
+  return `bgmscape:tuning:${key}`
+}
+
+/** Write all current tuning values to localStorage as the user's new defaults. */
+export function saveDefaults(state: Pick<PlaybackState, TuningKey>): void {
+  if (typeof window === 'undefined' || !window.localStorage) return
+  for (const key of TUNING_KEYS) {
+    try {
+      window.localStorage.setItem(_storageKey(key), JSON.stringify(state[key]))
+    } catch {
+      // Storage may be full or disabled — fail silently per-key.
+    }
+  }
+}
+
+/** Read saved tuning defaults from localStorage. Missing/invalid keys are omitted. */
+export function loadDefaults(): TuningValues {
+  if (typeof window === 'undefined' || !window.localStorage) return {}
+  const result: TuningValues = {}
+  for (const key of TUNING_KEYS) {
+    try {
+      const raw = window.localStorage.getItem(_storageKey(key))
+      if (raw === null) continue
+      const parsed = JSON.parse(raw)
+      if (typeof parsed === 'number' && Number.isFinite(parsed)) {
+        result[key] = parsed
+      }
+    } catch {
+      // Corrupted entry — ignore, fall back to hardcoded default.
+    }
+  }
+  return result
+}
+
 // ── Wander timer ─────────────────────────────────────────────────────────────
 
 let _wanderTimer: ReturnType<typeof setTimeout> | null = null
@@ -87,6 +145,10 @@ function _scheduleWander() {
 
 // ── Store ─────────────────────────────────────────────────────────────────────
 
+// Apply any saved defaults from localStorage on top of the hardcoded defaults.
+// Saved values win when present; otherwise the hardcoded defaults are used.
+const _savedDefaults = loadDefaults()
+
 export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) => ({
   // ── State ────────────────────────────────────────────────────────────────
   sessionId: null,
@@ -105,6 +167,9 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
   fadeInDuration: 1,
   travelMinMs: 3_000,
   travelVarianceMs: 3_000,
+
+  // Saved defaults from localStorage override the hardcoded values above where present
+  ..._savedDefaults,
 
   // ── Tunable setters ──────────────────────────────────────────────────────
 
