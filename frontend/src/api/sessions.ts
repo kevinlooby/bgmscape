@@ -1,5 +1,5 @@
 import client from './client'
-import type { PlaybackSession, AdvanceResponse } from '../types'
+import type { PlaybackSession, AdvanceResponse, LookaheadResponse } from '../types'
 
 export const createSession = (
   graph_id: string,
@@ -24,3 +24,9 @@ export const teleportSession = (
   node_id: string
 ): Promise<PlaybackSession> =>
   client.post(`/api/sessions/${sessionId}/teleport`, { node_id }).then(r => r.data)
+
+export const lookaheadSession = (
+  sessionId: string,
+  steps = 10,
+): Promise<LookaheadResponse> =>
+  client.post(`/api/sessions/${sessionId}/lookahead`, null, { params: { steps } }).then(r => r.data)
