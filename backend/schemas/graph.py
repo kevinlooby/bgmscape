@@ -15,6 +15,7 @@ class NodeBase(BaseModel):
     loop_start: Optional[float] = None
     loop_end: Optional[float] = None
     is_transition: bool = False
+    ambient_tags: list[str] = []
 
 
 class NodeCreate(NodeBase):
@@ -30,6 +31,7 @@ class NodeUpdate(BaseModel):
     loop_start: Optional[float] = None
     loop_end: Optional[float] = None
     is_transition: Optional[bool] = None
+    ambient_tags: Optional[list[str]] = None
 
 
 class NodeSchema(NodeBase):
@@ -148,6 +150,7 @@ class NodeExport(BaseModel):
     loop_start: Optional[float] = None
     loop_end: Optional[float] = None
     is_transition: bool = False
+    ambient_tags: list[str] = []
 
 
 class EdgeExport(BaseModel):

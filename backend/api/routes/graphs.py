@@ -122,6 +122,7 @@ def export_graph(graph_id: str, db: Session = Depends(get_db)):
             loop_start=n.loop_start,
             loop_end=n.loop_end,
             is_transition=n.is_transition,
+            ambient_tags=list(n.ambient_tags or []),
         )
         for n in graph.nodes
     ]
@@ -219,6 +220,7 @@ def import_graph(payload: GraphExport, db: Session = Depends(get_db)):
             loop_start=n.loop_start,
             loop_end=n.loop_end,
             is_transition=n.is_transition,
+            ambient_tags=list(n.ambient_tags or []),
         )
         db.add(node)
 

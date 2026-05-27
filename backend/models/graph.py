@@ -69,6 +69,10 @@ class Node(Base):
     # that aren't meant to loop. See the wander engine in
     # frontend/src/store/playback.ts (_scheduleWander) for the dwell logic.
     is_transition: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False, server_default="0")
+    # Free-form tag list matched against AmbientAsset.tags by the ambient
+    # engine to pick which atmospheric sounds (wind, water, fauna, …) play
+    # while the listener is at this node.
+    ambient_tags: Mapped[list[str]] = mapped_column(JSON, default=list, nullable=False)
 
     graph: Mapped[Graph] = relationship("Graph", back_populates="nodes", foreign_keys=[graph_id])
 
