@@ -110,18 +110,26 @@ export class AudioManager {
   }
 
   /**
-   * Fade the current track to silence, then fade in the next track.
-   * Loading the next track overlaps the fade-out for minimal dead air.
+   * Fade the current track to silence, optionally wait for a silent "travel"
+   * period, then fade in the next track. Loading the next track overlaps the
+   * fade-out (and the silence period) so audio is ready when the silence ends.
    */
   async transitionTo(
     url: string,
-    options: { fadeOutDuration?: number; fadeInDuration?: number; loopStart?: number; loopEnd?: number } = {}
+    options: { fadeOutDuration?: number; fadeInDuration?: number; silenceDuration?: number; loopStart?: number; loopEnd?: number } = {}
   ): Promise<void> {
-    const { fadeOutDuration = DEFAULT_FADE_OUT_DURATION, fadeInDuration = DEFAULT_FADE_IN_DURATION, loopStart = 0, loopEnd } = options
+    const { fadeOutDuration = DEFAULT_FADE_OUT_DURATION, fadeInDuration = DEFAULT_FADE_IN_DURATION, silenceDuration = 0, loopStart = 0, loopEnd } = options
 
-    // Load next track in parallel with the fade-out
+    // Load next track in parallel with the fade-out (and the silence period)
     const bufferPromise = this.loadTrack(url)
     await this._teardownCurrent(fadeOutDuration)
+
+    // Optional silent travel period between tracks. Buffer continues loading
+    // in the background during this wait.
+    if (silenceDuration > 0) {
+      await new Promise(resolve => setTimeout(resolve, silenceDuration * 1000))
+    }
+
     const buffer = await bufferPromise
 
     const ctx = this.getContext()
