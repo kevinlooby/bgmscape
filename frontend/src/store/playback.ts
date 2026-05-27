@@ -17,7 +17,12 @@ interface PlaybackState {
   wanderHistory: string[]
 
   // ── Tunable parameters (live-editable via tuning panel) ──────────────────
-  minDwellMs: number
+  //
+  // Dwell minimum is implicit: every track plays at least once end-to-end.
+  // _scheduleWander() uses the current track's duration (from the AudioManager
+  // buffer cache) as the floor, then adds random(0, dwellVarianceMs) on top.
+  // For nodes flagged is_transition, the variance is also skipped — the track
+  // plays once and then advance() fires.
   dwellVarianceMs: number
   fadeOutDuration: number
   fadeInDuration: number
@@ -41,7 +46,6 @@ interface PlaybackActions {
   reset: () => void
 
   // ── Tunable param setters ────────────────────────────────────────────────
-  setMinDwellMs: (v: number) => void
   setDwellVarianceMs: (v: number) => void
   setFadeOutDuration: (v: number) => void
   setFadeInDuration: (v: number) => void
@@ -72,7 +76,6 @@ function getAudio(): AudioManager {
 // to make that migration straightforward.
 
 const TUNING_KEYS = [
-  'minDwellMs',
   'dwellVarianceMs',
   'fadeOutDuration',
   'fadeInDuration',
@@ -130,9 +133,28 @@ function cancelWanderTimer() {
 }
 
 // Uses Zustand's static API so it can be called from module scope and setTimeout callbacks.
+//
+// Dwell is sized to the actual track length: we look up the current track's
+// duration from the AudioManager buffer cache (it's always populated by the
+// time we get here — startSession/advance/teleportTo each await play/transitionTo
+// which await loadTrack). For regular nodes we add random(0, dwellVarianceMs)
+// on top so timing isn't perfectly predictable. For transition nodes we use
+// the duration exactly — the track plays once and then we advance, no variance.
+//
+// Fallback: if the duration is somehow unknown (cache miss after a buffer was
+// evicted, or a future code path that schedules wander before the buffer
+// resolves), use 30s so the timer neither fires instantly nor stalls forever.
+const DWELL_FALLBACK_MS = 30_000
+
 function _scheduleWander() {
-  const { minDwellMs, dwellVarianceMs } = usePlayback.getState()
-  const dwell = minDwellMs + Math.random() * dwellVarianceMs
+  const { currentNode, dwellVarianceMs } = usePlayback.getState()
+  const url = currentNode?.audio_file_path ? audioUrl(currentNode.audio_file_path) : null
+  const durationSec = url ? getAudio().getDuration(url) : null
+  const baseMs = durationSec != null ? durationSec * 1000 : DWELL_FALLBACK_MS
+  const dwell = currentNode?.is_transition
+    ? baseMs
+    : baseMs + Math.random() * dwellVarianceMs
+
   const firesAt = Date.now() + dwell
   usePlayback.setState({ nextAdvanceAt: firesAt })
   _wanderTimer = setTimeout(async () => {
@@ -161,7 +183,6 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
   wanderHistory: [],
   nextAdvanceAt: null,
 
-  minDwellMs: 30_000,
   dwellVarianceMs: 20_000,
   fadeOutDuration: 1.5,
   fadeInDuration: 1,
@@ -173,7 +194,6 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
 
   // ── Tunable setters ──────────────────────────────────────────────────────
 
-  setMinDwellMs: (v) => set({ minDwellMs: v }),
   setDwellVarianceMs: (v) => set({ dwellVarianceMs: v }),
   setFadeOutDuration: (v) => set({ fadeOutDuration: v }),
   setFadeInDuration: (v) => set({ fadeInDuration: v }),
@@ -230,6 +250,7 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
         loopStart: startNode.loop_start ?? 0,
         loopEnd: startNode.loop_end ?? undefined,
         fadeInDuration,
+        loop: !startNode.is_transition,
       })
     }
 
@@ -269,6 +290,7 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
           fadeOutDuration,
           fadeInDuration,
           silenceDuration,
+          loop: !nextNode?.is_transition,
         })
       }
 
@@ -344,6 +366,7 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
             loopStart: targetNode.loop_start ?? 0,
             loopEnd: targetNode.loop_end ?? undefined,
             fadeInDuration,
+            loop: !targetNode.is_transition,
           })
         }
       }

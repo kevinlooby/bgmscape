@@ -39,6 +39,7 @@ def startup():
     _ensure_columns("nodes", {
         "loop_start": "REAL",
         "loop_end": "REAL",
+        "is_transition": "BOOLEAN NOT NULL DEFAULT 0",
     })
     _ensure_columns("playback_sessions", {
         "lookahead_queue": "JSON",

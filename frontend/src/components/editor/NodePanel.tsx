@@ -194,6 +194,24 @@ export default function NodePanel({ node }: Props) {
         />
       </div>
 
+      {/* ── Transition / play-once flag ───────────────────────────────────── */}
+      <div style={s.section}>
+        <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, cursor: 'pointer', fontFamily: 'monospace' }}>
+          <input
+            type="checkbox"
+            checked={node.is_transition}
+            onChange={e => save({ is_transition: e.target.checked })}
+            style={{ marginTop: 2, accentColor: '#4a90d9' }}
+          />
+          <span>
+            <div style={{ color: '#e8f0fe', fontSize: 12 }}>Plays once (transition)</div>
+            <div style={{ color: '#8a9bb0', fontSize: 10, marginTop: 2, lineHeight: 1.4 }}>
+              Track plays once at full length, then moves to the next node. Ignores dwell variance.
+            </div>
+          </span>
+        </label>
+      </div>
+
       {/* ── Loop points ───────────────────────────────────────────────────── */}
       <div style={s.section}>
         <label style={s.label}>Loop points (seconds)</label>
