@@ -63,19 +63,29 @@ export class AudioManager {
     return this.bufferCache.has(url)
   }
 
+  /**
+   * Duration in seconds of a cached buffer, or null if the buffer hasn't been
+   * decoded yet. Used by the wander engine to size dwell time to the actual
+   * track length so a track always plays at least once through.
+   */
+  getDuration(url: string): number | null {
+    return this.bufferCache.get(url)?.duration ?? null
+  }
+
   // ── Playback helpers ─────────────────────────────────────────────────────
 
-  private createLoopingSource(
+  private createSource(
     buffer: AudioBuffer,
-    loopStart = 0,
-    loopEnd?: number
+    options: { loop: boolean; loopStart: number; loopEnd?: number }
   ): AudioBufferSourceNode {
     const ctx = this.getContext()
     const source = ctx.createBufferSource()
     source.buffer = buffer
-    source.loop = true
-    source.loopStart = loopStart
-    source.loopEnd = loopEnd ?? buffer.duration
+    source.loop = options.loop
+    if (options.loop) {
+      source.loopStart = options.loopStart
+      source.loopEnd = options.loopEnd ?? buffer.duration
+    }
     return source
   }
 
@@ -87,9 +97,9 @@ export class AudioManager {
    */
   async play(
     url: string,
-    options: { loopStart?: number; loopEnd?: number; fadeInDuration?: number } = {}
+    options: { loopStart?: number; loopEnd?: number; fadeInDuration?: number; loop?: boolean } = {}
   ): Promise<void> {
-    const { loopStart = 0, loopEnd, fadeInDuration = DEFAULT_FADE_IN_DURATION } = options
+    const { loopStart = 0, loopEnd, fadeInDuration = DEFAULT_FADE_IN_DURATION, loop = true } = options
     const ctx = this.getContext()
     const buffer = await this.loadTrack(url)
 
@@ -101,7 +111,7 @@ export class AudioManager {
     gain.gain.linearRampToValueAtTime(1, ctx.currentTime + fadeInDuration)
     gain.connect(this.getMasterGain())
 
-    const source = this.createLoopingSource(buffer, loopStart, loopEnd)
+    const source = this.createSource(buffer, { loop, loopStart, loopEnd })
     source.connect(gain)
     source.start()
 
@@ -116,9 +126,9 @@ export class AudioManager {
    */
   async transitionTo(
     url: string,
-    options: { fadeOutDuration?: number; fadeInDuration?: number; silenceDuration?: number; loopStart?: number; loopEnd?: number } = {}
+    options: { fadeOutDuration?: number; fadeInDuration?: number; silenceDuration?: number; loopStart?: number; loopEnd?: number; loop?: boolean } = {}
   ): Promise<void> {
-    const { fadeOutDuration = DEFAULT_FADE_OUT_DURATION, fadeInDuration = DEFAULT_FADE_IN_DURATION, silenceDuration = 0, loopStart = 0, loopEnd } = options
+    const { fadeOutDuration = DEFAULT_FADE_OUT_DURATION, fadeInDuration = DEFAULT_FADE_IN_DURATION, silenceDuration = 0, loopStart = 0, loopEnd, loop = true } = options
 
     // Load next track in parallel with the fade-out (and the silence period)
     const bufferPromise = this.loadTrack(url)
@@ -138,7 +148,7 @@ export class AudioManager {
     inGain.gain.linearRampToValueAtTime(1, ctx.currentTime + fadeInDuration)
     inGain.connect(this.getMasterGain())
 
-    const inSource = this.createLoopingSource(buffer, loopStart, loopEnd)
+    const inSource = this.createSource(buffer, { loop, loopStart, loopEnd })
     inSource.connect(inGain)
     inSource.start()
 

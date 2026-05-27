@@ -6,14 +6,21 @@ const MONO = 'monospace'
 // ── Countdown bar ─────────────────────────────────────────────────────────────
 
 function CountdownBar() {
-  const { nextAdvanceAt, wanderActive, transitioning, minDwellMs, dwellVarianceMs } = usePlayback()
+  const { nextAdvanceAt, wanderActive, transitioning } = usePlayback()
   const [secsLeft, setSecsLeft] = useState<number | null>(null)
+  // We don't know the original full dwell budget from the store alone (dwell is
+  // now trackDuration + variance, computed per-node). We pin it on first tick
+  // after nextAdvanceAt changes so the bar fills correctly from full → empty.
+  const [totalSecs, setTotalSecs] = useState<number | null>(null)
 
   useEffect(() => {
     if (!wanderActive || !nextAdvanceAt) {
       setSecsLeft(null)
+      setTotalSecs(null)
       return
     }
+    // Capture the total budget for this dwell once.
+    setTotalSecs(Math.max(1, Math.ceil((nextAdvanceAt - Date.now()) / 1000)))
     const tick = () => {
       setSecsLeft(Math.max(0, Math.ceil((nextAdvanceAt - Date.now()) / 1000)))
     }
@@ -24,13 +31,7 @@ function CountdownBar() {
 
   if (!wanderActive || secsLeft === null || transitioning) return null
 
-  const totalMs = minDwellMs + dwellVarianceMs / 2
-  const totalSecs = Math.round(totalMs / 1000)
-  const progress = Math.max(0, Math.min(1, secsLeft / totalSecs))
-
-  const minSecs = Math.round(minDwellMs / 1000)
-  const maxSecs = Math.round((minDwellMs + dwellVarianceMs) / 1000)
-
+  const progress = totalSecs ? Math.max(0, Math.min(1, secsLeft / totalSecs)) : 0
   // Bar fills as time runs out (inverse of progress)
   const filledWidth = Math.round((1 - progress) * 100)
 
@@ -54,9 +55,6 @@ function CountdownBar() {
           borderRadius: 2,
           transition: 'width 0.5s linear, background 0.3s',
         }} />
-      </div>
-      <div style={{ fontSize: 10, color: '#2d4a6e', marginTop: 4 }}>
-        range: {minSecs}s – {maxSecs}s
       </div>
     </div>
   )
@@ -102,17 +100,12 @@ export default function DebugPanel() {
   const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const {
-    minDwellMs, dwellVarianceMs, fadeOutDuration, fadeInDuration,
+    dwellVarianceMs, fadeOutDuration, fadeInDuration,
     travelMinMs, travelVarianceMs,
-    setMinDwellMs, setDwellVarianceMs, setFadeOutDuration, setFadeInDuration,
+    setDwellVarianceMs, setFadeOutDuration, setFadeInDuration,
     setTravelMinMs, setTravelVarianceMs,
     wanderActive,
   } = usePlayback()
-
-  const minSecs = Math.round(minDwellMs / 1000)
-  const varSecs = Math.round(dwellVarianceMs / 1000)
-  const rangeLo = minSecs
-  const rangeHi = minSecs + varSecs
 
   const travelMinSecs = travelMinMs / 1000
   const travelVarSecs = travelVarianceMs / 1000
@@ -126,7 +119,7 @@ export default function DebugPanel() {
 
   const handleSaveDefaults = () => {
     saveDefaults({
-      minDwellMs, dwellVarianceMs, fadeOutDuration, fadeInDuration,
+      dwellVarianceMs, fadeOutDuration, fadeInDuration,
       travelMinMs, travelVarianceMs,
     })
     setSavedFlash(true)
@@ -163,23 +156,15 @@ export default function DebugPanel() {
               Wander Timing
             </div>
             <SliderRow
-              label="Min dwell"
-              tooltip="Minimum time spent at each location before wander moves on. Actual dwell = min + random variance."
-              value={minDwellMs / 1000}
-              min={5} max={300} step={5}
-              format={v => `${v}s`}
-              onChange={v => setMinDwellMs(v * 1000)}
-            />
-            <SliderRow
               label="Variance"
-              tooltip="Random extra time added to each dwell. Prevents wander feeling mechanical. Set to 0 for a fixed interval."
+              tooltip="Random extra time added on top of the track's full length. Each node plays at least once through; variance is added to keep timing from feeling mechanical. Transition nodes ignore this."
               value={dwellVarianceMs / 1000}
               min={0} max={120} step={5}
               format={v => `${v}s`}
               onChange={v => setDwellVarianceMs(v * 1000)}
             />
             <div style={{ fontSize: 10, color: '#2d4a6e', marginTop: 2 }}>
-              → range: {rangeLo}s – {rangeHi}s
+              dwell = track length + 0–{Math.round(dwellVarianceMs / 1000)}s
             </div>
           </div>
 

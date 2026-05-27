@@ -23,13 +23,16 @@ The app models a game world as a graph. Each node is a location with a looping a
 
 ### Playback
 - While at a node, the track loops seamlessly (end-to-start initially; auto loop-point detection later)
-- Transitions trigger at natural phrase boundaries where possible, otherwise after a minimum dwell time
+- Dwell at a node is **at least one full play-through of the track**. The wander engine reads the decoded `AudioBuffer.duration` and uses it as the floor; a configurable `dwellVarianceMs` slider adds random extra time on top.
+- Nodes flagged `is_transition` play their track exactly once (`loop = false`) with no variance — used for short directional cues that aren't meant to loop. Toggled per node in the editor.
+- Transitions trigger at natural phrase boundaries where possible, otherwise after the dwell window
 - All transitions are purely crossfade or fade-to-silence / fade-in — no interstitial audio
 
 ### Auto-Wander (primary feature)
 The app traverses the graph autonomously. Navigation is governed by:
 - **Edge weights**: some connections are more likely than others; hub nodes get higher inbound weight; recency weighting reduces ping-ponging between two nodes
-- **Stay probability**: per-node chance of looping the current track again before moving, simulating a player lingering in an area
+- **Track-length dwell**: a node plays at least one full pass of its track before the wander engine considers a transition; variance is added on top so timing isn't perfectly predictable
+- **Transition nodes**: nodes flagged `is_transition` play their track exactly once and then move on, ignoring the variance — used for short directional cues
 - **Manual steering**: while wandering, the user can nominate the next destination (takes effect at the next transition) without interrupting the current track
 - **Teleport**: jump to any node in the graph immediately, triggering a transition from the current track
 
@@ -42,7 +45,7 @@ The app traverses the graph autonomously. Navigation is governed by:
 ### Map Editor (separate from listener)
 - **Diagram view**: drag-and-drop node/edge canvas
 - **Form view**: list-based editing of nodes and edges
-- Per node: location name, audio file, stay probability
+- Per node: location name, audio file, loop points, transition flag
 - Per edge: source, target, traversal weight, bidirectional flag
 - Region/zone grouping on nodes (future: used for visual clustering and wander arc shaping)
 
@@ -55,7 +58,7 @@ The app traverses the graph autonomously. Navigation is governed by:
 - Graph data model (nodes, edges, weights, stay probabilities)
 - Audio upload and local file management
 - End-to-start track looping with crossfade transitions
-- Auto-wander engine with weighted edge traversal and stay probability
+- Auto-wander engine with weighted edge traversal and recency penalty
 - Manual steer and teleport controls
 - Map editor (diagram + form view)
 - Minimal now-playing listener UI
@@ -117,6 +120,7 @@ Node
   region (nullable)
   canvas_x, canvas_y                  (position in diagram editor)
   loop_start, loop_end (nullable)     (seconds; manually set or auto-detected)
+  is_transition (bool, default false) (true = play once, no looping, no variance)
 
 Edge
   id, graph_id, source_node_id, target_node_id
@@ -129,7 +133,7 @@ PlaybackSession
   created_at, updated_at
 ```
 
-Per-node stay probability is not currently a data field — dwell time and variance live as listener-side tuning parameters (see `frontend/src/store/playback.ts`).
+Dwell time is fully client-side and tied to track length (see `frontend/src/store/playback.ts::_scheduleWander`). The per-node `is_transition` flag controls whether the track loops or plays once.
 
 Audio storage is keyed by game: `./audio_files/{game_id}/{filename}`. Nodes in any graph for that game reference paths of the form `"{game_id}/{filename}"`. When the wander engine moves between two nodes that share an `audio_file_path`, the crossfade is skipped and the same source keeps looping — locations sharing one OST track (e.g. SM64 castle hubs all playing *Inside the Castle Walls*) feel like one continuous space.
 
@@ -137,14 +141,18 @@ Audio storage is keyed by game: `./audio_files/{game_id}/{filename}`. Nodes in a
 
 ## Wander Engine (behavior spec)
 
-At each transition decision:
-1. Roll against the current node's `stay_probability` — if hit, loop the current track and re-evaluate later
-2. Collect outgoing edges; compute effective weight for each:
+Dwell time at each node (computed client-side in `frontend/src/store/playback.ts`):
+- Base dwell = duration of the current track (read from `AudioBuffer.duration` via `AudioManager.getDuration()`)
+- If `is_transition`: total dwell = base, no variance, audio source loaded with `loop = false`
+- Otherwise: total dwell = base + `random(0, dwellVarianceMs)`, audio source loops
+
+At each transition decision (backend `services/wander.py`):
+1. Collect outgoing edges; compute effective weight for each:
    - Base edge weight
    - Recency penalty: divide by (times traversed recently + 1) to suppress back-and-forth
-3. Sample next node from weighted distribution
-4. If user has nominated a next destination via steer, use that instead and clear the nomination
-5. Initiate crossfade transition; update session history
+2. Sample next node from weighted distribution
+3. If user has nominated a next destination via steer, use that instead and clear the nomination
+4. Initiate crossfade transition; update session history
 
 ---
 

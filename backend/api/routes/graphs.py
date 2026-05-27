@@ -121,6 +121,7 @@ def export_graph(graph_id: str, db: Session = Depends(get_db)):
             canvas_y=n.canvas_y,
             loop_start=n.loop_start,
             loop_end=n.loop_end,
+            is_transition=n.is_transition,
         )
         for n in graph.nodes
     ]
@@ -217,6 +218,7 @@ def import_graph(payload: GraphExport, db: Session = Depends(get_db)):
             canvas_y=n.canvas_y,
             loop_start=n.loop_start,
             loop_end=n.loop_end,
+            is_transition=n.is_transition,
         )
         db.add(node)
 

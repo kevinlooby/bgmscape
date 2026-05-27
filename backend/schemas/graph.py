@@ -14,6 +14,7 @@ class NodeBase(BaseModel):
     canvas_y: float = 0.0
     loop_start: Optional[float] = None
     loop_end: Optional[float] = None
+    is_transition: bool = False
 
 
 class NodeCreate(NodeBase):
@@ -28,6 +29,7 @@ class NodeUpdate(BaseModel):
     canvas_y: Optional[float] = None
     loop_start: Optional[float] = None
     loop_end: Optional[float] = None
+    is_transition: Optional[bool] = None
 
 
 class NodeSchema(NodeBase):
@@ -145,6 +147,7 @@ class NodeExport(BaseModel):
     canvas_y: float
     loop_start: Optional[float] = None
     loop_end: Optional[float] = None
+    is_transition: bool = False
 
 
 class EdgeExport(BaseModel):

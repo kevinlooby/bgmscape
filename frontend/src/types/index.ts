@@ -8,6 +8,12 @@ export interface Node {
   canvas_y: number
   loop_start: number | null
   loop_end: number | null
+  /**
+   * When true, the node's track plays exactly once (no looping) and the wander
+   * timer fires at trackDuration with no variance added. Used for short
+   * directional cues that aren't meant to loop.
+   */
+  is_transition: boolean
 }
 
 export interface Edge {
@@ -119,6 +125,7 @@ export interface GraphExport {
     canvas_y: number
     loop_start: number | null
     loop_end: number | null
+    is_transition?: boolean
   }>
   edges: Array<{
     id: string

@@ -64,6 +64,11 @@ class Node(Base):
     # Loop points in seconds (set manually or via auto-detection)
     loop_start: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     loop_end: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    # Transition nodes play their track exactly once (no looping) and then
+    # advance immediately to the next node — used for short directional cues
+    # that aren't meant to loop. See the wander engine in
+    # frontend/src/store/playback.ts (_scheduleWander) for the dwell logic.
+    is_transition: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False, server_default="0")
 
     graph: Mapped[Graph] = relationship("Graph", back_populates="nodes", foreign_keys=[graph_id])
 
