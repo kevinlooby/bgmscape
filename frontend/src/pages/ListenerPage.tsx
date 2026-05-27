@@ -5,6 +5,7 @@ import * as gamesApi from '../api/games'
 import DebugPanel from '../components/listener/DebugPanel'
 import ListenerGraphView from '../components/listener/ListenerGraphView'
 import LookaheadQueue from '../components/listener/LookaheadQueue'
+import ActiveAmbientLayers from '../components/listener/ActiveAmbientLayers'
 import type { Game, Node } from '../types'
 
 const MONO = 'monospace'
@@ -265,8 +266,14 @@ export default function ListenerPage() {
             </div>
           )}
 
-          <div style={{ fontSize: 11, color: '#4a6a8a', marginBottom: 14 }}>
+          <div style={{ fontSize: 11, color: '#4a6a8a', marginBottom: 10 }}>
             {audioFileName ? `♪  ${audioFileName}` : 'No audio assigned to this node'}
+          </div>
+
+          {/* Always-visible active ambient layers — renders nothing if no
+              ambient is playing, so it stays unobtrusive otherwise. */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
+            <ActiveAmbientLayers />
           </div>
 
           {/* Status badges */}

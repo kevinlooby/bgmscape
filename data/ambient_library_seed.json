@@ -1,0 +1,109 @@
+{
+  "_doc": "Starter ambient library seed. Audio files referenced here must be downloaded separately and placed in the directory passed to scripts/load_ambient.py via --audio-dir. Suggested sources: Pixabay (royalty-free), Acoustic Nature (CC seamless loops), freesound.org filtered to CC0. License field should reflect the source.",
+  "assets": [
+    {
+      "name": "wind-light-meadow",
+      "file": "wind-light-meadow.mp3",
+      "category": "wind",
+      "tags": ["field", "day", "dawn", "dusk"],
+      "default_volume": 0.4,
+      "play_probability": 1.0,
+      "min_play_duration_s": 45,
+      "max_play_duration_s": 120,
+      "fade_in_ms": 2500,
+      "fade_out_ms": 3500,
+      "license": "Pixabay"
+    },
+    {
+      "name": "wind-mountain-gust",
+      "file": "wind-mountain-gust.mp3",
+      "category": "wind",
+      "tags": ["mountain", "cave", "day"],
+      "default_volume": 0.45,
+      "play_probability": 0.9,
+      "min_play_duration_s": 30,
+      "max_play_duration_s": 90,
+      "fade_in_ms": 2000,
+      "fade_out_ms": 3000,
+      "license": "Acoustic Nature"
+    },
+    {
+      "name": "water-river-shallow",
+      "file": "water-river-shallow.mp3",
+      "category": "water",
+      "tags": ["river", "forest", "day", "night"],
+      "default_volume": 0.35,
+      "play_probability": 1.0,
+      "min_play_duration_s": 60,
+      "max_play_duration_s": 180,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "Pixabay"
+    },
+    {
+      "name": "fauna-birds-morning",
+      "file": "fauna-birds-morning.mp3",
+      "category": "fauna",
+      "tags": ["field", "forest", "dawn", "day"],
+      "default_volume": 0.3,
+      "play_probability": 0.7,
+      "min_play_duration_s": 30,
+      "max_play_duration_s": 90,
+      "fade_in_ms": 2500,
+      "fade_out_ms": 3500,
+      "license": "freesound.org (CC0)"
+    },
+    {
+      "name": "fauna-crickets-night",
+      "file": "fauna-crickets-night.mp3",
+      "category": "fauna",
+      "tags": ["field", "forest", "night", "dusk"],
+      "default_volume": 0.3,
+      "play_probability": 0.8,
+      "min_play_duration_s": 60,
+      "max_play_duration_s": 180,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "freesound.org (CC0)"
+    },
+    {
+      "name": "fire-campfire-loop",
+      "file": "fire-campfire-loop.mp3",
+      "category": "fire",
+      "tags": ["indoor", "night", "dungeon", "cave"],
+      "default_volume": 0.4,
+      "play_probability": 1.0,
+      "min_play_duration_s": 45,
+      "max_play_duration_s": 120,
+      "fade_in_ms": 2000,
+      "fade_out_ms": 3000,
+      "license": "Pixabay"
+    },
+    {
+      "name": "weather-rain-light",
+      "file": "weather-rain-light.mp3",
+      "category": "weather",
+      "tags": ["rain", "field", "forest", "urban"],
+      "default_volume": 0.5,
+      "play_probability": 1.0,
+      "min_play_duration_s": 60,
+      "max_play_duration_s": 180,
+      "fade_in_ms": 4000,
+      "fade_out_ms": 5000,
+      "license": "Cymatics Life Ambient (free)"
+    },
+    {
+      "name": "crowd-village-distant",
+      "file": "crowd-village-distant.mp3",
+      "category": "crowd",
+      "tags": ["urban", "day"],
+      "default_volume": 0.3,
+      "play_probability": 0.85,
+      "min_play_duration_s": 45,
+      "max_play_duration_s": 120,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "freesound.org (CC0)"
+    }
+  ]
+}

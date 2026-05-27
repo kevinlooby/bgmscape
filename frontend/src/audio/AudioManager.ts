@@ -69,6 +69,17 @@ export class AudioManager {
   }
 
   /**
+   * Return the AudioContext and masterGain for engines that mix alongside the
+   * music chain (e.g. the AmbientEngine). Returns null until resume() has
+   * created the context. Used to attach a sibling bus so ambient audio runs
+   * through the same master output as music but with an independent gain.
+   */
+  getEngineHandles(): { context: AudioContext; masterGain: GainNode } | null {
+    if (!this.context || !this.masterGain) return null
+    return { context: this.context, masterGain: this.masterGain }
+  }
+
+  /**
    * Duration in seconds of a cached buffer, or null if the buffer hasn't been
    * decoded yet. Used by the wander engine to size dwell time to the actual
    * track length so a track always plays at least once through.

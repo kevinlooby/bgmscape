@@ -101,9 +101,9 @@ export default function DebugPanel() {
 
   const {
     dwellVarianceMs, fadeOutDuration, fadeInDuration,
-    travelMinMs, travelVarianceMs,
+    travelMinMs, travelVarianceMs, ambientBusVolume,
     setDwellVarianceMs, setFadeOutDuration, setFadeInDuration,
-    setTravelMinMs, setTravelVarianceMs,
+    setTravelMinMs, setTravelVarianceMs, setAmbientBusVolume,
     wanderActive,
   } = usePlayback()
 
@@ -120,7 +120,7 @@ export default function DebugPanel() {
   const handleSaveDefaults = () => {
     saveDefaults({
       dwellVarianceMs, fadeOutDuration, fadeInDuration,
-      travelMinMs, travelVarianceMs,
+      travelMinMs, travelVarianceMs, ambientBusVolume,
     })
     setSavedFlash(true)
     if (savedTimerRef.current) clearTimeout(savedTimerRef.current)
@@ -215,6 +215,21 @@ export default function DebugPanel() {
             <div style={{ fontSize: 10, color: '#2d4a6e', marginTop: 2 }}>
               → range: {travelRangeLo.toFixed(1)}s – {travelRangeHi.toFixed(1)}s
             </div>
+          </div>
+
+          {/* Ambient layer sliders */}
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 10, color: '#4a6a8a', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 }}>
+              Ambient layer
+            </div>
+            <SliderRow
+              label="Volume"
+              tooltip="Master volume for the ambient/atmospheric layer (wind, water, fauna, …). Multiplicative with the overall master volume."
+              value={ambientBusVolume}
+              min={0} max={1} step={0.05}
+              format={v => v.toFixed(2)}
+              onChange={setAmbientBusVolume}
+            />
           </div>
 
           {/* Save as defaults — directly beneath the sliders */}
