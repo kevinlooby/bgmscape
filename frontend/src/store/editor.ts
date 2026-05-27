@@ -1,9 +1,13 @@
 import { create } from 'zustand'
 import * as graphsApi from '../api/graphs'
+import * as gamesApi from '../api/games'
 import { uploadAudio } from '../api/audio'
-import type { Graph, GraphListItem, Node } from '../types'
+import type { Game, Graph, GraphListItem, Node } from '../types'
 
 interface EditorState {
+  /** The game we're scoped to. All graph operations happen within this game. */
+  game: Game | null
+  /** Graphs belonging to the current game. */
   graphs: GraphListItem[]
   activeGraphId: string | null
   graph: Graph | null
@@ -14,14 +18,17 @@ interface EditorState {
 }
 
 interface EditorActions {
-  // Graph list
-  loadGraphList: () => Promise<void>
+  /** Load a game by slug and its graphs. Auto-selects the default graph (or first available). */
+  loadGameBySlug: (slug: string) => Promise<void>
+  /** Reload the current game (after creating/deleting graphs or changing the default). */
+  reloadGame: () => Promise<void>
 
   // Active graph
   loadGraph: (graphId: string) => Promise<void>
-  createGraph: (name: string, gameTitle: string) => Promise<void>
-  updateGraph: (data: { name?: string; game_title?: string }) => Promise<void>
+  createGraph: (name: string) => Promise<void>
+  updateGraph: (data: { name?: string }) => Promise<void>
   deleteActiveGraph: () => Promise<void>
+  setActiveAsDefault: () => Promise<void>
 
   // Nodes
   createNode: (data: Partial<Node> & { name: string }) => Promise<Node | null>
@@ -43,6 +50,7 @@ interface EditorActions {
 }
 
 export const useEditor = create<EditorState & EditorActions>((set, get) => ({
+  game: null,
   graphs: [],
   activeGraphId: null,
   graph: null,
@@ -51,11 +59,29 @@ export const useEditor = create<EditorState & EditorActions>((set, get) => ({
   saving: false,
   error: null,
 
-  // ── Graph list ──────────────────────────────────────────────────────────
+  // ── Game scope ──────────────────────────────────────────────────────────
 
-  loadGraphList: async () => {
-    const graphs = await graphsApi.listGraphs()
-    set({ graphs })
+  loadGameBySlug: async (slug) => {
+    const game = await gamesApi.getGameBySlug(slug)
+    const graphsList = await graphsApi.listGraphs(game.id)
+    set({ game, graphs: graphsList })
+
+    // Auto-select the default graph, or the first graph if none is set.
+    const targetId = game.default_graph_id ?? graphsList[0]?.id ?? null
+    if (targetId) {
+      const full = await graphsApi.getGraph(targetId)
+      set({ graph: full, activeGraphId: targetId, selectedNodeId: null, selectedEdgeId: null })
+    } else {
+      set({ graph: null, activeGraphId: null })
+    }
+  },
+
+  reloadGame: async () => {
+    const { game } = get()
+    if (!game) return
+    const fresh = await gamesApi.getGame(game.id)
+    const graphsList = await graphsApi.listGraphs(game.id)
+    set({ game: fresh, graphs: graphsList })
   },
 
   // ── Active graph ────────────────────────────────────────────────────────
@@ -65,39 +91,51 @@ export const useEditor = create<EditorState & EditorActions>((set, get) => ({
     set({ graph, activeGraphId: graphId, selectedNodeId: null, selectedEdgeId: null })
   },
 
-  createGraph: async (name, gameTitle) => {
+  createGraph: async (name) => {
+    const { game } = get()
+    if (!game) return
     set({ saving: true })
     try {
-      const created = await graphsApi.createGraph(name, gameTitle)
+      const created = await graphsApi.createGraph(name, game.id)
       const full = await graphsApi.getGraph(created.id)
-      const graphs = await graphsApi.listGraphs()
-      set({ graph: full, activeGraphId: full.id, graphs, selectedNodeId: null, selectedEdgeId: null })
+      const graphsList = await graphsApi.listGraphs(game.id)
+      const fresh = await gamesApi.getGame(game.id)
+      set({ graph: full, activeGraphId: full.id, graphs: graphsList, game: fresh, selectedNodeId: null, selectedEdgeId: null })
     } finally {
       set({ saving: false })
     }
   },
 
   updateGraph: async (data) => {
-    const { activeGraphId, graph } = get()
+    const { activeGraphId, graph, game } = get()
     if (!activeGraphId || !graph) return
     set({ saving: true })
     try {
       const updated = await graphsApi.updateGraph(activeGraphId, data)
       set({ graph: { ...graph, ...updated } })
-      // Refresh list
-      const graphs = await graphsApi.listGraphs()
-      set({ graphs })
+      if (game) {
+        const graphsList = await graphsApi.listGraphs(game.id)
+        set({ graphs: graphsList })
+      }
     } finally {
       set({ saving: false })
     }
   },
 
   deleteActiveGraph: async () => {
-    const { activeGraphId } = get()
-    if (!activeGraphId) return
+    const { activeGraphId, game } = get()
+    if (!activeGraphId || !game) return
     await graphsApi.deleteGraph(activeGraphId)
-    const graphs = await graphsApi.listGraphs()
-    set({ graph: null, activeGraphId: null, graphs, selectedNodeId: null, selectedEdgeId: null })
+    const graphsList = await graphsApi.listGraphs(game.id)
+    const fresh = await gamesApi.getGame(game.id)
+    set({ graph: null, activeGraphId: null, graphs: graphsList, game: fresh, selectedNodeId: null, selectedEdgeId: null })
+  },
+
+  setActiveAsDefault: async () => {
+    const { activeGraphId, game } = get()
+    if (!activeGraphId || !game) return
+    const updated = await gamesApi.setDefaultGraph(game.id, activeGraphId)
+    set({ game: updated })
   },
 
   // ── Nodes ───────────────────────────────────────────────────────────────
@@ -113,7 +151,6 @@ export const useEditor = create<EditorState & EditorActions>((set, get) => ({
   updateNode: async (nodeId, data) => {
     const { graph } = get()
     if (!graph) return
-    // Optimistic update
     set({
       graph: {
         ...graph,
@@ -138,9 +175,9 @@ export const useEditor = create<EditorState & EditorActions>((set, get) => ({
   },
 
   uploadNodeAudio: async (nodeId, file) => {
-    const { graph, activeGraphId } = get()
-    if (!graph || !activeGraphId) return
-    const response = await uploadAudio(activeGraphId, file)
+    const { graph, game } = get()
+    if (!graph || !game) return
+    const response = await uploadAudio(game.id, file)
     await get().updateNode(nodeId, { audio_file_path: response.file_path })
   },
 

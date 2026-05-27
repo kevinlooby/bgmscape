@@ -1,0 +1,40 @@
+{
+  "_instructions": [
+    "Each key is a node name. Each value is the exact filename in your audio directory.",
+    "Run: python scripts/load_audio.py --seed data/sm64_v1.bgmscape.json --map data/sm64_audio_map.json --audio-dir data/sm64_audio",
+    "Many SM64 areas share an OST track — that's intentional. The wander engine skips the crossfade when consecutive nodes have the same audio_file_path."
+  ],
+
+  "Castle Grounds":              "1-07 Inside The Castle Walls.mp3",
+  "Castle Lobby":                "1-07 Inside The Castle Walls.mp3",
+  "Castle Basement":             "1-07 Inside The Castle Walls.mp3",
+  "Castle Upstairs":             "1-07 Inside The Castle Walls.mp3",
+  "Endless Stairs":              "1-08 Looping Steps.mp3",
+
+  "Bob-omb Battlefield":         "1-05 Super Mario 64 Main Theme.mp3",
+  "Whomp's Fortress":            "1-05 Super Mario 64 Main Theme.mp3",
+  "Princess's Secret Slide":     "1-06 Slider.mp3",
+
+  "Jolly Roger Bay":             "1-09 Dire, Dire Docks.mp3",
+  "Cool, Cool Mountain":         "1-11 Snow Mountain.mp3",
+  "Big Boo's Haunt":             "1-12 Haunted House.mp3",
+  "Merry-Go-Round":              "1-13 Merry-Go-Round.mp3",
+  "Tower of the Wing Cap":       "1-16 Powerful Mario.mp3",
+
+  "Hazy Maze Cave":              "1-14 Cave Dungeon.mp3",
+  "Cavern of the Metal Cap":     "1-17 Metallic Mario.mp3",
+  "Lethal Lava Land":            "1-10 Lethal Lava Land.mp3",
+  "Shifting Sand Land":          "1-10 Lethal Lava Land.mp3",
+  "Dire, Dire Docks":            "1-09 Dire, Dire Docks.mp3",
+  "Vanish Cap Under the Moat":   "1-16 Powerful Mario.mp3",
+  "Bowser in the Dark World":    "1-29 Koopa's Road.mp3",
+
+  "Snowman's Land":              "1-11 Snow Mountain.mp3",
+  "Wet-Dry World":               "1-15 Piranha Plant's Lullaby.mp3",
+  "Tall, Tall Mountain":         "1-10 Lethal Lava Land.mp3",
+  "Tiny-Huge Island":            "1-10 Lethal Lava Land.mp3",
+  "Tick Tock Clock":             "1-36 Piranha Plant's Lullaby-Piano.mp3",
+  "Rainbow Ride":                "1-06 Slider.mp3",
+  "Bowser in the Fire Sea":      "1-29 Koopa's Road.mp3",
+  "Bowser in the Sky":           "1-29 Koopa's Road.mp3"
+}

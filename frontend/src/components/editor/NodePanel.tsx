@@ -105,14 +105,14 @@ export default function NodePanel({ node }: Props) {
   const handleAnalyze = async () => {
     if (!node.audio_file_path) return
     const parts = node.audio_file_path.split('/')
-    const graphId = parts[0]
+    const folder = parts[0]
     const filename = parts.slice(1).join('/')
-    if (!graphId || !filename) return
+    if (!folder || !filename) return
 
     setAnalyzing(true)
     setAnalyzeError(null)
     try {
-      const result = await analyzeAudioLoop(graphId, filename)
+      const result = await analyzeAudioLoop(folder, filename)
       // Apply detected values
       setLoopStart(result.loop_start)
       setLoopEnd(result.loop_end)

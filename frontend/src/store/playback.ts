@@ -247,7 +247,18 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
       const result = await sessionsApi.advanceSession(sessionId)
       const nextNode = graph?.nodes.find(n => n.id === result.next_node_id) ?? null
 
-      if (result.audio_file_path) {
+      // Skip the crossfade when the next node shares an audio file with the
+      // current node. This is intentional in graphs that model spatially
+      // distinct locations sharing one OST track (e.g. SM64 castle hubs all
+      // playing "Inside The Castle Walls"). The music keeps looping while
+      // the listener "moves" between same-track locations.
+      const sameAudio = !!(
+        result.audio_file_path &&
+        currentNode?.audio_file_path &&
+        result.audio_file_path === currentNode.audio_file_path
+      )
+
+      if (result.audio_file_path && !sameAudio) {
         const url = audioUrl(result.audio_file_path)
         // Random silent travel period between this transition's tracks.
         // Teleport intentionally does not use this — teleport stays instant.
@@ -315,16 +326,26 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
     const targetNode = graph?.nodes.find(n => n.id === nodeId) ?? null
     if (!targetNode) return
 
+    // Same-audio skip: teleporting to a node that shares the current track is
+    // a pure visual jump — no fade, no reload.
+    const sameAudio = !!(
+      targetNode.audio_file_path &&
+      currentNode?.audio_file_path &&
+      targetNode.audio_file_path === currentNode.audio_file_path
+    )
+
     set({ transitioning: true })
     try {
       await sessionsApi.teleportSession(sessionId, nodeId)
-      await audio.fadeOut()
-      if (targetNode.audio_file_path) {
-        await audio.play(audioUrl(targetNode.audio_file_path), {
-          loopStart: targetNode.loop_start ?? 0,
-          loopEnd: targetNode.loop_end ?? undefined,
-          fadeInDuration,
-        })
+      if (!sameAudio) {
+        await audio.fadeOut()
+        if (targetNode.audio_file_path) {
+          await audio.play(audioUrl(targetNode.audio_file_path), {
+            loopStart: targetNode.loop_start ?? 0,
+            loopEnd: targetNode.loop_end ?? undefined,
+            fadeInDuration,
+          })
+        }
       }
       const prev = currentNode?.id
       const newHistory = prev ? [...wanderHistory.slice(-19), prev] : wanderHistory

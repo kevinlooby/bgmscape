@@ -2,16 +2,16 @@ import client from './client'
 import type { Graph, GraphListItem, GraphExport, Node, Edge } from '../types'
 
 // Graphs
-export const listGraphs = (): Promise<GraphListItem[]> =>
-  client.get('/api/graphs').then(r => r.data)
+export const listGraphs = (gameId?: string): Promise<GraphListItem[]> =>
+  client.get('/api/graphs', { params: gameId ? { game_id: gameId } : undefined }).then(r => r.data)
 
 export const getGraph = (graphId: string): Promise<Graph> =>
   client.get(`/api/graphs/${graphId}`).then(r => r.data)
 
-export const createGraph = (name: string, game_title: string): Promise<Graph> =>
-  client.post('/api/graphs', { name, game_title }).then(r => r.data)
+export const createGraph = (name: string, game_id: string): Promise<Graph> =>
+  client.post('/api/graphs', { name, game_id }).then(r => r.data)
 
-export const updateGraph = (graphId: string, data: { name?: string; game_title?: string }): Promise<Graph> =>
+export const updateGraph = (graphId: string, data: { name?: string }): Promise<Graph> =>
   client.patch(`/api/graphs/${graphId}`, data).then(r => r.data)
 
 export const deleteGraph = (graphId: string): Promise<void> =>

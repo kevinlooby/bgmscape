@@ -1,6 +1,7 @@
 {
   "version": "2",
   "name": "Ocarina of Time v2",
+  "game_slug": "oot",
   "game_title": "The Legend of Zelda: Ocarina of Time",
   "_notes": [
     "node_type: 'location' = looping ambient node; 'transitional' = plays once, no loop, auto-advances",

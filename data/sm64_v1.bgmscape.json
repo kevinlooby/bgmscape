@@ -1,0 +1,83 @@
+{
+  "version": "1",
+  "name": "Super Mario 64 v1",
+  "game_slug": "sm64",
+  "game_title": "Super Mario 64",
+  "_notes": [
+    "Draft starter graph based on the canonical Peach's Castle layout.",
+    "Many courses share an audio track in the original OST — the wander engine skips the crossfade when consecutive nodes share an audio_file_path, so the music continues uninterrupted as Mario moves between same-theme areas.",
+    "Castle hubs (Grounds, Lobby, Basement, Upstairs) all share 'Inside The Castle Walls'.",
+    "Cap stages overlap: Tower of the Wing Cap and Vanish Cap both use 'Powerful Mario'; Metal Cap uses 'Metallic Mario'.",
+    "Bowser stages share 'Koopa's Road'."
+  ],
+  "nodes": [
+    { "id": "n01", "name": "Castle Grounds",            "region": "Castle",   "canvas_x": 320, "canvas_y": 500, "loop_start": null, "loop_end": null },
+    { "id": "n02", "name": "Castle Lobby",              "region": "Castle",   "canvas_x": 320, "canvas_y": 380, "loop_start": null, "loop_end": null },
+    { "id": "n03", "name": "Castle Basement",           "region": "Castle",   "canvas_x": 320, "canvas_y": 600, "loop_start": null, "loop_end": null },
+    { "id": "n04", "name": "Castle Upstairs",           "region": "Castle",   "canvas_x": 320, "canvas_y": 240, "loop_start": null, "loop_end": null },
+    { "id": "n05", "name": "Endless Stairs",            "region": "Castle",   "canvas_x": 320, "canvas_y": 120, "loop_start": null, "loop_end": null },
+
+    { "id": "n06", "name": "Bob-omb Battlefield",       "region": "Lobby Wing",   "canvas_x": 120, "canvas_y": 380, "loop_start": null, "loop_end": null },
+    { "id": "n07", "name": "Whomp's Fortress",          "region": "Lobby Wing",   "canvas_x": 120, "canvas_y": 320, "loop_start": null, "loop_end": null },
+    { "id": "n08", "name": "Princess's Secret Slide",   "region": "Lobby Wing",   "canvas_x": 120, "canvas_y": 460, "loop_start": null, "loop_end": null },
+
+    { "id": "n09", "name": "Jolly Roger Bay",           "region": "Lobby Wing",   "canvas_x": 520, "canvas_y": 380, "loop_start": null, "loop_end": null },
+    { "id": "n10", "name": "Cool, Cool Mountain",       "region": "Lobby Wing",   "canvas_x": 520, "canvas_y": 320, "loop_start": null, "loop_end": null },
+    { "id": "n11", "name": "Big Boo's Haunt",           "region": "Lobby Wing",   "canvas_x": 520, "canvas_y": 440, "loop_start": null, "loop_end": null },
+    { "id": "n12", "name": "Merry-Go-Round",            "region": "Lobby Wing",   "canvas_x": 640, "canvas_y": 440, "loop_start": null, "loop_end": null },
+    { "id": "n13", "name": "Tower of the Wing Cap",     "region": "Lobby Wing",   "canvas_x": 520, "canvas_y": 250, "loop_start": null, "loop_end": null },
+
+    { "id": "n14", "name": "Hazy Maze Cave",            "region": "Basement",     "canvas_x": 120, "canvas_y": 600, "loop_start": null, "loop_end": null },
+    { "id": "n15", "name": "Cavern of the Metal Cap",   "region": "Basement",     "canvas_x":  50, "canvas_y": 660, "loop_start": null, "loop_end": null },
+    { "id": "n16", "name": "Lethal Lava Land",          "region": "Basement",     "canvas_x": 200, "canvas_y": 680, "loop_start": null, "loop_end": null },
+    { "id": "n17", "name": "Shifting Sand Land",        "region": "Basement",     "canvas_x": 320, "canvas_y": 720, "loop_start": null, "loop_end": null },
+    { "id": "n18", "name": "Dire, Dire Docks",          "region": "Basement",     "canvas_x": 440, "canvas_y": 680, "loop_start": null, "loop_end": null },
+    { "id": "n19", "name": "Vanish Cap Under the Moat", "region": "Basement",     "canvas_x": 520, "canvas_y": 600, "loop_start": null, "loop_end": null },
+    { "id": "n20", "name": "Bowser in the Dark World",  "region": "Bowser",       "canvas_x": 640, "canvas_y": 600, "loop_start": null, "loop_end": null },
+
+    { "id": "n21", "name": "Snowman's Land",            "region": "Upstairs",     "canvas_x": 120, "canvas_y": 240, "loop_start": null, "loop_end": null },
+    { "id": "n22", "name": "Wet-Dry World",             "region": "Upstairs",     "canvas_x": 200, "canvas_y": 180, "loop_start": null, "loop_end": null },
+    { "id": "n23", "name": "Tall, Tall Mountain",       "region": "Upstairs",     "canvas_x": 440, "canvas_y": 180, "loop_start": null, "loop_end": null },
+    { "id": "n24", "name": "Tiny-Huge Island",          "region": "Upstairs",     "canvas_x": 520, "canvas_y": 240, "loop_start": null, "loop_end": null },
+    { "id": "n25", "name": "Tick Tock Clock",           "region": "Upstairs",     "canvas_x": 640, "canvas_y": 240, "loop_start": null, "loop_end": null },
+    { "id": "n26", "name": "Rainbow Ride",              "region": "Upstairs",     "canvas_x": 200, "canvas_y": 100, "loop_start": null, "loop_end": null },
+    { "id": "n27", "name": "Bowser in the Fire Sea",    "region": "Bowser",       "canvas_x": 440, "canvas_y": 100, "loop_start": null, "loop_end": null },
+    { "id": "n28", "name": "Bowser in the Sky",         "region": "Bowser",       "canvas_x": 320, "canvas_y":  30, "loop_start": null, "loop_end": null }
+  ],
+
+  "edges": [
+    { "id": "e01", "source_node_id": "n01", "target_node_id": "n02", "weight": 1.5, "bidirectional": true },
+
+    { "id": "e02", "source_node_id": "n02", "target_node_id": "n03", "weight": 1.0, "bidirectional": true },
+    { "id": "e03", "source_node_id": "n02", "target_node_id": "n04", "weight": 1.0, "bidirectional": true },
+
+    { "id": "e04", "source_node_id": "n02", "target_node_id": "n06", "weight": 2.0, "bidirectional": true },
+    { "id": "e05", "source_node_id": "n02", "target_node_id": "n07", "weight": 1.2, "bidirectional": true },
+    { "id": "e06", "source_node_id": "n02", "target_node_id": "n08", "weight": 0.6, "bidirectional": true },
+    { "id": "e07", "source_node_id": "n02", "target_node_id": "n09", "weight": 1.2, "bidirectional": true },
+    { "id": "e08", "source_node_id": "n02", "target_node_id": "n10", "weight": 1.2, "bidirectional": true },
+    { "id": "e09", "source_node_id": "n02", "target_node_id": "n11", "weight": 1.0, "bidirectional": true },
+    { "id": "e10", "source_node_id": "n02", "target_node_id": "n13", "weight": 0.6, "bidirectional": true },
+
+    { "id": "e11", "source_node_id": "n11", "target_node_id": "n12", "weight": 0.8, "bidirectional": true },
+
+    { "id": "e12", "source_node_id": "n03", "target_node_id": "n14", "weight": 1.2, "bidirectional": true },
+    { "id": "e13", "source_node_id": "n14", "target_node_id": "n15", "weight": 0.6, "bidirectional": true },
+    { "id": "e14", "source_node_id": "n03", "target_node_id": "n16", "weight": 1.2, "bidirectional": true },
+    { "id": "e15", "source_node_id": "n03", "target_node_id": "n17", "weight": 1.2, "bidirectional": true },
+    { "id": "e16", "source_node_id": "n03", "target_node_id": "n18", "weight": 1.2, "bidirectional": true },
+    { "id": "e17", "source_node_id": "n03", "target_node_id": "n19", "weight": 0.6, "bidirectional": true },
+    { "id": "e18", "source_node_id": "n03", "target_node_id": "n20", "weight": 0.8, "bidirectional": true },
+
+    { "id": "e19", "source_node_id": "n04", "target_node_id": "n21", "weight": 1.2, "bidirectional": true },
+    { "id": "e20", "source_node_id": "n04", "target_node_id": "n22", "weight": 1.2, "bidirectional": true },
+    { "id": "e21", "source_node_id": "n04", "target_node_id": "n23", "weight": 1.2, "bidirectional": true },
+    { "id": "e22", "source_node_id": "n04", "target_node_id": "n24", "weight": 1.2, "bidirectional": true },
+    { "id": "e23", "source_node_id": "n04", "target_node_id": "n25", "weight": 1.0, "bidirectional": true },
+    { "id": "e24", "source_node_id": "n04", "target_node_id": "n26", "weight": 1.0, "bidirectional": true },
+    { "id": "e25", "source_node_id": "n04", "target_node_id": "n27", "weight": 0.8, "bidirectional": true },
+
+    { "id": "e26", "source_node_id": "n04", "target_node_id": "n05", "weight": 0.6, "bidirectional": true },
+    { "id": "e27", "source_node_id": "n05", "target_node_id": "n28", "weight": 0.6, "bidirectional": true }
+  ]
+}

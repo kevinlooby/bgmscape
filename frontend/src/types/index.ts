@@ -22,7 +22,7 @@ export interface Edge {
 export interface Graph {
   id: string
   name: string
-  game_title: string
+  game_id: string | null
   created_at: string
   nodes: Node[]
   edges: Edge[]
@@ -31,10 +31,40 @@ export interface Graph {
 export interface GraphListItem {
   id: string
   name: string
-  game_title: string
+  game_id: string | null
   created_at: string
   node_count: number
 }
+
+// ── Games ────────────────────────────────────────────────────────────────────
+
+export interface GameListItem {
+  id: string
+  name: string
+  slug: string
+  default_graph_id: string | null
+  graph_count: number
+  created_at: string
+}
+
+export interface GameGraphSummary {
+  id: string
+  name: string
+  created_at: string
+  node_count: number
+  is_default: boolean
+}
+
+export interface Game {
+  id: string
+  name: string
+  slug: string
+  default_graph_id: string | null
+  created_at: string
+  graphs: GameGraphSummary[]
+}
+
+// ── Playback / sessions ──────────────────────────────────────────────────────
 
 export interface PlaybackSession {
   id: string
@@ -79,7 +109,8 @@ export interface LookaheadResponse {
 export interface GraphExport {
   version: string
   name: string
-  game_title: string
+  game_slug?: string | null
+  game_title?: string | null
   nodes: Array<{
     id: string
     name: string

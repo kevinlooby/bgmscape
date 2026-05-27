@@ -14,28 +14,32 @@ from sqlalchemy.orm import Session
 
 from backend.api.deps import get_db
 from backend.config import settings
-from backend.models.graph import Graph
+from backend.models.graph import Game
 from backend.schemas.graph import AudioUploadResponse, LoopAnalysisResult
 
 router = APIRouter(prefix="/audio", tags=["audio"])
 
 CHUNK_SIZE = 1024 * 256  # 256 KB
 
+_AUDIO_EXTS = {".mp3", ".flac", ".ogg", ".wav", ".aac", ".m4a", ".opus", ".wma", ".aiff"}
 
-@router.post("/{graph_id}/upload", response_model=AudioUploadResponse, status_code=201)
-async def upload_audio(graph_id: str, file: UploadFile, db: Session = Depends(get_db)):
-    graph = db.query(Graph).filter(Graph.id == graph_id).first()
-    if not graph:
-        raise HTTPException(status_code=404, detail="Graph not found")
+
+def _is_audio(content_type: str, filename: str) -> bool:
+    ext = Path(filename or "").suffix.lower()
+    return content_type.startswith("audio/") or ext in _AUDIO_EXTS
+
+
+@router.post("/games/{game_id}/upload", response_model=AudioUploadResponse, status_code=201)
+async def upload_audio_for_game(game_id: str, file: UploadFile, db: Session = Depends(get_db)):
+    game = db.query(Game).filter(Game.id == game_id).first()
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
 
     content_type = file.content_type or ""
-    ext = Path(file.filename or "").suffix.lower()
-    _AUDIO_EXTS = {".mp3", ".flac", ".ogg", ".wav", ".aac", ".m4a", ".opus", ".wma", ".aiff"}
-    is_audio = content_type.startswith("audio/") or ext in _AUDIO_EXTS
-    if not is_audio:
+    if not _is_audio(content_type, file.filename or ""):
         raise HTTPException(status_code=422, detail="File must be an audio file (audio/* MIME type)")
 
-    dest_dir = Path(settings.AUDIO_STORAGE_PATH) / graph_id
+    dest_dir = Path(settings.AUDIO_STORAGE_PATH) / game_id
     dest_dir.mkdir(parents=True, exist_ok=True)
     dest_path = dest_dir / file.filename
 
@@ -43,7 +47,7 @@ async def upload_audio(graph_id: str, file: UploadFile, db: Session = Depends(ge
     async with aiofiles.open(dest_path, "wb") as f:
         await f.write(content)
 
-    relative_path = f"{graph_id}/{file.filename}"
+    relative_path = f"{game_id}/{file.filename}"
     return AudioUploadResponse(
         file_path=relative_path,
         filename=file.filename,
@@ -51,9 +55,15 @@ async def upload_audio(graph_id: str, file: UploadFile, db: Session = Depends(ge
     )
 
 
-@router.get("/{graph_id}/{filename}")
-async def stream_audio(graph_id: str, filename: str, request: Request):
-    file_path = Path(settings.AUDIO_STORAGE_PATH) / graph_id / filename
+@router.get("/{folder}/{filename}")
+async def stream_audio(folder: str, filename: str, request: Request):
+    """Stream an audio file from {AUDIO_STORAGE_PATH}/{folder}/{filename}.
+
+    `folder` is treated as opaque — typically a game_id, but legacy callers
+    that still hold a graph_id-keyed path will resolve correctly as long as
+    the file exists on disk.
+    """
+    file_path = Path(settings.AUDIO_STORAGE_PATH) / folder / filename
     if not file_path.exists():
         raise HTTPException(status_code=404, detail="Audio file not found")
 
@@ -109,22 +119,22 @@ async def stream_audio(graph_id: str, filename: str, request: Request):
     )
 
 
-@router.delete("/{graph_id}/{filename}", status_code=204)
-async def delete_audio(graph_id: str, filename: str):
-    file_path = Path(settings.AUDIO_STORAGE_PATH) / graph_id / filename
+@router.delete("/{folder}/{filename}", status_code=204)
+async def delete_audio(folder: str, filename: str):
+    file_path = Path(settings.AUDIO_STORAGE_PATH) / folder / filename
     if not file_path.exists():
         raise HTTPException(status_code=404, detail="Audio file not found")
     file_path.unlink()
 
 
-@router.post("/{graph_id}/{filename}/analyze", response_model=LoopAnalysisResult)
-async def analyze_loop(graph_id: str, filename: str):
+@router.post("/{folder}/{filename}/analyze", response_model=LoopAnalysisResult)
+async def analyze_loop(folder: str, filename: str):
     """
     Run loop-point detection on an uploaded audio file.
     Returns loop_start, loop_end (seconds), duration, and confidence (0–1).
     Requires librosa to be installed in the backend environment.
     """
-    file_path = Path(settings.AUDIO_STORAGE_PATH) / graph_id / filename
+    file_path = Path(settings.AUDIO_STORAGE_PATH) / folder / filename
     if not file_path.exists():
         raise HTTPException(status_code=404, detail="Audio file not found")
 

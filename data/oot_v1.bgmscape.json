@@ -1,6 +1,7 @@
 {
   "version": "1",
   "name": "Ocarina of Time v1",
+  "game_slug": "oot",
   "game_title": "The Legend of Zelda: Ocarina of Time",
   "nodes": [
     {

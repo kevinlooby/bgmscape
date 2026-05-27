@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useEditor } from '../../store/editor'
 import { exportGraph, importGraph } from '../../api/graphs'
@@ -30,25 +30,26 @@ const s = {
     color: active ? '#90b8e8' : '#8a9bb0',
   } as React.CSSProperties),
   sep: { width: 1, height: 20, background: '#2d4a6e', flexShrink: 0 } as React.CSSProperties,
-  title: { color: '#4a90d9', fontWeight: 700, fontSize: 14, marginRight: 8 } as React.CSSProperties,
+  title: { color: '#4a90d9', fontWeight: 700, fontSize: 14, marginRight: 8, cursor: 'pointer' } as React.CSSProperties,
 }
 
 export default function GraphToolbar({ view, onViewChange }: Props) {
-  const { graphs, activeGraphId, graph, saving, loadGraphList, loadGraph, createGraph, updateGraph, deleteActiveGraph } = useEditor()
+  const {
+    game, graphs, activeGraphId, graph, saving,
+    loadGraph, createGraph, updateGraph, deleteActiveGraph, setActiveAsDefault, reloadGame,
+  } = useEditor()
   const navigate = useNavigate()
   const importRef = useRef<HTMLInputElement>(null)
 
   const [showNew, setShowNew] = useState(false)
   const [newName, setNewName] = useState('')
-  const [newTitle, setNewTitle] = useState('')
   const [confirmDelete, setConfirmDelete] = useState(false)
 
   // Inline graph metadata editing
   const [editingMeta, setEditingMeta] = useState(false)
   const [metaName, setMetaName] = useState('')
-  const [metaTitle, setMetaTitle] = useState('')
 
-  useEffect(() => { loadGraphList() }, [])
+  const isDefault = !!(game && activeGraphId && game.default_graph_id === activeGraphId)
 
   const handleGraphSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const id = e.target.value
@@ -57,11 +58,10 @@ export default function GraphToolbar({ view, onViewChange }: Props) {
   }
 
   const handleCreate = async () => {
-    if (!newName.trim() || !newTitle.trim()) return
-    await createGraph(newName.trim(), newTitle.trim())
+    if (!newName.trim()) return
+    await createGraph(newName.trim())
     setShowNew(false)
     setNewName('')
-    setNewTitle('')
   }
 
   const handleDelete = async () => {
@@ -74,20 +74,21 @@ export default function GraphToolbar({ view, onViewChange }: Props) {
   const startEditMeta = () => {
     if (!graph) return
     setMetaName(graph.name)
-    setMetaTitle(graph.game_title)
     setEditingMeta(true)
     setShowNew(false)
   }
 
   const saveMeta = async () => {
-    const updates: { name?: string; game_title?: string } = {}
+    const updates: { name?: string } = {}
     if (metaName.trim() && metaName.trim() !== graph?.name) updates.name = metaName.trim()
-    if (metaTitle.trim() && metaTitle.trim() !== graph?.game_title) updates.game_title = metaTitle.trim()
     if (Object.keys(updates).length > 0) await updateGraph(updates)
     setEditingMeta(false)
   }
 
-  // Export current graph as JSON download
+  const handleSetDefault = async () => {
+    await setActiveAsDefault()
+  }
+
   const handleExport = async () => {
     if (!activeGraphId) return
     try {
@@ -104,7 +105,6 @@ export default function GraphToolbar({ view, onViewChange }: Props) {
     }
   }
 
-  // Import a graph JSON file
   const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -112,7 +112,9 @@ export default function GraphToolbar({ view, onViewChange }: Props) {
       const text = await file.text()
       const data = JSON.parse(text)
       const imported = await importGraph(data)
-      // Reload the list and switch to the imported graph
+      // The import may have created a new game if the slug didn't match — reload
+      // the current game and select the imported graph if it belongs here.
+      await reloadGame()
       await loadGraph(imported.id)
     } catch (err) {
       console.error('Import failed', err)
@@ -124,15 +126,26 @@ export default function GraphToolbar({ view, onViewChange }: Props) {
   return (
     <div>
       <div style={s.bar}>
-        <span style={s.title}>bgmscape</span>
+        <span style={s.title} onClick={() => navigate('/')} title="Back to game library">bgmscape</span>
+        <button
+          onClick={() => navigate('/')}
+          style={{ ...s.btn(), padding: '5px 10px' }}
+          title="Back to game library"
+        >
+          ← Games
+        </button>
+        <div style={s.sep} />
+
+        <span style={{ color: '#90b8e8', fontWeight: 700 }}>{game?.name ?? '—'}</span>
         <div style={s.sep} />
 
         {/* Graph selector */}
         <select style={s.select} value={activeGraphId ?? ''} onChange={handleGraphSelect}>
           <option value="">— select graph —</option>
-          {graphs.map(g => (
-            <option key={g.id} value={g.id}>{g.name} ({g.node_count} nodes)</option>
-          ))}
+          {graphs.map(g => {
+            const star = game?.default_graph_id === g.id ? ' ★' : ''
+            return <option key={g.id} value={g.id}>{g.name} ({g.node_count} nodes){star}</option>
+          })}
         </select>
 
         <button style={s.btn()} onClick={() => { setShowNew(v => !v); setConfirmDelete(false); setEditingMeta(false) }}>
@@ -140,8 +153,23 @@ export default function GraphToolbar({ view, onViewChange }: Props) {
         </button>
 
         {activeGraphId && !editingMeta && (
-          <button style={s.btn()} onClick={startEditMeta} title="Edit graph name / game title">
-            ✎ Edit
+          <button style={s.btn()} onClick={startEditMeta} title="Rename this graph">
+            ✎ Rename
+          </button>
+        )}
+
+        {activeGraphId && (
+          <button
+            style={{
+              ...s.btn(isDefault),
+              color: isDefault ? '#90b8e8' : '#8a9bb0',
+              cursor: isDefault ? 'default' : 'pointer',
+            }}
+            onClick={isDefault ? undefined : handleSetDefault}
+            disabled={isDefault}
+            title={isDefault ? 'This is the default graph for this game' : 'Make this the default graph for this game'}
+          >
+            {isDefault ? '★ Default' : '☆ Set as default'}
           </button>
         )}
 
@@ -178,7 +206,6 @@ export default function GraphToolbar({ view, onViewChange }: Props) {
         <button style={s.btn(view === 'list')} onClick={() => onViewChange('list')}>List</button>
 
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
-          {/* Saving indicator */}
           {saving && (
             <span style={{ fontSize: 11, color: '#4a90d9', fontFamily: 'monospace' }}>saving…</span>
           )}
@@ -186,7 +213,8 @@ export default function GraphToolbar({ view, onViewChange }: Props) {
           {activeGraphId && (
             <button
               style={{ ...s.btn(), color: '#4caf50', borderColor: '#1a4a2e' }}
-              onClick={() => navigate(`/listen/${activeGraphId}`)}
+              onClick={() => navigate(`/listen/graph/${activeGraphId}`)}
+              title="Listen to this specific graph (not the game's default)"
             >
               ▶ Listen
             </button>
@@ -198,41 +226,29 @@ export default function GraphToolbar({ view, onViewChange }: Props) {
       {showNew && (
         <div style={{ display: 'flex', gap: 8, padding: '8px 16px', background: '#0f1923', borderBottom: '1px solid #2d4a6e', fontFamily: 'monospace' }}>
           <input
-            style={{ ...s.select, minWidth: 160 }}
-            placeholder="Graph name (e.g. Ocarina of Time)"
+            style={{ ...s.select, minWidth: 200 }}
+            placeholder={`Graph name (e.g. ${game?.name ?? ''} v3)`}
             value={newName}
             onChange={e => setNewName(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleCreate()}
             autoFocus
           />
-          <input
-            style={{ ...s.select, minWidth: 200 }}
-            placeholder="Game title (e.g. The Legend of Zelda: OOT)"
-            value={newTitle}
-            onChange={e => setNewTitle(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleCreate()}
-          />
-          <button style={s.btn(true)} onClick={handleCreate} disabled={!newName.trim() || !newTitle.trim()}>
+          <button style={s.btn(true)} onClick={handleCreate} disabled={!newName.trim()}>
             Create
           </button>
         </div>
       )}
 
-      {/* Edit graph metadata form */}
+      {/* Rename form */}
       {editingMeta && graph && (
         <div style={{ display: 'flex', gap: 8, padding: '8px 16px', background: '#0f1923', borderBottom: '1px solid #2d4a6e', fontFamily: 'monospace', alignItems: 'center' }}>
           <span style={{ fontSize: 11, color: '#4a6a8a', flexShrink: 0 }}>Graph name:</span>
           <input
-            style={{ ...s.input, minWidth: 160 }}
+            style={{ ...s.input, minWidth: 200 }}
             value={metaName}
             onChange={e => setMetaName(e.target.value)}
-            autoFocus
-          />
-          <span style={{ fontSize: 11, color: '#4a6a8a', flexShrink: 0 }}>Game title:</span>
-          <input
-            style={{ ...s.input, minWidth: 220 }}
-            value={metaTitle}
-            onChange={e => setMetaTitle(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter') saveMeta(); if (e.key === 'Escape') setEditingMeta(false) }}
+            autoFocus
           />
           <button style={s.btn(true)} onClick={saveMeta} disabled={saving}>
             {saving ? 'Saving…' : 'Save'}
