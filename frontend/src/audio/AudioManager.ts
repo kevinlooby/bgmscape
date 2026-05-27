@@ -11,6 +11,11 @@ export class AudioManager {
   // Currently playing source + its gain node
   private currentSource: AudioBufferSourceNode | null = null
   private currentGain: GainNode | null = null
+  // True when the current source has stopped on its own (non-looping source
+  // reached the end of its buffer). _teardownCurrent uses this to skip the
+  // fade-out ramp on an already-silent source — relevant for transition nodes
+  // (`is_transition: true`) where the track plays once and ends naturally.
+  private currentSourceEnded = false
 
   // Buffer cache keyed by URL
   private bufferCache: Map<string, AudioBuffer> = new Map()
@@ -63,19 +68,29 @@ export class AudioManager {
     return this.bufferCache.has(url)
   }
 
+  /**
+   * Duration in seconds of a cached buffer, or null if the buffer hasn't been
+   * decoded yet. Used by the wander engine to size dwell time to the actual
+   * track length so a track always plays at least once through.
+   */
+  getDuration(url: string): number | null {
+    return this.bufferCache.get(url)?.duration ?? null
+  }
+
   // ── Playback helpers ─────────────────────────────────────────────────────
 
-  private createLoopingSource(
+  private createSource(
     buffer: AudioBuffer,
-    loopStart = 0,
-    loopEnd?: number
+    options: { loop: boolean; loopStart: number; loopEnd?: number }
   ): AudioBufferSourceNode {
     const ctx = this.getContext()
     const source = ctx.createBufferSource()
     source.buffer = buffer
-    source.loop = true
-    source.loopStart = loopStart
-    source.loopEnd = loopEnd ?? buffer.duration
+    source.loop = options.loop
+    if (options.loop) {
+      source.loopStart = options.loopStart
+      source.loopEnd = options.loopEnd ?? buffer.duration
+    }
     return source
   }
 
@@ -87,9 +102,9 @@ export class AudioManager {
    */
   async play(
     url: string,
-    options: { loopStart?: number; loopEnd?: number; fadeInDuration?: number } = {}
+    options: { loopStart?: number; loopEnd?: number; fadeInDuration?: number; loop?: boolean } = {}
   ): Promise<void> {
-    const { loopStart = 0, loopEnd, fadeInDuration = DEFAULT_FADE_IN_DURATION } = options
+    const { loopStart = 0, loopEnd, fadeInDuration = DEFAULT_FADE_IN_DURATION, loop = true } = options
     const ctx = this.getContext()
     const buffer = await this.loadTrack(url)
 
@@ -101,12 +116,16 @@ export class AudioManager {
     gain.gain.linearRampToValueAtTime(1, ctx.currentTime + fadeInDuration)
     gain.connect(this.getMasterGain())
 
-    const source = this.createLoopingSource(buffer, loopStart, loopEnd)
+    const source = this.createSource(buffer, { loop, loopStart, loopEnd })
     source.connect(gain)
     source.start()
 
     this.currentSource = source
     this.currentGain = gain
+    this.currentSourceEnded = false
+    source.onended = () => {
+      if (this.currentSource === source) this.currentSourceEnded = true
+    }
   }
 
   /**
@@ -116,9 +135,9 @@ export class AudioManager {
    */
   async transitionTo(
     url: string,
-    options: { fadeOutDuration?: number; fadeInDuration?: number; silenceDuration?: number; loopStart?: number; loopEnd?: number } = {}
+    options: { fadeOutDuration?: number; fadeInDuration?: number; silenceDuration?: number; loopStart?: number; loopEnd?: number; loop?: boolean } = {}
   ): Promise<void> {
-    const { fadeOutDuration = DEFAULT_FADE_OUT_DURATION, fadeInDuration = DEFAULT_FADE_IN_DURATION, silenceDuration = 0, loopStart = 0, loopEnd } = options
+    const { fadeOutDuration = DEFAULT_FADE_OUT_DURATION, fadeInDuration = DEFAULT_FADE_IN_DURATION, silenceDuration = 0, loopStart = 0, loopEnd, loop = true } = options
 
     // Load next track in parallel with the fade-out (and the silence period)
     const bufferPromise = this.loadTrack(url)
@@ -138,12 +157,16 @@ export class AudioManager {
     inGain.gain.linearRampToValueAtTime(1, ctx.currentTime + fadeInDuration)
     inGain.connect(this.getMasterGain())
 
-    const inSource = this.createLoopingSource(buffer, loopStart, loopEnd)
+    const inSource = this.createSource(buffer, { loop, loopStart, loopEnd })
     inSource.connect(inGain)
     inSource.start()
 
     this.currentSource = inSource
     this.currentGain = inGain
+    this.currentSourceEnded = false
+    inSource.onended = () => {
+      if (this.currentSource === inSource) this.currentSourceEnded = true
+    }
 
     return new Promise(resolve => setTimeout(resolve, fadeInDuration * 1000))
   }
@@ -191,19 +214,29 @@ export class AudioManager {
   private async _teardownCurrent(fadeDuration: number): Promise<void> {
     if (!this.currentGain || !this.currentSource) return
     const ctx = this.getContext()
-    const now = ctx.currentTime
     const gain = this.currentGain
     const source = this.currentSource
+    const alreadyEnded = this.currentSourceEnded
 
-    gain.gain.cancelScheduledValues(now)
-    gain.gain.setValueAtTime(gain.gain.value, now)
-    gain.gain.linearRampToValueAtTime(0, now + fadeDuration)
+    // If the source has already ended (non-looping track played through to its
+    // end), skip the fade ramp and the wait — there's nothing left to fade. The
+    // wander code path for a transition node would otherwise wait ~1.5s on a
+    // silent gain node before kicking off the travel-silence period.
+    if (!alreadyEnded) {
+      const now = ctx.currentTime
+      gain.gain.cancelScheduledValues(now)
+      gain.gain.setValueAtTime(gain.gain.value, now)
+      gain.gain.linearRampToValueAtTime(0, now + fadeDuration)
+      await new Promise<void>(resolve => setTimeout(resolve, fadeDuration * 1000 + 50))
+    }
 
-    await new Promise<void>(resolve => setTimeout(resolve, fadeDuration * 1000 + 50))
     try { source.stop() } catch (_) { /* already stopped */ }
     gain.disconnect()
 
-    if (this.currentSource === source) this.currentSource = null
+    if (this.currentSource === source) {
+      this.currentSource = null
+      this.currentSourceEnded = false
+    }
     if (this.currentGain === gain) this.currentGain = null
   }
 }
