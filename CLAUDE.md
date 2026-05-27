@@ -12,10 +12,14 @@ The app models a game world as a graph. Each node is a location with a looping a
 
 ## Core Concepts
 
+### Game-first organization
+- **Game**: top-level entity representing one soundtrack (Ocarina of Time, Super Mario 64, …). Holds a unique slug used in URLs, a display name, and a `default_graph_id`. Audio files live in a per-game folder so multiple graphs for the same game share the same audio pool.
+- The user enters the app at a game grid, picks a game, and the game's default graph starts playing. The editor is reached *through* a game — there is no graph that isn't owned by a game.
+
 ### Graph Model
-- **Node**: a game location with a name, an audio track, and a stay probability
+- **Node**: a game location with a name and an audio track
 - **Edge**: a connection between two nodes with a traversal weight
-- **Graph**: the complete map for one game/soundtrack; each game has its own graph
+- **Graph**: one map for a game's world. A game can have several graphs (for prototyping different versions); exactly one is the default that the listener uses.
 
 ### Playback
 - While at a node, the track loops seamlessly (end-to-start initially; auto loop-point detection later)
@@ -99,16 +103,20 @@ The app traverses the graph autonomously. Navigation is governed by:
 
 ---
 
-## Data Model (initial)
+## Data Model
 
 ```
+Game
+  id, name, slug (unique), default_graph_id (nullable), created_at
+
 Graph
-  id, name, game_title, created_at
+  id, name, game_id (FK), created_at
 
 Node
-  id, graph_id, name, audio_file_path, stay_probability (0.0–1.0)
+  id, graph_id, name, audio_file_path
   region (nullable)
-  canvas_x, canvas_y  (position in diagram editor)
+  canvas_x, canvas_y                  (position in diagram editor)
+  loop_start, loop_end (nullable)     (seconds; manually set or auto-detected)
 
 Edge
   id, graph_id, source_node_id, target_node_id
@@ -116,8 +124,14 @@ Edge
   bidirectional (bool)
 
 PlaybackSession
-  id, graph_id, current_node_id, wander_history (JSON), created_at
+  id, graph_id, current_node_id, wander_active,
+  nominated_next_node_id, wander_history (JSON), lookahead_queue (JSON),
+  created_at, updated_at
 ```
+
+Per-node stay probability is not currently a data field — dwell time and variance live as listener-side tuning parameters (see `frontend/src/store/playback.ts`).
+
+Audio storage is keyed by game: `./audio_files/{game_id}/{filename}`. Nodes in any graph for that game reference paths of the form `"{game_id}/{filename}"`. When the wander engine moves between two nodes that share an `audio_file_path`, the crossfade is skipped and the same source keeps looping — locations sharing one OST track (e.g. SM64 castle hubs all playing *Inside the Castle Walls*) feel like one continuous space.
 
 ---
 
@@ -134,11 +148,18 @@ At each transition decision:
 
 ---
 
-## First Graph: Ocarina of Time
+## Shipped games
 
-Start with a representative subset (~15–20 nodes) covering the main overworld and a few dungeons, then expand. Key locations to include in v1:
-- Hyrule Field, Kokiri Forest, Kakariko Village, Goron City, Zora's Domain, Lake Hylia, Gerudo Valley, Lon Lon Ranch, Temple of Time, Market / Hyrule Castle Town
-- At least one dungeon (e.g., Dodongo's Cavern or the Forest Temple)
+- **Ocarina of Time** (slug `oot`) — default graph is *Ocarina of Time v2*, ~50 nodes covering overworld + dungeons. Seeds at `data/oot_v1.bgmscape.json` and `data/oot_v2.bgmscape.json`.
+- **Super Mario 64** (slug `sm64`) — default graph is *Super Mario 64 v1*, 28 nodes covering Peach's Castle and all 15 painting courses plus cap stages and Bowser levels. Seed at `data/sm64_v1.bgmscape.json`; audio map at `data/sm64_audio_map.json`. Many courses intentionally share an OST track (Lethal Lava Land theme covers four courses; Inside the Castle Walls covers four castle hubs).
+
+## Loading a new game
+
+1. Drop the soundtrack files into `data/<slug>_audio/`.
+2. Author `data/<slug>_vN.bgmscape.json` with `game_slug`, `game_title`, nodes, edges.
+3. Author `data/<slug>_audio_map.json` mapping each node name to its filename.
+4. Run: `python scripts/load_audio.py --seed data/<slug>_v1.bgmscape.json --map data/<slug>_audio_map.json --audio-dir data/<slug>_audio`.
+   The script creates the Game on first run, uploads audio under the game's folder, skips files already in the pool, and sets the imported graph as the default if the game has none.
 
 ---
 

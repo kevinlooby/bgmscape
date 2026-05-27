@@ -1,15 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { usePlayback } from '../store/playback'
+import * as gamesApi from '../api/games'
 import DebugPanel from '../components/listener/DebugPanel'
 import ListenerGraphView from '../components/listener/ListenerGraphView'
 import LookaheadQueue from '../components/listener/LookaheadQueue'
-import type { Node } from '../types'
+import type { Game, Node } from '../types'
 
 const MONO = 'monospace'
 
 export default function ListenerPage() {
-  const { graphId } = useParams<{ graphId: string }>()
+  const { gameSlug, graphId: directGraphId } = useParams<{ gameSlug?: string; graphId?: string }>()
   const navigate = useNavigate()
 
   const {
@@ -23,15 +24,57 @@ export default function ListenerPage() {
   const [volume, setVolumeLocal] = useState(1)
   const [showTeleport, setShowTeleport] = useState(false)
 
+  /**
+   * The game associated with the current listen, if known. When entering by
+   * /listen/:gameSlug we fetch it directly; when entering by /listen/graph/:graphId
+   * we leave it null and just show the graph name.
+   */
+  const [game, setGame] = useState<Game | null>(null)
+
   // Fade out audio and clear state when leaving the page
   useEffect(() => () => { reset() }, [reset])
 
+  // Resolve route → graphId.
+  // /listen/:gameSlug   → fetch game, use its default_graph_id
+  // /listen/graph/:graphId → use graphId directly
+  const [resolvedGraphId, setResolvedGraphId] = useState<string | null>(null)
+  const [resolveError, setResolveError] = useState<string | null>(null)
+  useEffect(() => {
+    let cancelled = false
+    setResolveError(null)
+    setResolvedGraphId(null)
+    setGame(null)
+
+    if (directGraphId) {
+      setResolvedGraphId(directGraphId)
+      return
+    }
+    if (!gameSlug) return
+
+    gamesApi.getGameBySlug(gameSlug)
+      .then(g => {
+        if (cancelled) return
+        setGame(g)
+        if (g.default_graph_id) {
+          setResolvedGraphId(g.default_graph_id)
+        } else {
+          setResolveError(`The game "${g.name}" has no default graph yet. Set one in the editor.`)
+        }
+      })
+      .catch(e => {
+        if (cancelled) return
+        setResolveError(e instanceof Error ? e.message : 'Failed to load game')
+      })
+
+    return () => { cancelled = true }
+  }, [gameSlug, directGraphId])
+
   const handleStart = async () => {
-    if (!graphId) return
+    if (!resolvedGraphId) return
     setLoading(true)
     setError(null)
     try {
-      await startSession(graphId)
+      await startSession(resolvedGraphId)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to start session')
     } finally {
@@ -45,7 +88,6 @@ export default function ListenerPage() {
     setVolume(v)
   }
 
-  // Reachable neighbors from current node (for steering)
   const neighbors = useMemo((): Node[] => {
     if (!graph || !currentNode) return []
     const seen = new Set<string>()
@@ -62,7 +104,6 @@ export default function ListenerPage() {
     return result
   }, [graph, currentNode])
 
-  // All nodes except the current one (for teleport)
   const allOtherNodes = useMemo(
     () => graph?.nodes.filter(n => n.id !== currentNode?.id) ?? [],
     [graph, currentNode]
@@ -70,6 +111,13 @@ export default function ListenerPage() {
 
   const audioFileName = currentNode?.audio_file_path?.split('/').pop() ?? null
   const nominatedNode = graph?.nodes.find(n => n.id === nominatedNextNodeId)
+
+  // Title shown in the header next to "bgmscape". Prefer the resolved Game's name;
+  // fall back to the graph's name (for /listen/graph/:graphId direct routes).
+  const headerTitle = game?.name ?? graph?.name ?? ''
+
+  // Where the Edit button takes you — back to the game-scoped editor.
+  const editHref = game ? `/games/${game.slug}/edit` : null
 
   // ── Header (shared between splash and now-playing) ────────────────────────
 
@@ -79,12 +127,18 @@ export default function ListenerPage() {
       background: '#0f1923', borderBottom: '1px solid #2d4a6e', flexShrink: 0, fontSize: 12,
       fontFamily: MONO,
     }}>
-      <span style={{ color: '#4a90d9', fontWeight: 700, fontSize: 14 }}>bgmscape</span>
+      <span
+        style={{ color: '#4a90d9', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}
+        onClick={() => navigate('/')}
+        title="Back to game library"
+      >
+        bgmscape
+      </span>
 
-      {graph && (
+      {headerTitle && (
         <>
           <div style={{ width: 1, height: 16, background: '#2d4a6e' }} />
-          <span style={{ color: '#4a6a8a' }}>{graph.game_title}</span>
+          <span style={{ color: '#4a6a8a' }}>{headerTitle}</span>
         </>
       )}
 
@@ -101,15 +155,17 @@ export default function ListenerPage() {
         </label>
       )}
 
-      <button
-        onClick={() => navigate('/editor')}
-        style={{
-          background: 'none', border: '1px solid #2d4a6e', borderRadius: 4,
-          color: '#8a9bb0', cursor: 'pointer', fontSize: 12, fontFamily: MONO, padding: '4px 10px',
-        }}
-      >
-        ← Editor
-      </button>
+      {editHref && (
+        <button
+          onClick={() => navigate(editHref)}
+          style={{
+            background: 'none', border: '1px solid #2d4a6e', borderRadius: 4,
+            color: '#8a9bb0', cursor: 'pointer', fontSize: 12, fontFamily: MONO, padding: '4px 10px',
+          }}
+        >
+          ✎ Edit
+        </button>
+      )}
     </div>
   )
 
@@ -126,28 +182,48 @@ export default function ListenerPage() {
           <div style={{ fontSize: 11, color: '#4a6a8a', letterSpacing: 3, textTransform: 'uppercase' }}>
             bgmscape
           </div>
-          <div style={{ fontSize: 34, color: '#e8f0fe', fontWeight: 700 }}>
-            Ready to listen?
+          <div style={{ fontSize: 34, color: '#e8f0fe', fontWeight: 700, textAlign: 'center', padding: '0 24px' }}>
+            {game ? `Ready to listen to ${game.name}?` : 'Ready to listen?'}
           </div>
+
+          {resolveError && (
+            <div style={{ fontSize: 13, color: '#f87171', maxWidth: 480, textAlign: 'center' }}>
+              {resolveError}
+              {gameSlug && (
+                <div style={{ marginTop: 12 }}>
+                  <button
+                    onClick={() => navigate(`/games/${gameSlug}/edit`)}
+                    style={{ background: 'none', border: '1px solid #4a90d9', color: '#90b8e8', padding: '6px 12px', borderRadius: 4, fontFamily: MONO, cursor: 'pointer' }}
+                  >
+                    Open editor →
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
           {error && (
             <div style={{ fontSize: 13, color: '#f87171', maxWidth: 360, textAlign: 'center' }}>
               {error}
             </div>
           )}
-          <button
-            onClick={handleStart}
-            disabled={loading}
-            style={{
-              padding: '12px 36px', borderRadius: 6,
-              background: loading ? '#1a2a3a' : '#1e4a8a',
-              color: loading ? '#4a6a8a' : '#90b8e8',
-              border: `2px solid ${loading ? '#2d4a6e' : '#4a90d9'}`,
-              cursor: loading ? 'wait' : 'pointer',
-              fontSize: 16, fontFamily: MONO, fontWeight: 700,
-            }}
-          >
-            {loading ? 'Starting…' : '▶  Start Listening'}
-          </button>
+
+          {!resolveError && (
+            <button
+              onClick={handleStart}
+              disabled={loading || !resolvedGraphId}
+              style={{
+                padding: '12px 36px', borderRadius: 6,
+                background: loading || !resolvedGraphId ? '#1a2a3a' : '#1e4a8a',
+                color: loading || !resolvedGraphId ? '#4a6a8a' : '#90b8e8',
+                border: `2px solid ${loading || !resolvedGraphId ? '#2d4a6e' : '#4a90d9'}`,
+                cursor: loading ? 'wait' : (!resolvedGraphId ? 'not-allowed' : 'pointer'),
+                fontSize: 16, fontFamily: MONO, fontWeight: 700,
+              }}
+            >
+              {loading ? 'Starting…' : !resolvedGraphId ? 'Loading…' : '▶  Start Listening'}
+            </button>
+          )}
         </div>
       </div>
     )
@@ -218,7 +294,6 @@ export default function ListenerPage() {
 
         {/* ── Controls ─────────────────────────────────────────────────────── */}
         <div style={{ display: 'flex', gap: 10, marginBottom: 44, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
-          {/* Play */}
           <button
             onClick={() => setPlaying(true)}
             disabled={playing || transitioning}
@@ -235,7 +310,6 @@ export default function ListenerPage() {
             ▶  Play
           </button>
 
-          {/* Pause */}
           <button
             onClick={() => setPlaying(false)}
             disabled={!playing || transitioning}
@@ -252,7 +326,6 @@ export default function ListenerPage() {
             ⏸  Pause
           </button>
 
-          {/* Skip / manual advance */}
           <button
             onClick={() => advance()}
             disabled={!playing || transitioning}
@@ -267,10 +340,8 @@ export default function ListenerPage() {
             ⏭  Skip
           </button>
 
-          {/* Divider */}
           <div style={{ width: 1, height: 28, background: '#1a2a3a', margin: '0 4px' }} />
 
-          {/* Wander toggle */}
           <button
             onClick={() => setWanderActive(!wanderActive)}
             disabled={transitioning}
@@ -419,7 +490,6 @@ export default function ListenerPage() {
           )}
         </div>
 
-        {/* ── Debug panel ──────────────────────────────────────────────────── */}
         {sessionId && currentNode && <DebugPanel />}
 
       </div>

@@ -7,7 +7,7 @@ from sqlalchemy import inspect, text
 from backend.config import settings
 from backend.db.base import Base
 from backend.db.session import engine
-from backend.api.routes import graphs, nodes, edges, audio, sessions
+from backend.api.routes import games, graphs, nodes, edges, audio, sessions
 
 # Import models so SQLAlchemy registers them before create_all
 import backend.models.graph  # noqa: F401
@@ -22,6 +22,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(games.router, prefix="/api")
 app.include_router(graphs.router, prefix="/api")
 app.include_router(nodes.router, prefix="/api")
 app.include_router(edges.router, prefix="/api")
@@ -41,6 +42,11 @@ def startup():
     })
     _ensure_columns("playback_sessions", {
         "lookahead_queue": "JSON",
+    })
+    # Add the game_id column to graphs if a pre-game-entity DB is being opened.
+    # The migrate_to_games.py script then backfills the values and assigns defaults.
+    _ensure_columns("graphs", {
+        "game_id": "VARCHAR(36)",
     })
 
 

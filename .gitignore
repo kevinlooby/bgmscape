@@ -131,7 +131,15 @@ dmypy.json
 # bgmscape runtime artifacts
 bgmscape.db
 bgmscape.db-journal
+bgmscape.db.*.bak
 audio_files/
+
+# Staging folders for game soundtracks (unzipped OST source files). The seed
+# JSONs in data/ are tracked; the audio_files referenced by them are not.
+data/*_audio/
+
+# Local Claude Code launch configs
+.claude/
 
 # Frontend
 frontend/node_modules/

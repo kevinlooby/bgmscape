@@ -58,32 +58,31 @@ class EdgeSchema(EdgeBase):
     graph_id: str
 
 
-class GraphBase(BaseModel):
+class GraphCreate(BaseModel):
     name: str
-    game_title: str
-
-
-class GraphCreate(GraphBase):
-    pass
+    game_id: str
 
 
 class GraphUpdate(BaseModel):
     name: Optional[str] = None
-    game_title: Optional[str] = None
+    # game_id intentionally not editable here — moving a graph between games is
+    # not a supported operation; recreate it under the target game instead.
 
 
 class GraphListItem(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: str
     name: str
-    game_title: str
+    game_id: Optional[str] = None
     created_at: datetime
     node_count: int = 0
 
 
-class GraphSchema(GraphBase):
+class GraphSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: str
+    name: str
+    game_id: Optional[str] = None
     created_at: datetime
     nodes: list[NodeSchema] = []
     edges: list[EdgeSchema] = []
@@ -157,10 +156,18 @@ class EdgeExport(BaseModel):
 
 
 class GraphExport(BaseModel):
-    """Self-contained graph definition for JSON export/import."""
+    """Self-contained graph definition for JSON export/import.
+
+    `game_slug` is the canonical way to attach an imported graph to a game.
+    `game_title` is accepted for backward compatibility with pre-game-entity
+    export files; if no slug matches, the importer falls back to looking up a
+    Game by name. New exports always include `game_slug`.
+    """
+    model_config = ConfigDict(extra='ignore')
     version: str = "1"
     name: str
-    game_title: str
+    game_slug: Optional[str] = None
+    game_title: Optional[str] = None
     nodes: list[NodeExport]
     edges: list[EdgeExport]
 

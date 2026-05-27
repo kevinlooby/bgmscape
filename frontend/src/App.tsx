@@ -4,6 +4,7 @@ import { AudioManager } from './audio/AudioManager'
 import { initPlaybackStore } from './store/playback'
 import EditorPage from './pages/EditorPage'
 import ListenerPage from './pages/ListenerPage'
+import GameGridPage from './pages/GameGridPage'
 
 // Initialise the global AudioManager instance once
 const audioManager = new AudioManager()
@@ -28,9 +29,12 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/editor" replace />} />
-        <Route path="/editor" element={<EditorPage />} />
-        <Route path="/listen/:graphId" element={<ListenerPage />} />
+        <Route path="/" element={<GameGridPage />} />
+        <Route path="/listen/:gameSlug" element={<ListenerPage />} />
+        <Route path="/listen/graph/:graphId" element={<ListenerPage />} />
+        <Route path="/games/:gameSlug/edit" element={<EditorPage />} />
+        {/* Legacy redirects */}
+        <Route path="/editor" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   )
