@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { usePlayback } from '../store/playback'
 import DebugPanel from '../components/listener/DebugPanel'
 import ListenerGraphView from '../components/listener/ListenerGraphView'
+import LookaheadQueue from '../components/listener/LookaheadQueue'
 import type { Node } from '../types'
 
 const MONO = 'monospace'
@@ -315,8 +316,19 @@ export default function ListenerPage() {
 
         {/* ── Graph view ───────────────────────────────────────────────────── */}
         {graph && sessionId && currentNode && (
-          <div style={{ width: '100%', maxWidth: 800, marginBottom: 32 }}>
+          <div style={{ width: '100%', maxWidth: 800, marginBottom: 16 }}>
             <ListenerGraphView />
+          </div>
+        )}
+
+        {/* ── Lookahead queue (sits directly beneath the graph) ────────────── */}
+        {sessionId && currentNode && (
+          <div style={{ width: '100%', maxWidth: 580, marginBottom: 32 }}>
+            <LookaheadQueue
+              sessionId={sessionId}
+              currentNodeId={currentNode.id}
+              currentNodeName={currentNode.name}
+            />
           </div>
         )}
 
@@ -408,13 +420,7 @@ export default function ListenerPage() {
         </div>
 
         {/* ── Debug panel ──────────────────────────────────────────────────── */}
-        {sessionId && currentNode && (
-          <DebugPanel
-            sessionId={sessionId}
-            currentNodeId={currentNode.id}
-            currentNodeName={currentNode.name}
-          />
-        )}
+        {sessionId && currentNode && <DebugPanel />}
 
       </div>
     </div>
