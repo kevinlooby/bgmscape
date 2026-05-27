@@ -43,10 +43,17 @@ const styles = {
     background: hasAudio ? '#4caf50' : '#e53935',
     flexShrink: 0,
   } as React.CSSProperties),
-  stay: {
-    color: '#8a9bb0',
-    fontSize: 10,
-  } as React.CSSProperties,
+}
+
+// Small, unobtrusive handle dots on all four sides.
+// Floating edges route from the nearest border regardless of which handle
+// started the connection; these just provide the drag targets.
+const handleStyle: React.CSSProperties = {
+  width: 8,
+  height: 8,
+  background: '#4a90d9',
+  border: '1px solid #0a1520',
+  opacity: 0.6,
 }
 
 function LocationNode({ data, selected }: NodeProps<DomainNode>) {
@@ -54,14 +61,16 @@ function LocationNode({ data, selected }: NodeProps<DomainNode>) {
 
   return (
     <div style={{ ...styles.node, ...(selected ? styles.nodeSelected : {}) }}>
-      <Handle type="target" position={Position.Left} style={{ background: '#4a90d9' }} />
+      <Handle type="target"  position={Position.Top}    style={handleStyle} />
+      <Handle type="source"  position={Position.Right}  style={handleStyle} />
+      <Handle type="target"  position={Position.Bottom} style={handleStyle} id="b" />
+      <Handle type="source"  position={Position.Left}   style={handleStyle} id="l" />
+
       <div style={styles.name}>{data.name}</div>
       {data.region && <div style={styles.region}>{data.region}</div>}
       <div style={styles.meta}>
         <div style={styles.dot(hasAudio)} title={hasAudio ? 'Audio assigned' : 'No audio'} />
-        <span style={styles.stay}>stay {Math.round(data.stay_probability * 100)}%</span>
       </div>
-      <Handle type="source" position={Position.Right} style={{ background: '#4a90d9' }} />
     </div>
   )
 }

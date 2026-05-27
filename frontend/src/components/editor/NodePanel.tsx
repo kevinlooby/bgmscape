@@ -28,7 +28,6 @@ export default function NodePanel({ node }: Props) {
 
   const [name, setName] = useState(node.name)
   const [region, setRegion] = useState(node.region ?? '')
-  const [stay, setStay] = useState(node.stay_probability)
   const [loopStart, setLoopStart] = useState(node.loop_start ?? '')
   const [loopEnd, setLoopEnd] = useState(node.loop_end ?? '')
 
@@ -42,7 +41,6 @@ export default function NodePanel({ node }: Props) {
   useEffect(() => {
     setName(node.name)
     setRegion(node.region ?? '')
-    setStay(node.stay_probability)
     setLoopStart(node.loop_start ?? '')
     setLoopEnd(node.loop_end ?? '')
     setConfirmDelete(false)
@@ -159,21 +157,6 @@ export default function NodePanel({ node }: Props) {
           onChange={e => setRegion(e.target.value)}
           onBlur={() => save({ region: region || null })}
         />
-      </div>
-
-      <div style={s.section}>
-        <label style={s.label}>Stay probability: {Math.round(stay * 100)}%</label>
-        <input
-          type="range" min={0} max={1} step={0.05}
-          style={s.slider}
-          value={stay}
-          onChange={e => setStay(parseFloat(e.target.value))}
-          onMouseUp={() => save({ stay_probability: stay })}
-          onTouchEnd={() => save({ stay_probability: stay })}
-        />
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#8a9bb0' }}>
-          <span>0% (always moves)</span><span>100% (stays forever)</span>
-        </div>
       </div>
 
       {/* ── Audio track ───────────────────────────────────────────────────── */}
