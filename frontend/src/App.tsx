@@ -1,15 +1,20 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { AudioManager } from './audio/AudioManager'
+import { AmbientEngine } from './audio/AmbientEngine'
 import { initPlaybackStore } from './store/playback'
 import EditorPage from './pages/EditorPage'
 import ListenerPage from './pages/ListenerPage'
 import GameGridPage from './pages/GameGridPage'
 import AmbientLibraryPage from './pages/AmbientLibraryPage'
 
-// Initialise the global AudioManager instance once
+// Initialise the global AudioManager and the parallel AmbientEngine once.
+// The engine shares the AudioContext but routes its own bus into masterGain.
 const audioManager = new AudioManager()
-initPlaybackStore(audioManager)
+const ambientEngine = new AmbientEngine(audioManager)
+initPlaybackStore(audioManager, ambientEngine)
+// Re-exported for the listener UI (active-layers chip strip + volume slider).
+export { ambientEngine }
 
 function App() {
   useEffect(() => {
