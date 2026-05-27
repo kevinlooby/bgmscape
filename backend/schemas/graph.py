@@ -9,7 +9,6 @@ from pydantic import BaseModel, ConfigDict
 class NodeBase(BaseModel):
     name: str
     audio_file_path: Optional[str] = None
-    stay_probability: float = 0.3
     region: Optional[str] = None
     canvas_x: float = 0.0
     canvas_y: float = 0.0
@@ -24,7 +23,6 @@ class NodeCreate(NodeBase):
 class NodeUpdate(BaseModel):
     name: Optional[str] = None
     audio_file_path: Optional[str] = None
-    stay_probability: Optional[float] = None
     region: Optional[str] = None
     canvas_x: Optional[float] = None
     canvas_y: Optional[float] = None
@@ -140,9 +138,9 @@ class LoopAnalysisResult(BaseModel):
 
 class NodeExport(BaseModel):
     """Node representation for export (omits audio path — files are local)."""
+    model_config = ConfigDict(extra='ignore')
     id: str
     name: str
-    stay_probability: float
     region: Optional[str] = None
     canvas_x: float
     canvas_y: float
@@ -165,3 +163,15 @@ class GraphExport(BaseModel):
     game_title: str
     nodes: list[NodeExport]
     edges: list[EdgeExport]
+
+
+# ── Lookahead ────────────────────────────────────────────────────────────────
+
+class LookaheadStep(BaseModel):
+    node_id: str
+    node_name: str
+    region: Optional[str]
+
+
+class LookaheadResponse(BaseModel):
+    steps: list[LookaheadStep]

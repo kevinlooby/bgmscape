@@ -32,7 +32,6 @@ class Node(Base):
     graph_id: Mapped[str] = mapped_column(String(36), ForeignKey("graphs.id"), nullable=False)
     name: Mapped[str] = mapped_column(String, nullable=False)
     audio_file_path: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    stay_probability: Mapped[float] = mapped_column(Float, default=0.3)
     region: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     canvas_x: Mapped[float] = mapped_column(Float, default=0.0)
     canvas_y: Mapped[float] = mapped_column(Float, default=0.0)
@@ -71,6 +70,7 @@ class PlaybackSession(Base):
     wander_active: Mapped[bool] = mapped_column(Boolean, default=False)
     nominated_next_node_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("nodes.id"), nullable=True)
     wander_history: Mapped[list] = mapped_column(JSON, default=list)
+    lookahead_queue: Mapped[list] = mapped_column(JSON, default=list)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

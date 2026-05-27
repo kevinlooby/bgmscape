@@ -3,6 +3,10 @@ from __future__ import annotations
 import mimetypes
 from pathlib import Path
 
+# Register FLAC MIME type — not present in the Windows system MIME database
+mimetypes.add_type("audio/flac", ".flac")
+mimetypes.add_type("audio/flac", ".FLAC")
+
 import aiofiles
 from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile
 from fastapi.responses import StreamingResponse
@@ -25,7 +29,10 @@ async def upload_audio(graph_id: str, file: UploadFile, db: Session = Depends(ge
         raise HTTPException(status_code=404, detail="Graph not found")
 
     content_type = file.content_type or ""
-    if not content_type.startswith("audio/"):
+    ext = Path(file.filename or "").suffix.lower()
+    _AUDIO_EXTS = {".mp3", ".flac", ".ogg", ".wav", ".aac", ".m4a", ".opus", ".wma", ".aiff"}
+    is_audio = content_type.startswith("audio/") or ext in _AUDIO_EXTS
+    if not is_audio:
         raise HTTPException(status_code=422, detail="File must be an audio file (audio/* MIME type)")
 
     dest_dir = Path(settings.AUDIO_STORAGE_PATH) / graph_id
