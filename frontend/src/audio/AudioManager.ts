@@ -11,6 +11,11 @@ export class AudioManager {
   // Currently playing source + its gain node
   private currentSource: AudioBufferSourceNode | null = null
   private currentGain: GainNode | null = null
+  // True when the current source has stopped on its own (non-looping source
+  // reached the end of its buffer). _teardownCurrent uses this to skip the
+  // fade-out ramp on an already-silent source — relevant for transition nodes
+  // (`is_transition: true`) where the track plays once and ends naturally.
+  private currentSourceEnded = false
 
   // Buffer cache keyed by URL
   private bufferCache: Map<string, AudioBuffer> = new Map()
@@ -117,6 +122,10 @@ export class AudioManager {
 
     this.currentSource = source
     this.currentGain = gain
+    this.currentSourceEnded = false
+    source.onended = () => {
+      if (this.currentSource === source) this.currentSourceEnded = true
+    }
   }
 
   /**
@@ -154,6 +163,10 @@ export class AudioManager {
 
     this.currentSource = inSource
     this.currentGain = inGain
+    this.currentSourceEnded = false
+    inSource.onended = () => {
+      if (this.currentSource === inSource) this.currentSourceEnded = true
+    }
 
     return new Promise(resolve => setTimeout(resolve, fadeInDuration * 1000))
   }
@@ -201,19 +214,29 @@ export class AudioManager {
   private async _teardownCurrent(fadeDuration: number): Promise<void> {
     if (!this.currentGain || !this.currentSource) return
     const ctx = this.getContext()
-    const now = ctx.currentTime
     const gain = this.currentGain
     const source = this.currentSource
+    const alreadyEnded = this.currentSourceEnded
 
-    gain.gain.cancelScheduledValues(now)
-    gain.gain.setValueAtTime(gain.gain.value, now)
-    gain.gain.linearRampToValueAtTime(0, now + fadeDuration)
+    // If the source has already ended (non-looping track played through to its
+    // end), skip the fade ramp and the wait — there's nothing left to fade. The
+    // wander code path for a transition node would otherwise wait ~1.5s on a
+    // silent gain node before kicking off the travel-silence period.
+    if (!alreadyEnded) {
+      const now = ctx.currentTime
+      gain.gain.cancelScheduledValues(now)
+      gain.gain.setValueAtTime(gain.gain.value, now)
+      gain.gain.linearRampToValueAtTime(0, now + fadeDuration)
+      await new Promise<void>(resolve => setTimeout(resolve, fadeDuration * 1000 + 50))
+    }
 
-    await new Promise<void>(resolve => setTimeout(resolve, fadeDuration * 1000 + 50))
     try { source.stop() } catch (_) { /* already stopped */ }
     gain.disconnect()
 
-    if (this.currentSource === source) this.currentSource = null
+    if (this.currentSource === source) {
+      this.currentSource = null
+      this.currentSourceEnded = false
+    }
     if (this.currentGain === gain) this.currentGain = null
   }
 }
