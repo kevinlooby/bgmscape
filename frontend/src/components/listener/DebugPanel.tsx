@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { usePlayback } from '../../store/playback'
+import { usePlayback, saveDefaults } from '../../store/playback'
 import { lookaheadSession } from '../../api/sessions'
 import type { LookaheadStep } from '../../types'
 
@@ -255,10 +255,14 @@ function LookaheadQueue({
 
 export default function DebugPanel({ sessionId, currentNodeId, currentNodeName }: DebugPanelProps) {
   const [open, setOpen] = useState(false)
+  const [savedFlash, setSavedFlash] = useState(false)
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const {
     minDwellMs, dwellVarianceMs, fadeOutDuration, fadeInDuration,
+    travelMinMs, travelVarianceMs,
     setMinDwellMs, setDwellVarianceMs, setFadeOutDuration, setFadeInDuration,
+    setTravelMinMs, setTravelVarianceMs,
     wanderActive,
   } = usePlayback()
 
@@ -266,6 +270,26 @@ export default function DebugPanel({ sessionId, currentNodeId, currentNodeName }
   const varSecs = Math.round(dwellVarianceMs / 1000)
   const rangeLo = minSecs
   const rangeHi = minSecs + varSecs
+
+  const travelMinSecs = travelMinMs / 1000
+  const travelVarSecs = travelVarianceMs / 1000
+  const travelRangeLo = travelMinSecs
+  const travelRangeHi = travelMinSecs + travelVarSecs
+
+  // Clear the saved-flash timer on unmount to avoid setting state on a gone component.
+  useEffect(() => () => {
+    if (savedTimerRef.current) clearTimeout(savedTimerRef.current)
+  }, [])
+
+  const handleSaveDefaults = () => {
+    saveDefaults({
+      minDwellMs, dwellVarianceMs, fadeOutDuration, fadeInDuration,
+      travelMinMs, travelVarianceMs,
+    })
+    setSavedFlash(true)
+    if (savedTimerRef.current) clearTimeout(savedTimerRef.current)
+    savedTimerRef.current = setTimeout(() => setSavedFlash(false), 1500)
+  }
 
   return (
     <div style={{ width: '100%', maxWidth: 580, marginTop: 8 }}>
@@ -278,10 +302,10 @@ export default function DebugPanel({ sessionId, currentNodeId, currentNodeName }
         }}
       >
         <span style={{ fontSize: 10, color: '#4a6a8a', letterSpacing: 3, textTransform: 'uppercase', flexShrink: 0 }}>
-          {open ? '▾' : '▸'} Debug
+          {open ? '▾' : '▸'} Tuning
         </span>
         <div style={{ height: 1, flex: 1, background: '#1a2a3a' }} />
-        <span style={{ fontSize: 10, color: '#2d4a6e' }}>tuning &amp; lookahead</span>
+        <span style={{ fontSize: 10, color: '#2d4a6e' }}>timing &amp; lookahead</span>
       </div>
 
       {open && (
@@ -317,7 +341,7 @@ export default function DebugPanel({ sessionId, currentNodeId, currentNodeName }
           </div>
 
           {/* Transition sliders */}
-          <div style={{ marginBottom: 20 }}>
+          <div style={{ marginBottom: 16 }}>
             <div style={{ fontSize: 10, color: '#4a6a8a', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 }}>
               Transitions
             </div>
@@ -339,12 +363,60 @@ export default function DebugPanel({ sessionId, currentNodeId, currentNodeName }
             />
           </div>
 
+          {/* Travel time sliders */}
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: 10, color: '#4a6a8a', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 }}>
+              Travel Time
+            </div>
+            <SliderRow
+              label="Travel min"
+              tooltip="Minimum silent period between wander transitions — simulates the listener moving between locations. Teleport is unaffected."
+              value={travelMinSecs}
+              min={0} max={30} step={0.5}
+              format={v => `${v.toFixed(1)}s`}
+              onChange={v => setTravelMinMs(v * 1000)}
+            />
+            <SliderRow
+              label="Travel variance"
+              tooltip="Random extra silence on top of the minimum. Prevents travel feeling mechanical. Set to 0 for a fixed travel period."
+              value={travelVarSecs}
+              min={0} max={20} step={0.5}
+              format={v => `${v.toFixed(1)}s`}
+              onChange={v => setTravelVarianceMs(v * 1000)}
+            />
+            <div style={{ fontSize: 10, color: '#2d4a6e', marginTop: 2 }}>
+              → range: {travelRangeLo.toFixed(1)}s – {travelRangeHi.toFixed(1)}s
+            </div>
+          </div>
+
           {/* Lookahead queue */}
           <LookaheadQueue
             sessionId={sessionId}
             currentNodeId={currentNodeId}
             currentNodeName={currentNodeName}
           />
+
+          {/* Save as defaults */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 16 }}>
+            <button
+              onClick={handleSaveDefaults}
+              title="Persist current slider values as the defaults for next time the app loads"
+              style={{
+                background: 'none', border: '1px solid #2d4a6e', borderRadius: 3,
+                color: '#6a8aaa', cursor: 'pointer',
+                fontSize: 11, fontFamily: MONO, padding: '4px 12px',
+              }}
+            >
+              ⤓ save as defaults
+            </button>
+            <span style={{
+              fontSize: 10, color: '#4caf78', fontFamily: MONO,
+              opacity: savedFlash ? 1 : 0,
+              transition: 'opacity 0.3s',
+            }}>
+              ✓ saved
+            </span>
+          </div>
 
         </div>
       )}
