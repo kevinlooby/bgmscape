@@ -1,0 +1,1447 @@
+{
+  "version": "2",
+  "name": "Ocarina of Time v2",
+  "game_title": "The Legend of Zelda: Ocarina of Time",
+  "_notes": [
+    "node_type: 'location' = looping ambient node; 'transitional' = plays once, no loop, auto-advances",
+    "silent: true = no audio track; wander engine fades to silence on entry",
+    "e10 from v1 removed \u2014 Kokiri Forest <-> Inside the Deku Tree direct edge replaced by Deku Tree chain (e80-e82)",
+    "Sacred Forest Meadow shares Lost Woods audio \u2014 flagged for custom ambient track in future pass",
+    "Shop node flagged for additional location connections beyond Market and Kakariko Village"
+  ],
+  "nodes": [
+    {
+      "id": "n01",
+      "name": "Hyrule Field",
+      "region": "Overworld",
+      "node_type": "location",
+      "canvas_x": 450,
+      "canvas_y": 300,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n02",
+      "name": "Kokiri Forest",
+      "region": "Forest",
+      "node_type": "location",
+      "canvas_x": 210,
+      "canvas_y": 420,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n03",
+      "name": "Lost Woods",
+      "region": "Forest",
+      "node_type": "location",
+      "canvas_x": 150,
+      "canvas_y": 340,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n04",
+      "name": "Sacred Forest Meadow",
+      "region": "Forest",
+      "node_type": "location",
+      "canvas_x": 100,
+      "canvas_y": 265,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n05",
+      "name": "Lon Lon Ranch",
+      "region": "Overworld",
+      "node_type": "location",
+      "canvas_x": 430,
+      "canvas_y": 345,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n06",
+      "name": "Market",
+      "region": "Market",
+      "node_type": "location",
+      "canvas_x": 450,
+      "canvas_y": 160,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n07",
+      "name": "Temple of Time",
+      "region": "Market",
+      "node_type": "location",
+      "canvas_x": 530,
+      "canvas_y": 115,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n08",
+      "name": "Hyrule Castle",
+      "region": "Market",
+      "node_type": "location",
+      "canvas_x": 370,
+      "canvas_y": 110,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n09",
+      "name": "Kakariko Village",
+      "region": "Kakariko",
+      "node_type": "location",
+      "canvas_x": 625,
+      "canvas_y": 330,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n10",
+      "name": "Windmill Hut",
+      "region": "Kakariko",
+      "node_type": "location",
+      "canvas_x": 715,
+      "canvas_y": 320,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n11",
+      "name": "Fire Temple",
+      "region": "Dungeon",
+      "node_type": "location",
+      "canvas_x": 760,
+      "canvas_y": 120,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n12",
+      "name": "Goron City",
+      "region": "Death Mountain",
+      "node_type": "location",
+      "canvas_x": 680,
+      "canvas_y": 200,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n13",
+      "name": "Zora's Domain",
+      "region": "Zora",
+      "node_type": "location",
+      "canvas_x": 690,
+      "canvas_y": 400,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n14",
+      "name": "Spirit Temple",
+      "region": "Dungeon",
+      "node_type": "location",
+      "canvas_x": 155,
+      "canvas_y": 380,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n15",
+      "name": "Gerudo Valley",
+      "region": "Gerudo",
+      "node_type": "location",
+      "canvas_x": 255,
+      "canvas_y": 360,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n16",
+      "name": "Inside the Deku Tree",
+      "region": "Dungeon",
+      "node_type": "location",
+      "canvas_x": 165,
+      "canvas_y": 500,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n17",
+      "name": "Forest Temple",
+      "region": "Dungeon",
+      "node_type": "location",
+      "canvas_x": 60,
+      "canvas_y": 220,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n18",
+      "name": "Shadow Temple",
+      "region": "Dungeon",
+      "node_type": "location",
+      "canvas_x": 660,
+      "canvas_y": 420,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n19",
+      "name": "Lake Hylia",
+      "region": "Overworld",
+      "node_type": "location",
+      "canvas_x": 450,
+      "canvas_y": 490,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n20",
+      "name": "Zora's Fountain",
+      "region": "Zora",
+      "node_type": "location",
+      "canvas_x": 760,
+      "canvas_y": 390,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n21",
+      "name": "Death Mountain Trail",
+      "region": "Death Mountain",
+      "node_type": "location",
+      "canvas_x": 650,
+      "canvas_y": 265,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n22",
+      "name": "Death Mountain Crater",
+      "region": "Death Mountain",
+      "node_type": "location",
+      "silent": true,
+      "canvas_x": 710,
+      "canvas_y": 148,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n23",
+      "name": "Market (Ruins)",
+      "region": "Market",
+      "node_type": "location",
+      "silent": true,
+      "canvas_x": 500,
+      "canvas_y": 148,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n24",
+      "name": "Ganon's Castle Exterior",
+      "region": "Endgame",
+      "node_type": "location",
+      "silent": true,
+      "canvas_x": 460,
+      "canvas_y": 72,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n25",
+      "name": "Dodongo's Cavern",
+      "region": "Dungeon",
+      "node_type": "location",
+      "canvas_x": 800,
+      "canvas_y": 195,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n26",
+      "name": "Inside Jabu-Jabu's Belly",
+      "region": "Dungeon",
+      "node_type": "location",
+      "canvas_x": 835,
+      "canvas_y": 378,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n27",
+      "name": "Water Temple",
+      "region": "Dungeon",
+      "node_type": "location",
+      "canvas_x": 450,
+      "canvas_y": 565,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n28",
+      "name": "Ice Cavern",
+      "region": "Dungeon",
+      "node_type": "location",
+      "canvas_x": 840,
+      "canvas_y": 415,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n29",
+      "name": "Great Fairy's Fountain (Death Mountain Trail)",
+      "region": "Special",
+      "node_type": "location",
+      "canvas_x": 618,
+      "canvas_y": 228,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n30",
+      "name": "Great Fairy's Fountain (Hyrule Castle)",
+      "region": "Special",
+      "node_type": "location",
+      "canvas_x": 310,
+      "canvas_y": 92,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n31",
+      "name": "Great Fairy's Fountain (Zora's Fountain)",
+      "region": "Special",
+      "node_type": "location",
+      "canvas_x": 800,
+      "canvas_y": 358,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n32",
+      "name": "Great Fairy's Fountain (Death Mountain Crater)",
+      "region": "Special",
+      "node_type": "location",
+      "canvas_x": 778,
+      "canvas_y": 162,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n33",
+      "name": "Great Fairy's Fountain (Spirit Temple)",
+      "region": "Special",
+      "node_type": "location",
+      "canvas_x": 118,
+      "canvas_y": 405,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n34",
+      "name": "Great Fairy's Fountain (Ganon's Castle)",
+      "region": "Special",
+      "node_type": "location",
+      "canvas_x": 512,
+      "canvas_y": 70,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n35",
+      "name": "Inside Ganon's Castle",
+      "region": "Endgame",
+      "node_type": "location",
+      "canvas_x": 520,
+      "canvas_y": 48,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n36",
+      "name": "Ganon's Castle Bridge",
+      "region": "Endgame",
+      "node_type": "transitional",
+      "canvas_x": 460,
+      "canvas_y": 55,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n37",
+      "name": "Ganon's Castle Underground",
+      "region": "Endgame",
+      "node_type": "location",
+      "canvas_x": 592,
+      "canvas_y": 48,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n38",
+      "name": "Ganondorf's Tower",
+      "region": "Endgame",
+      "node_type": "location",
+      "canvas_x": 450,
+      "canvas_y": 38,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n39",
+      "name": "House",
+      "region": "Various",
+      "node_type": "location",
+      "canvas_x": 195,
+      "canvas_y": 445,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n40",
+      "name": "Shop",
+      "region": "Market",
+      "node_type": "location",
+      "canvas_x": 468,
+      "canvas_y": 185,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n41",
+      "name": "Potion Shop",
+      "region": "Kakariko",
+      "node_type": "location",
+      "canvas_x": 662,
+      "canvas_y": 358,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n42",
+      "name": "Shooting Gallery",
+      "region": "Market",
+      "node_type": "location",
+      "canvas_x": 492,
+      "canvas_y": 185,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n43",
+      "name": "Kakariko Village (Adult)",
+      "region": "Kakariko",
+      "node_type": "location",
+      "canvas_x": 660,
+      "canvas_y": 328,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n44",
+      "name": "Ingo's Lon Lon Ranch",
+      "region": "Overworld",
+      "node_type": "location",
+      "canvas_x": 400,
+      "canvas_y": 348,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n45",
+      "name": "Minuet of Forest",
+      "region": "Forest",
+      "node_type": "transitional",
+      "canvas_x": 68,
+      "canvas_y": 268,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n46",
+      "name": "Bolero of Fire",
+      "region": "Death Mountain",
+      "node_type": "transitional",
+      "canvas_x": 752,
+      "canvas_y": 178,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n47",
+      "name": "Serenade of Water",
+      "region": "Overworld",
+      "node_type": "transitional",
+      "canvas_x": 392,
+      "canvas_y": 525,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n48",
+      "name": "Nocturne of Shadow",
+      "region": "Kakariko",
+      "node_type": "transitional",
+      "canvas_x": 708,
+      "canvas_y": 372,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n49",
+      "name": "Prelude of Light",
+      "region": "Market",
+      "node_type": "transitional",
+      "canvas_x": 598,
+      "canvas_y": 152,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n50",
+      "name": "Requiem of Spirit",
+      "region": "Gerudo",
+      "node_type": "transitional",
+      "canvas_x": 148,
+      "canvas_y": 432,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n51",
+      "name": "Sheik (Sacred Forest Meadow)",
+      "region": "Forest",
+      "node_type": "location",
+      "canvas_x": 112,
+      "canvas_y": 248,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n52",
+      "name": "Sheik (Death Mountain Crater)",
+      "region": "Death Mountain",
+      "node_type": "location",
+      "canvas_x": 738,
+      "canvas_y": 162,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n53",
+      "name": "Sheik (Lake Hylia)",
+      "region": "Overworld",
+      "node_type": "location",
+      "canvas_x": 418,
+      "canvas_y": 512,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n54",
+      "name": "Sheik (Kakariko Village Adult)",
+      "region": "Kakariko",
+      "node_type": "location",
+      "canvas_x": 688,
+      "canvas_y": 342,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n55",
+      "name": "Sheik (Spirit Temple)",
+      "region": "Gerudo",
+      "node_type": "location",
+      "canvas_x": 168,
+      "canvas_y": 415,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n56",
+      "name": "Sheik (Temple of Time)",
+      "region": "Market",
+      "node_type": "location",
+      "canvas_x": 572,
+      "canvas_y": 138,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n57",
+      "name": "Kaepora Gaebora (Kokiri Forest)",
+      "region": "Forest",
+      "node_type": "location",
+      "canvas_x": 228,
+      "canvas_y": 402,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n58",
+      "name": "Kaepora Gaebora (Death Mountain Trail)",
+      "region": "Death Mountain",
+      "node_type": "location",
+      "canvas_x": 632,
+      "canvas_y": 248,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n59",
+      "name": "Kaepora Gaebora (Lake Hylia)",
+      "region": "Overworld",
+      "node_type": "location",
+      "canvas_x": 478,
+      "canvas_y": 492,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n60",
+      "name": "Kaepora Gaebora (Gerudo Valley)",
+      "region": "Gerudo",
+      "node_type": "location",
+      "canvas_x": 240,
+      "canvas_y": 342,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n61",
+      "name": "Chamber of Sages",
+      "region": "Sacred Realm",
+      "node_type": "location",
+      "canvas_x": 625,
+      "canvas_y": 78,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n62",
+      "name": "Open Door of Temple of Time",
+      "region": "Market",
+      "node_type": "transitional",
+      "canvas_x": 562,
+      "canvas_y": 100,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n63",
+      "name": "Master Sword",
+      "region": "Market",
+      "node_type": "transitional",
+      "canvas_x": 590,
+      "canvas_y": 88,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n64",
+      "name": "Enter Ganondorf",
+      "region": "Market",
+      "node_type": "transitional",
+      "canvas_x": 340,
+      "canvas_y": 98,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n65",
+      "name": "Deku Tree",
+      "region": "Forest",
+      "node_type": "location",
+      "canvas_x": 195,
+      "canvas_y": 478,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n66",
+      "name": "Zelda's Theme",
+      "region": "Market",
+      "node_type": "location",
+      "canvas_x": 355,
+      "canvas_y": 125,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n67",
+      "name": "Horse Race",
+      "region": "Overworld",
+      "node_type": "location",
+      "canvas_x": 415,
+      "canvas_y": 362,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n68",
+      "name": "Meet Zelda Again",
+      "region": "Market",
+      "node_type": "location",
+      "canvas_x": 548,
+      "canvas_y": 128,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n69",
+      "name": "Hyrule Field Morning",
+      "region": "Overworld",
+      "node_type": "location",
+      "canvas_x": 392,
+      "canvas_y": 288,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n70",
+      "name": "Kotake & Koume",
+      "region": "Gerudo",
+      "node_type": "location",
+      "canvas_x": 132,
+      "canvas_y": 368,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n71",
+      "name": "Seal of Six Sages",
+      "region": "Endgame",
+      "node_type": "transitional",
+      "canvas_x": 412,
+      "canvas_y": 22,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n72",
+      "name": "Ocarina of Time (Zelda's Ocarina)",
+      "region": "Endgame",
+      "node_type": "transitional",
+      "canvas_x": 375,
+      "canvas_y": 22,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n73",
+      "name": "End Credits A",
+      "region": "Endgame",
+      "node_type": "transitional",
+      "canvas_x": 338,
+      "canvas_y": 22,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n74",
+      "name": "End Credits B",
+      "region": "Endgame",
+      "node_type": "transitional",
+      "canvas_x": 302,
+      "canvas_y": 22,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n75",
+      "name": "End Credits C",
+      "region": "Endgame",
+      "node_type": "transitional",
+      "canvas_x": 265,
+      "canvas_y": 22,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n76",
+      "name": "End Credits D",
+      "region": "Endgame",
+      "node_type": "transitional",
+      "canvas_x": 228,
+      "canvas_y": 22,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n77",
+      "name": "Title Theme",
+      "region": "Various",
+      "node_type": "location",
+      "canvas_x": 192,
+      "canvas_y": 22,
+      "loop_start": null,
+      "loop_end": null
+    }
+  ],
+  "edges": [
+    {
+      "id": "e01",
+      "source_node_id": "n01",
+      "target_node_id": "n06",
+      "weight": 2.0,
+      "bidirectional": true
+    },
+    {
+      "id": "e02",
+      "source_node_id": "n01",
+      "target_node_id": "n09",
+      "weight": 1.5,
+      "bidirectional": true
+    },
+    {
+      "id": "e03",
+      "source_node_id": "n01",
+      "target_node_id": "n02",
+      "weight": 1.5,
+      "bidirectional": true
+    },
+    {
+      "id": "e04",
+      "source_node_id": "n01",
+      "target_node_id": "n05",
+      "weight": 1.5,
+      "bidirectional": true
+    },
+    {
+      "id": "e05",
+      "source_node_id": "n01",
+      "target_node_id": "n13",
+      "weight": 1.0,
+      "bidirectional": true
+    },
+    {
+      "id": "e06",
+      "source_node_id": "n01",
+      "target_node_id": "n15",
+      "weight": 1.0,
+      "bidirectional": true
+    },
+    {
+      "id": "e07",
+      "source_node_id": "n06",
+      "target_node_id": "n07",
+      "weight": 1.5,
+      "bidirectional": true
+    },
+    {
+      "id": "e08",
+      "source_node_id": "n06",
+      "target_node_id": "n08",
+      "weight": 0.8,
+      "bidirectional": true
+    },
+    {
+      "id": "e09",
+      "source_node_id": "n02",
+      "target_node_id": "n03",
+      "weight": 1.2,
+      "bidirectional": true
+    },
+    {
+      "id": "e11",
+      "source_node_id": "n03",
+      "target_node_id": "n04",
+      "weight": 1.0,
+      "bidirectional": true
+    },
+    {
+      "id": "e12",
+      "source_node_id": "n04",
+      "target_node_id": "n17",
+      "weight": 0.7,
+      "bidirectional": true
+    },
+    {
+      "id": "e13",
+      "source_node_id": "n09",
+      "target_node_id": "n12",
+      "weight": 1.0,
+      "bidirectional": true
+    },
+    {
+      "id": "e14",
+      "source_node_id": "n09",
+      "target_node_id": "n10",
+      "weight": 1.0,
+      "bidirectional": true
+    },
+    {
+      "id": "e15",
+      "source_node_id": "n09",
+      "target_node_id": "n18",
+      "weight": 0.6,
+      "bidirectional": true
+    },
+    {
+      "id": "e16",
+      "source_node_id": "n12",
+      "target_node_id": "n11",
+      "weight": 0.7,
+      "bidirectional": true
+    },
+    {
+      "id": "e17",
+      "source_node_id": "n15",
+      "target_node_id": "n14",
+      "weight": 0.7,
+      "bidirectional": true
+    },
+    {
+      "id": "e18",
+      "source_node_id": "n01",
+      "target_node_id": "n19",
+      "weight": 1.0,
+      "bidirectional": true
+    },
+    {
+      "id": "e19",
+      "source_node_id": "n13",
+      "target_node_id": "n19",
+      "weight": 0.8,
+      "bidirectional": true
+    },
+    {
+      "id": "e20",
+      "source_node_id": "n13",
+      "target_node_id": "n20",
+      "weight": 1.2,
+      "bidirectional": true
+    },
+    {
+      "id": "e21",
+      "source_node_id": "n09",
+      "target_node_id": "n21",
+      "weight": 1.0,
+      "bidirectional": true
+    },
+    {
+      "id": "e22",
+      "source_node_id": "n21",
+      "target_node_id": "n22",
+      "weight": 1.0,
+      "bidirectional": true
+    },
+    {
+      "id": "e23",
+      "source_node_id": "n22",
+      "target_node_id": "n11",
+      "weight": 0.8,
+      "bidirectional": true
+    },
+    {
+      "id": "e24",
+      "source_node_id": "n01",
+      "target_node_id": "n23",
+      "weight": 1.5,
+      "bidirectional": true
+    },
+    {
+      "id": "e25",
+      "source_node_id": "n23",
+      "target_node_id": "n24",
+      "weight": 1.0,
+      "bidirectional": true
+    },
+    {
+      "id": "e26",
+      "source_node_id": "n12",
+      "target_node_id": "n25",
+      "weight": 0.7,
+      "bidirectional": true
+    },
+    {
+      "id": "e27",
+      "source_node_id": "n20",
+      "target_node_id": "n26",
+      "weight": 0.7,
+      "bidirectional": true
+    },
+    {
+      "id": "e28",
+      "source_node_id": "n19",
+      "target_node_id": "n27",
+      "weight": 0.7,
+      "bidirectional": true
+    },
+    {
+      "id": "e29",
+      "source_node_id": "n20",
+      "target_node_id": "n28",
+      "weight": 0.6,
+      "bidirectional": true
+    },
+    {
+      "id": "e30",
+      "source_node_id": "n12",
+      "target_node_id": "n03",
+      "weight": 0.5,
+      "bidirectional": true
+    },
+    {
+      "id": "e31",
+      "source_node_id": "n21",
+      "target_node_id": "n29",
+      "weight": 0.5,
+      "bidirectional": true
+    },
+    {
+      "id": "e32",
+      "source_node_id": "n08",
+      "target_node_id": "n30",
+      "weight": 0.5,
+      "bidirectional": true
+    },
+    {
+      "id": "e33",
+      "source_node_id": "n20",
+      "target_node_id": "n31",
+      "weight": 0.5,
+      "bidirectional": true
+    },
+    {
+      "id": "e34",
+      "source_node_id": "n22",
+      "target_node_id": "n32",
+      "weight": 0.5,
+      "bidirectional": true
+    },
+    {
+      "id": "e35",
+      "source_node_id": "n14",
+      "target_node_id": "n33",
+      "weight": 0.5,
+      "bidirectional": true
+    },
+    {
+      "id": "e36",
+      "source_node_id": "n24",
+      "target_node_id": "n34",
+      "weight": 0.5,
+      "bidirectional": true
+    },
+    {
+      "id": "e37",
+      "source_node_id": "n24",
+      "target_node_id": "n36",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e38",
+      "source_node_id": "n36",
+      "target_node_id": "n35",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e39",
+      "source_node_id": "n35",
+      "target_node_id": "n37",
+      "weight": 0.7,
+      "bidirectional": true
+    },
+    {
+      "id": "e40",
+      "source_node_id": "n35",
+      "target_node_id": "n38",
+      "weight": 0.8,
+      "bidirectional": true
+    },
+    {
+      "id": "e41",
+      "source_node_id": "n39",
+      "target_node_id": "n02",
+      "weight": 0.5,
+      "bidirectional": true
+    },
+    {
+      "id": "e42",
+      "source_node_id": "n39",
+      "target_node_id": "n09",
+      "weight": 0.5,
+      "bidirectional": true
+    },
+    {
+      "id": "e43",
+      "source_node_id": "n40",
+      "target_node_id": "n06",
+      "weight": 0.8,
+      "bidirectional": true
+    },
+    {
+      "id": "e44",
+      "source_node_id": "n40",
+      "target_node_id": "n09",
+      "weight": 0.7,
+      "bidirectional": true
+    },
+    {
+      "id": "e45",
+      "source_node_id": "n41",
+      "target_node_id": "n09",
+      "weight": 0.7,
+      "bidirectional": true
+    },
+    {
+      "id": "e46",
+      "source_node_id": "n41",
+      "target_node_id": "n06",
+      "weight": 0.7,
+      "bidirectional": true
+    },
+    {
+      "id": "e47",
+      "source_node_id": "n42",
+      "target_node_id": "n06",
+      "weight": 0.6,
+      "bidirectional": true
+    },
+    {
+      "id": "e48",
+      "source_node_id": "n42",
+      "target_node_id": "n43",
+      "weight": 0.6,
+      "bidirectional": true
+    },
+    {
+      "id": "e49",
+      "source_node_id": "n43",
+      "target_node_id": "n09",
+      "weight": 1.0,
+      "bidirectional": true
+    },
+    {
+      "id": "e50",
+      "source_node_id": "n44",
+      "target_node_id": "n05",
+      "weight": 1.0,
+      "bidirectional": true
+    },
+    {
+      "id": "e51",
+      "source_node_id": "n04",
+      "target_node_id": "n51",
+      "weight": 0.6,
+      "bidirectional": false
+    },
+    {
+      "id": "e52",
+      "source_node_id": "n51",
+      "target_node_id": "n45",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e53",
+      "source_node_id": "n45",
+      "target_node_id": "n04",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e54",
+      "source_node_id": "n22",
+      "target_node_id": "n52",
+      "weight": 0.6,
+      "bidirectional": false
+    },
+    {
+      "id": "e55",
+      "source_node_id": "n52",
+      "target_node_id": "n46",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e56",
+      "source_node_id": "n46",
+      "target_node_id": "n22",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e57",
+      "source_node_id": "n19",
+      "target_node_id": "n53",
+      "weight": 0.6,
+      "bidirectional": false
+    },
+    {
+      "id": "e58",
+      "source_node_id": "n53",
+      "target_node_id": "n47",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e59",
+      "source_node_id": "n47",
+      "target_node_id": "n19",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e60",
+      "source_node_id": "n43",
+      "target_node_id": "n54",
+      "weight": 0.6,
+      "bidirectional": false
+    },
+    {
+      "id": "e61",
+      "source_node_id": "n54",
+      "target_node_id": "n48",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e62",
+      "source_node_id": "n48",
+      "target_node_id": "n43",
+      "weight": 0.6,
+      "bidirectional": false
+    },
+    {
+      "id": "e63",
+      "source_node_id": "n48",
+      "target_node_id": "n18",
+      "weight": 0.7,
+      "bidirectional": true
+    },
+    {
+      "id": "e64",
+      "source_node_id": "n14",
+      "target_node_id": "n55",
+      "weight": 0.6,
+      "bidirectional": false
+    },
+    {
+      "id": "e65",
+      "source_node_id": "n55",
+      "target_node_id": "n50",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e66",
+      "source_node_id": "n50",
+      "target_node_id": "n14",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e67",
+      "source_node_id": "n07",
+      "target_node_id": "n56",
+      "weight": 0.6,
+      "bidirectional": false
+    },
+    {
+      "id": "e68",
+      "source_node_id": "n56",
+      "target_node_id": "n49",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e69",
+      "source_node_id": "n49",
+      "target_node_id": "n07",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e70",
+      "source_node_id": "n02",
+      "target_node_id": "n57",
+      "weight": 0.4,
+      "bidirectional": true
+    },
+    {
+      "id": "e71",
+      "source_node_id": "n21",
+      "target_node_id": "n58",
+      "weight": 0.4,
+      "bidirectional": true
+    },
+    {
+      "id": "e72",
+      "source_node_id": "n19",
+      "target_node_id": "n59",
+      "weight": 0.4,
+      "bidirectional": true
+    },
+    {
+      "id": "e73",
+      "source_node_id": "n15",
+      "target_node_id": "n60",
+      "weight": 0.4,
+      "bidirectional": true
+    },
+    {
+      "id": "e74",
+      "source_node_id": "n07",
+      "target_node_id": "n62",
+      "weight": 0.2,
+      "bidirectional": false
+    },
+    {
+      "id": "e75",
+      "source_node_id": "n62",
+      "target_node_id": "n63",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e76",
+      "source_node_id": "n63",
+      "target_node_id": "n61",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e77",
+      "source_node_id": "n61",
+      "target_node_id": "n07",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e78",
+      "source_node_id": "n08",
+      "target_node_id": "n64",
+      "weight": 0.3,
+      "bidirectional": false
+    },
+    {
+      "id": "e79",
+      "source_node_id": "n64",
+      "target_node_id": "n08",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e80",
+      "source_node_id": "n02",
+      "target_node_id": "n65",
+      "weight": 0.6,
+      "bidirectional": false
+    },
+    {
+      "id": "e81",
+      "source_node_id": "n65",
+      "target_node_id": "n16",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e82",
+      "source_node_id": "n16",
+      "target_node_id": "n02",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e83",
+      "source_node_id": "n08",
+      "target_node_id": "n66",
+      "weight": 0.6,
+      "bidirectional": true
+    },
+    {
+      "id": "e84",
+      "source_node_id": "n05",
+      "target_node_id": "n67",
+      "weight": 0.6,
+      "bidirectional": true
+    },
+    {
+      "id": "e85",
+      "source_node_id": "n07",
+      "target_node_id": "n68",
+      "weight": 0.5,
+      "bidirectional": true
+    },
+    {
+      "id": "e86",
+      "source_node_id": "n01",
+      "target_node_id": "n69",
+      "weight": 0.5,
+      "bidirectional": true
+    },
+    {
+      "id": "e87",
+      "source_node_id": "n14",
+      "target_node_id": "n70",
+      "weight": 0.5,
+      "bidirectional": true
+    },
+    {
+      "id": "e88",
+      "source_node_id": "n38",
+      "target_node_id": "n71",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e89",
+      "source_node_id": "n71",
+      "target_node_id": "n72",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e90",
+      "source_node_id": "n72",
+      "target_node_id": "n73",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e91",
+      "source_node_id": "n73",
+      "target_node_id": "n74",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e92",
+      "source_node_id": "n74",
+      "target_node_id": "n75",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e93",
+      "source_node_id": "n75",
+      "target_node_id": "n76",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e94",
+      "source_node_id": "n76",
+      "target_node_id": "n77",
+      "weight": 1.0,
+      "bidirectional": false
+    },
+    {
+      "id": "e95",
+      "source_node_id": "n77",
+      "target_node_id": "n39",
+      "weight": 1.0,
+      "bidirectional": true
+    }
+  ]
+}

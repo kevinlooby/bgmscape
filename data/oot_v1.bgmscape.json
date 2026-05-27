@@ -1,0 +1,290 @@
+{
+  "version": "1",
+  "name": "Ocarina of Time v1",
+  "game_title": "The Legend of Zelda: Ocarina of Time",
+  "nodes": [
+    {
+      "id": "n01",
+      "name": "Hyrule Field",
+      "region": "Overworld",
+      "canvas_x": 450,
+      "canvas_y": 300,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n02",
+      "name": "Kokiri Forest",
+      "region": "Forest",
+      "canvas_x": 210,
+      "canvas_y": 420,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n03",
+      "name": "Lost Woods",
+      "region": "Forest",
+      "canvas_x": 150,
+      "canvas_y": 340,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n04",
+      "name": "Sacred Forest Meadow",
+      "region": "Forest",
+      "canvas_x": 100,
+      "canvas_y": 265,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n05",
+      "name": "Lon Lon Ranch",
+      "region": "Overworld",
+      "canvas_x": 430,
+      "canvas_y": 345,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n06",
+      "name": "Market",
+      "region": "Market",
+      "canvas_x": 450,
+      "canvas_y": 160,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n07",
+      "name": "Temple of Time",
+      "region": "Market",
+      "canvas_x": 530,
+      "canvas_y": 115,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n08",
+      "name": "Hyrule Castle",
+      "region": "Market",
+      "canvas_x": 370,
+      "canvas_y": 110,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n09",
+      "name": "Kakariko Village",
+      "region": "Kakariko",
+      "canvas_x": 625,
+      "canvas_y": 330,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n10",
+      "name": "Windmill Hut",
+      "region": "Kakariko",
+      "canvas_x": 715,
+      "canvas_y": 320,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n11",
+      "name": "Fire Temple",
+      "region": "Dungeon",
+      "canvas_x": 760,
+      "canvas_y": 120,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n12",
+      "name": "Goron City",
+      "region": "Death Mountain",
+      "canvas_x": 680,
+      "canvas_y": 200,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n13",
+      "name": "Zora's Domain",
+      "region": "Zora",
+      "canvas_x": 690,
+      "canvas_y": 400,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n14",
+      "name": "Spirit Temple",
+      "region": "Dungeon",
+      "canvas_x": 155,
+      "canvas_y": 380,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n15",
+      "name": "Gerudo Valley",
+      "region": "Gerudo",
+      "canvas_x": 255,
+      "canvas_y": 360,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n16",
+      "name": "Inside the Deku Tree",
+      "region": "Dungeon",
+      "canvas_x": 165,
+      "canvas_y": 500,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n17",
+      "name": "Forest Temple",
+      "region": "Dungeon",
+      "canvas_x": 60,
+      "canvas_y": 220,
+      "loop_start": null,
+      "loop_end": null
+    },
+    {
+      "id": "n18",
+      "name": "Shadow Temple",
+      "region": "Dungeon",
+      "canvas_x": 660,
+      "canvas_y": 420,
+      "loop_start": null,
+      "loop_end": null
+    }
+  ],
+  "edges": [
+    {
+      "id": "e01",
+      "source_node_id": "n01",
+      "target_node_id": "n06",
+      "weight": 2.0,
+      "bidirectional": true
+    },
+    {
+      "id": "e02",
+      "source_node_id": "n01",
+      "target_node_id": "n09",
+      "weight": 1.5,
+      "bidirectional": true
+    },
+    {
+      "id": "e03",
+      "source_node_id": "n01",
+      "target_node_id": "n02",
+      "weight": 1.5,
+      "bidirectional": true
+    },
+    {
+      "id": "e04",
+      "source_node_id": "n01",
+      "target_node_id": "n05",
+      "weight": 1.5,
+      "bidirectional": true
+    },
+    {
+      "id": "e05",
+      "source_node_id": "n01",
+      "target_node_id": "n13",
+      "weight": 1.0,
+      "bidirectional": true
+    },
+    {
+      "id": "e06",
+      "source_node_id": "n01",
+      "target_node_id": "n15",
+      "weight": 1.0,
+      "bidirectional": true
+    },
+    {
+      "id": "e07",
+      "source_node_id": "n06",
+      "target_node_id": "n07",
+      "weight": 1.5,
+      "bidirectional": true
+    },
+    {
+      "id": "e08",
+      "source_node_id": "n06",
+      "target_node_id": "n08",
+      "weight": 0.8,
+      "bidirectional": true
+    },
+    {
+      "id": "e09",
+      "source_node_id": "n02",
+      "target_node_id": "n03",
+      "weight": 1.2,
+      "bidirectional": true
+    },
+    {
+      "id": "e10",
+      "source_node_id": "n02",
+      "target_node_id": "n16",
+      "weight": 0.7,
+      "bidirectional": true
+    },
+    {
+      "id": "e11",
+      "source_node_id": "n03",
+      "target_node_id": "n04",
+      "weight": 1.0,
+      "bidirectional": true
+    },
+    {
+      "id": "e12",
+      "source_node_id": "n04",
+      "target_node_id": "n17",
+      "weight": 0.7,
+      "bidirectional": true
+    },
+    {
+      "id": "e13",
+      "source_node_id": "n09",
+      "target_node_id": "n12",
+      "weight": 1.0,
+      "bidirectional": true
+    },
+    {
+      "id": "e14",
+      "source_node_id": "n09",
+      "target_node_id": "n10",
+      "weight": 1.0,
+      "bidirectional": true
+    },
+    {
+      "id": "e15",
+      "source_node_id": "n09",
+      "target_node_id": "n18",
+      "weight": 0.6,
+      "bidirectional": true
+    },
+    {
+      "id": "e16",
+      "source_node_id": "n12",
+      "target_node_id": "n11",
+      "weight": 0.7,
+      "bidirectional": true
+    },
+    {
+      "id": "e17",
+      "source_node_id": "n15",
+      "target_node_id": "n14",
+      "weight": 0.7,
+      "bidirectional": true
+    }
+  ]
+}
