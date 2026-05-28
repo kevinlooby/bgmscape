@@ -80,6 +80,14 @@ export class AmbientEngine {
   private bufferCache: Map<string, AudioBuffer> = new Map()
   /** Currently playing ambient sources, keyed by category. */
   private activePlays: Map<string, ActivePlay> = new Map()
+  /**
+   * Assets selected and queued at the most recent onNodeChange but not yet
+   * playing — typically waiting on _loadBuffer to fetch + decode the audio
+   * file. Keyed by category so it mirrors activePlays. Surfaced in the
+   * listener UI so the player can see what's about to start, not just what's
+   * already audible.
+   */
+  private pendingPlays: Map<string, AmbientAsset> = new Map()
 
   /** Asset library snapshot. The library page is the canonical source — this
    *  is refreshed via setLibrary() when the listener mounts (and on demand). */
@@ -169,19 +177,49 @@ export class AmbientEngine {
       try { play.gain.disconnect() } catch { /* ok */ }
     }
     this.activePlays.clear()
+    this.pendingPlays.clear()
   }
 
   // ── Public read of active state (for the listener UI chip strip) ─────────
 
-  getActivePlays(): Array<{ category: string; assetName: string; remainingS: number }> {
+  /**
+   * Snapshot of every category slot the engine is currently driving — both
+   * actively playing layers (with remaining seconds) and pending layers
+   * (selected at the last node arrival, still loading/decoding their audio
+   * file, so remainingS is null). Pending layers do not duplicate active
+   * ones — a category appears as one or the other, never both.
+   */
+  getActivePlays(): Array<{
+    category: string
+    assetName: string
+    remainingS: number | null
+    status: 'playing' | 'queued'
+  }> {
     if (!this.context) return []
     const now = this.context.currentTime
-    const out: Array<{ category: string; assetName: string; remainingS: number }> = []
+    const out: Array<{
+      category: string
+      assetName: string
+      remainingS: number | null
+      status: 'playing' | 'queued'
+    }> = []
     for (const [category, play] of this.activePlays.entries()) {
       out.push({
         category,
         assetName: play.asset.name,
         remainingS: Math.max(0, play.endTimeS - now),
+        status: 'playing',
+      })
+    }
+    for (const [category, asset] of this.pendingPlays.entries()) {
+      // An active play in the same category supersedes its pending entry —
+      // pendingPlays is cleared the moment the source actually starts.
+      if (this.activePlays.has(category)) continue
+      out.push({
+        category,
+        assetName: asset.name,
+        remainingS: null,
+        status: 'queued',
       })
     }
     return out
@@ -204,7 +242,12 @@ export class AmbientEngine {
     for (const { asset } of winners) {
       if (this.activePlays.has(asset.category)) continue
       if (Math.random() > asset.play_probability) continue
-      this._queuePlay(asset)
+      // Mark as pending immediately so the listener UI surfaces the
+      // about-to-play asset during the buffer fetch/decode window. The
+      // entry is cleared inside _queuePlay once source.start() runs (or on
+      // load failure).
+      this.pendingPlays.set(asset.category, asset)
+      void this._queuePlay(asset)
     }
   }
 
@@ -226,9 +269,15 @@ export class AmbientEngine {
   }
 
   private async _queuePlay(asset: AmbientAsset): Promise<void> {
-    if (!this.context || !this.ambientBus) return
+    if (!this.context || !this.ambientBus) {
+      this.pendingPlays.delete(asset.category)
+      return
+    }
     const buf = await this._loadBuffer(asset)
-    if (!buf || !this.context || !this.ambientBus) return
+    if (!buf || !this.context || !this.ambientBus) {
+      this.pendingPlays.delete(asset.category)
+      return
+    }
 
     // Pick a duration in [min, max]; clamp to a length that comfortably holds
     // both fade ramps so fade_in and fade_out can't overlap (and aren't longer
@@ -265,6 +314,8 @@ export class AmbientEngine {
     const endTimeS = now + durationS
     const play: ActivePlay = { asset, source, gain, endTimeS }
     this.activePlays.set(asset.category, play)
+    // Audio is now actually playing — clear the pending marker.
+    this.pendingPlays.delete(asset.category)
 
     source.onended = () => {
       // The source might be the *new* one for this category by the time this
