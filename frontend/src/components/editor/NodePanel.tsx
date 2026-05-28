@@ -1,7 +1,9 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useMemo } from 'react'
 import { useEditor } from '../../store/editor'
 import { analyzeAudioLoop, audioUrl } from '../../api/audio'
-import type { Node } from '../../types'
+import * as ambientApi from '../../api/ambient'
+import { selectActiveAssets } from '../../audio/AmbientEngine'
+import type { AmbientAsset, Node } from '../../types'
 
 interface Props {
   node: Node
@@ -194,6 +196,9 @@ export default function NodePanel({ node }: Props) {
         />
       </div>
 
+      {/* ── Ambient tags ──────────────────────────────────────────────────── */}
+      <AmbientTagsSection node={node} save={save} />
+
       {/* ── Transition / play-once flag ───────────────────────────────────── */}
       <div style={s.section}>
         <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, cursor: 'pointer', fontFamily: 'monospace' }}>
@@ -271,6 +276,124 @@ export default function NodePanel({ node }: Props) {
           </button>
         )}
       </div>
+    </div>
+  )
+}
+
+// ── Ambient tags section ────────────────────────────────────────────────────
+
+interface AmbientTagsProps {
+  node: Node
+  save: (data: Partial<Node>) => Promise<void>
+}
+
+function AmbientTagsSection({ node, save }: AmbientTagsProps) {
+  const [text, setText] = useState((node.ambient_tags ?? []).join(', '))
+  const [library, setLibrary] = useState<AmbientAsset[]>([])
+  const [tagSuggestions, setTagSuggestions] = useState<string[]>([])
+  const [previewOpen, setPreviewOpen] = useState(false)
+
+  // Sync when the selected node changes
+  useEffect(() => {
+    setText((node.ambient_tags ?? []).join(', '))
+    setPreviewOpen(false)
+  }, [node.id])
+
+  // Lazy-load library + global tag list. Failures are silent — ambient is
+  // optional and shouldn't block the editor when the backend is rough.
+  useEffect(() => {
+    let cancelled = false
+    ambientApi.listAmbientAssets().then(a => { if (!cancelled) setLibrary(a) }).catch(() => {})
+    ambientApi.listAmbientTags().then(t => { if (!cancelled) setTagSuggestions(t) }).catch(() => {})
+    return () => { cancelled = true }
+  }, [])
+
+  const parseTags = (s: string): string[] =>
+    s.split(',').map(t => t.trim()).filter(t => t.length > 0)
+
+  const commitTags = () => {
+    const tags = parseTags(text)
+    const current = node.ambient_tags ?? []
+    if (tags.length === current.length && tags.every((t, i) => t === current[i])) return
+    void save({ ambient_tags: tags })
+  }
+
+  const previewTags = useMemo(() => parseTags(text), [text])
+  const previewWinners = useMemo(
+    () => previewOpen ? selectActiveAssets(previewTags, library) : [],
+    [previewOpen, previewTags, library],
+  )
+
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <label style={{ display: 'block', fontSize: 11, color: '#8a9bb0', marginBottom: 4, fontFamily: 'monospace' }}>
+        Ambient tags
+      </label>
+      <input
+        type="text"
+        list="ambient-tag-suggestions"
+        value={text}
+        onChange={e => setText(e.target.value)}
+        onBlur={commitTags}
+        placeholder="field, day, …"
+        style={{
+          width: '100%', background: '#1e2a3a', border: '1px solid #2d4a6e',
+          borderRadius: 4, color: '#e8f0fe', padding: '5px 8px', fontSize: 12,
+          fontFamily: 'monospace', boxSizing: 'border-box',
+        }}
+      />
+      <datalist id="ambient-tag-suggestions">
+        {tagSuggestions.map(t => <option key={t} value={t} />)}
+      </datalist>
+      <div style={{ fontSize: 10, color: '#4a6a8a', marginTop: 4, lineHeight: 1.4 }}>
+        Comma-separated. Matched against the ambient library; best-fit asset per category plays under the music.
+      </div>
+
+      <div style={{ marginTop: 8 }}>
+        <button
+          onClick={() => setPreviewOpen(o => !o)}
+          disabled={previewTags.length === 0}
+          style={{
+            padding: '4px 10px', borderRadius: 4, border: '1px solid #2d4a6e',
+            background: '#1e2a3a', color: '#8a9bb0', cursor: 'pointer',
+            fontSize: 11, fontFamily: 'monospace',
+          }}
+          title="Show which ambient assets the engine would queue for this node"
+        >
+          {previewOpen ? 'Hide preview' : 'Preview ambient'}
+        </button>
+      </div>
+
+      {previewOpen && (
+        <div style={{
+          marginTop: 8, padding: 8, border: '1px solid #2d4a6e',
+          borderRadius: 4, background: '#0c1822',
+        }}>
+          {library.length === 0 && (
+            <div style={{ fontSize: 11, color: '#4a6a8a' }}>
+              No assets in library yet. Upload some in <strong>Ambient library</strong>.
+            </div>
+          )}
+          {library.length > 0 && previewWinners.length === 0 && (
+            <div style={{ fontSize: 11, color: '#4a6a8a' }}>
+              No matching assets for these tags.
+            </div>
+          )}
+          {previewWinners.map(({ asset, score }) => (
+            <div key={asset.id} style={{
+              display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, padding: '3px 0',
+            }}>
+              <span style={{
+                display: 'inline-block', padding: '1px 6px', borderRadius: 8,
+                background: '#1e2a3a', border: '1px solid #2d4a6e',
+                color: '#90b8e8', fontSize: 9, textTransform: 'uppercase', letterSpacing: 1,
+              }}>{asset.category}</span>
+              <span style={{ color: '#e8f0fe' }}>{asset.name}</span>
+              <span style={{ color: '#4a6a8a', marginLeft: 'auto' }}>match {score}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

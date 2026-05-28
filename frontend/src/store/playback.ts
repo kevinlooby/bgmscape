@@ -1,8 +1,10 @@
 import { create } from 'zustand'
 import { AudioManager } from '../audio/AudioManager'
+import { AmbientEngine } from '../audio/AmbientEngine'
 import { audioUrl } from '../api/audio'
 import * as sessionsApi from '../api/sessions'
 import * as graphsApi from '../api/graphs'
+import * as ambientApi from '../api/ambient'
 import type { Graph, Node } from '../types'
 
 interface PlaybackState {
@@ -30,6 +32,8 @@ interface PlaybackState {
   travelMinMs: number
   /** Random additional travel time on top of the minimum, in ms. */
   travelVarianceMs: number
+  /** Ambient bus master volume (0..1). Multiplicative with the music master. */
+  ambientBusVolume: number
 
   /** Timestamp (Date.now()) when the next wander advance will fire. Null when wander is off. */
   nextAdvanceAt: number | null
@@ -51,17 +55,40 @@ interface PlaybackActions {
   setFadeInDuration: (v: number) => void
   setTravelMinMs: (v: number) => void
   setTravelVarianceMs: (v: number) => void
+  setAmbientBusVolume: (v: number) => void
 }
 
 let _audioManager: AudioManager | null = null
+let _ambientEngine: AmbientEngine | null = null
 
-export function initPlaybackStore(manager: AudioManager) {
+export function initPlaybackStore(manager: AudioManager, ambient: AmbientEngine) {
   _audioManager = manager
+  _ambientEngine = ambient
 }
 
 function getAudio(): AudioManager {
   if (!_audioManager) throw new Error('AudioManager not initialised — call initPlaybackStore() first')
   return _audioManager
+}
+
+function getAmbient(): AmbientEngine | null {
+  return _ambientEngine
+}
+
+/**
+ * Fetch the global ambient library and hand it to the engine. Called on
+ * session start. Failures (e.g. backend unreachable) are swallowed — ambient
+ * is non-essential and a music-only experience is still the primary product.
+ */
+async function _refreshAmbientLibrary(): Promise<void> {
+  const engine = getAmbient()
+  if (!engine) return
+  try {
+    const assets = await ambientApi.listAmbientAssets()
+    engine.setLibrary(assets)
+  } catch {
+    // Backend down or endpoint missing — silently leave the library empty.
+  }
 }
 
 // ── Persistence: saved defaults for tuning sliders ───────────────────────────
@@ -81,6 +108,7 @@ const TUNING_KEYS = [
   'fadeInDuration',
   'travelMinMs',
   'travelVarianceMs',
+  'ambientBusVolume',
 ] as const
 
 type TuningKey = typeof TUNING_KEYS[number]
@@ -188,6 +216,7 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
   fadeInDuration: 1,
   travelMinMs: 3_000,
   travelVarianceMs: 3_000,
+  ambientBusVolume: 0.7,
 
   // Saved defaults from localStorage override the hardcoded values above where present
   ..._savedDefaults,
@@ -199,6 +228,10 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
   setFadeInDuration: (v) => set({ fadeInDuration: v }),
   setTravelMinMs: (v) => set({ travelMinMs: v }),
   setTravelVarianceMs: (v) => set({ travelVarianceMs: v }),
+  setAmbientBusVolume: (v) => {
+    set({ ambientBusVolume: v })
+    _ambientEngine?.setBusVolume(v)
+  },
 
   // ── Actions ──────────────────────────────────────────────────────────────
 
@@ -209,6 +242,7 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
   reset: () => {
     cancelWanderTimer()
     _audioManager?.fadeOut(0.5).catch(() => {})
+    _ambientEngine?.stopAll()
     set({
       sessionId: null,
       graph: null,
@@ -253,6 +287,15 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
         loop: !startNode.is_transition,
       })
     }
+
+    // Refresh the ambient asset library (fire-and-forget — does not gate
+    // music playback) and trigger the first node-arrival evaluation once
+    // it's done. Also push the saved bus volume so the engine reflects
+    // localStorage values picked up at store init.
+    _ambientEngine?.setBusVolume(get().ambientBusVolume)
+    void _refreshAmbientLibrary().then(() => {
+      _ambientEngine?.onNodeChange(startNode.ambient_tags ?? [])
+    })
 
     await sessionsApi.updateSession(session.id, { wander_active: true })
     _scheduleWander()
@@ -299,6 +342,13 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
         ? [...wanderHistory.slice(-19), prev]
         : wanderHistory
       set({ currentNode: nextNode, nominatedNextNodeId: null, wanderHistory: newHistory })
+
+      // Ambient layer re-evaluates at every arrival. Active plays from a
+      // previous node continue their scheduled durations — see AmbientEngine
+      // tail-off rule.
+      if (nextNode) {
+        _ambientEngine?.onNodeChange(nextNode.ambient_tags ?? [])
+      }
     } finally {
       set({ transitioning: false })
     }
@@ -308,6 +358,7 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
     const audio = getAudio()
     if (active) {
       audio.unpause()
+      _ambientEngine?.resume()
       set({ playing: true })
       const { wanderActive } = get()
       if (wanderActive) _scheduleWander()
@@ -315,6 +366,7 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
       cancelWanderTimer()
       set({ playing: false, nextAdvanceAt: null })
       audio.pause()
+      _ambientEngine?.pause()
     }
   },
 
@@ -373,6 +425,11 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
       const prev = currentNode?.id
       const newHistory = prev ? [...wanderHistory.slice(-19), prev] : wanderHistory
       set({ currentNode: targetNode, nominatedNextNodeId: null, wanderHistory: newHistory })
+
+      // Same as advance(): refresh ambient at the new node. Teleport is
+      // instant for music but ambient still gets re-evaluated — already-
+      // playing scheduled events continue regardless.
+      _ambientEngine?.onNodeChange(targetNode.ambient_tags ?? [])
     } finally {
       set({ transitioning: false })
     }
