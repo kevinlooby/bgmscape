@@ -102,8 +102,10 @@ export default function DebugPanel() {
   const {
     dwellVarianceMs, fadeOutDuration, fadeInDuration,
     travelMinMs, travelVarianceMs, ambientBusVolume,
+    ambientDensity, ambientCrowdingFalloff, ambientRestMinMs, ambientRestVarianceMs,
     setDwellVarianceMs, setFadeOutDuration, setFadeInDuration,
     setTravelMinMs, setTravelVarianceMs, setAmbientBusVolume,
+    setAmbientDensity, setAmbientCrowdingFalloff, setAmbientRestMinMs, setAmbientRestVarianceMs,
     wanderActive,
   } = usePlayback()
 
@@ -121,6 +123,7 @@ export default function DebugPanel() {
     saveDefaults({
       dwellVarianceMs, fadeOutDuration, fadeInDuration,
       travelMinMs, travelVarianceMs, ambientBusVolume,
+      ambientDensity, ambientCrowdingFalloff, ambientRestMinMs, ambientRestVarianceMs,
     })
     setSavedFlash(true)
     if (savedTimerRef.current) clearTimeout(savedTimerRef.current)
@@ -230,6 +233,41 @@ export default function DebugPanel() {
               format={v => v.toFixed(2)}
               onChange={setAmbientBusVolume}
             />
+            <SliderRow
+              label="Density"
+              tooltip="How likely a matching ambient sound starts at all. Lower = sparser soundscape; 0 = ambient off. Combines with each asset's own probability."
+              value={ambientDensity}
+              min={0} max={1} step={0.05}
+              format={v => v.toFixed(2)}
+              onChange={setAmbientDensity}
+            />
+            <SliderRow
+              label="Layering"
+              tooltip="How readily ambient sounds stack. Each sound already playing multiplies the chance of adding another by this amount. Low = rarely more than one at a time; 1 = no limit on stacking."
+              value={ambientCrowdingFalloff}
+              min={0} max={1} step={0.05}
+              format={v => v.toFixed(2)}
+              onChange={setAmbientCrowdingFalloff}
+            />
+            <SliderRow
+              label="Rest min"
+              tooltip="Minimum silence for a category after one of its sounds ends, before another may start. Higher = more quiet stretches between ambient sounds."
+              value={ambientRestMinMs / 1000}
+              min={0} max={60} step={1}
+              format={v => `${v.toFixed(0)}s`}
+              onChange={v => setAmbientRestMinMs(v * 1000)}
+            />
+            <SliderRow
+              label="Rest variance"
+              tooltip="Random extra rest on top of the minimum, so sounds don't return on a fixed clock. Set to 0 for a fixed rest period."
+              value={ambientRestVarianceMs / 1000}
+              min={0} max={60} step={1}
+              format={v => `${v.toFixed(0)}s`}
+              onChange={v => setAmbientRestVarianceMs(v * 1000)}
+            />
+            <div style={{ fontSize: 10, color: '#2d4a6e', marginTop: 2 }}>
+              rest: {(ambientRestMinMs / 1000).toFixed(0)}s – {((ambientRestMinMs + ambientRestVarianceMs) / 1000).toFixed(0)}s between sounds
+            </div>
           </div>
 
           {/* Save as defaults — directly beneath the sliders */}

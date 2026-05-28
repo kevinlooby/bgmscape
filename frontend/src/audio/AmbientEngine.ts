@@ -60,6 +60,15 @@ export function selectActiveAssets(
   return winners
 }
 
+/** In-place Fisher–Yates shuffle; returns the same array for chaining. */
+function shuffle<T>(arr: T[]): T[] {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[arr[i], arr[j]] = [arr[j], arr[i]]
+  }
+  return arr
+}
+
 
 // ── Runtime engine ───────────────────────────────────────────────────────────
 
@@ -101,6 +110,33 @@ export class AmbientEngine {
   private _busVolume = 0.7
   private _paused = false
 
+  // ── Density model ──────────────────────────────────────────────────────────
+  //
+  // Spawning is probabilistic and crowding-aware so the soundscape stays sparse
+  // by default and only rarely reaches a high layer count. The chance a matching
+  // category actually starts a sound is:
+  //
+  //   density × asset.play_probability × crowdingFalloff^(layers already playing)
+  //
+  // With density 0.6 / falloff 0.35 that's ~0.6 with nothing playing, ~0.21 with
+  // one layer, ~0.07 with two — so 3+ at once is uncommon but never forbidden.
+  /** Global base chance a matching category starts a sound (0..1). */
+  private _density = 0.6
+  /** Per-already-playing-layer multiplier on the start chance (0..1). */
+  private _crowdingFalloff = 0.35
+  /** Minimum silence after a play ends before its category may restart (ms). */
+  private _restMinMs = 8_000
+  /** Random extra silence on top of the minimum (ms). */
+  private _restVarianceMs = 22_000
+
+  /**
+   * Categories currently in their post-play rest window, keyed by category to a
+   * pending timer handle. A category is "resting" iff it has an entry here; the
+   * timer fires _maybeRequeueCategory when the rest elapses. Keeps the layer
+   * from refilling the instant a sound ends, which is what makes it breathe.
+   */
+  private restTimers: Map<string, ReturnType<typeof setTimeout>> = new Map()
+
   constructor(audioManager: AudioManager) {
     this.am = audioManager
   }
@@ -137,6 +173,21 @@ export class AmbientEngine {
 
   getBusVolume(): number {
     return this._busVolume
+  }
+
+  // ── Density tuning ───────────────────────────────────────────────────────────
+
+  setDensity(v: number): void {
+    this._density = Math.max(0, Math.min(1, v))
+  }
+
+  setCrowdingFalloff(v: number): void {
+    this._crowdingFalloff = Math.max(0, Math.min(1, v))
+  }
+
+  setRest(minMs: number, varianceMs: number): void {
+    this._restMinMs = Math.max(0, minMs)
+    this._restVarianceMs = Math.max(0, varianceMs)
   }
 
   // ── Lifecycle: pause / resume ──────────────────────────────────────────────
@@ -176,6 +227,8 @@ export class AmbientEngine {
       try { play.source.stop() } catch { /* already stopped */ }
       try { play.gain.disconnect() } catch { /* ok */ }
     }
+    for (const timer of this.restTimers.values()) clearTimeout(timer)
+    this.restTimers.clear()
     this.activePlays.clear()
     this.pendingPlays.clear()
   }
@@ -236,12 +289,22 @@ export class AmbientEngine {
    */
   onNodeChange(ambientTags: string[]): void {
     this.currentNodeTags = ambientTags
+    if (this._paused) return
     if (!this.ensureBus()) return
 
-    const winners = selectActiveAssets(ambientTags, this.library)
+    // Shuffle the per-category winners so that when crowding falloff limits how
+    // many actually start, it isn't always the same categories that win the
+    // early (less-suppressed) slots.
+    const winners = shuffle(selectActiveAssets(ambientTags, this.library))
     for (const { asset } of winners) {
       if (this.activePlays.has(asset.category)) continue
-      if (Math.random() > asset.play_probability) continue
+      if (this.pendingPlays.has(asset.category)) continue
+      if (this.restTimers.has(asset.category)) continue
+      // Crowding-aware roll: each layer already playing (or pending) lowers the
+      // chance the next one starts, so density stays low and high counts are
+      // rare. _currentLayerCount() rises as accepted assets are added to
+      // pendingPlays below, so the 2nd/3rd candidate this arrival is suppressed.
+      if (Math.random() > this._effectiveStartProb(asset)) continue
       // Mark as pending immediately so the listener UI surfaces the
       // about-to-play asset during the buffer fetch/decode window. The
       // entry is cleared inside _queuePlay once source.start() runs (or on
@@ -325,20 +388,49 @@ export class AmbientEngine {
       if (current && current.source === source) {
         this.activePlays.delete(asset.category)
         try { gain.disconnect() } catch { /* ok */ }
-        // Re-evaluate against the *current* node — the listener may have
-        // wandered to a node where this category no longer matches, or to one
-        // where a different asset would win.
-        this._maybeRequeueCategory(asset.category)
+        // Breathing: instead of refilling immediately, rest the category for a
+        // randomized window. Only when the rest elapses do we re-evaluate the
+        // current node and maybe start a new sound — so density drops and the
+        // layer goes genuinely quiet between plays.
+        const restMs = this._restMinMs + Math.random() * this._restVarianceMs
+        const timer = setTimeout(() => {
+          this.restTimers.delete(asset.category)
+          this._maybeRequeueCategory(asset.category)
+        }, restMs)
+        this.restTimers.set(asset.category, timer)
       }
     }
   }
 
+  /** Layers occupying a slot right now — used to scale the crowding falloff. */
+  private _currentLayerCount(): number {
+    return this.activePlays.size + this.pendingPlays.size
+  }
+
+  /**
+   * Chance a given asset should actually start, combining the global density
+   * dial, the asset's own play_probability, and the crowding falloff applied
+   * once per layer already occupying a slot. Clamped to [0, 1].
+   */
+  private _effectiveStartProb(asset: AmbientAsset): number {
+    const p = this._density
+      * asset.play_probability
+      * Math.pow(this._crowdingFalloff, this._currentLayerCount())
+    return Math.max(0, Math.min(1, p))
+  }
+
   private _maybeRequeueCategory(category: string): void {
+    if (this._paused) return
     if (!this.context || !this.ambientBus) return
+    // Bail if the category filled or re-entered a rest window while we waited.
+    if (this.activePlays.has(category)) return
+    if (this.pendingPlays.has(category)) return
+    if (this.restTimers.has(category)) return
     const winners = selectActiveAssets(this.currentNodeTags, this.library)
     const next = winners.find(w => w.asset.category === category)
     if (!next) return
-    if (Math.random() > next.asset.play_probability) return
+    if (Math.random() > this._effectiveStartProb(next.asset)) return
+    this.pendingPlays.set(next.asset.category, next.asset)
     void this._queuePlay(next.asset)
   }
 }
