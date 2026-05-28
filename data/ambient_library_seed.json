@@ -1,64 +1,11 @@
 {
-  "_doc": "Real ambient library seed. The 'file' field is the source filename; the loader searches recursively under --audio-dir to find it, and uploads it as {name}.{ext} so on-disk paths stay clean. Source packs: JC Sounds Nature Ambient Pack Vol 1 (OpenGameArt, CC0) — Fire, Forest, Water, Weather subfolders; individual freesound CC0 tracks; named Acoustic Nature-style tracks (non-commercial — fine for personal/local use, swap before any commercial distribution); plus a couple of Pixabay tracks (royalty-free, no attribution).",
+  "_doc": "Real ambient library seed. The 'file' field is the source filename; the loader searches recursively under --audio-dir to find it, and uploads it as {name}.{ext} so on-disk paths stay clean. Source packs: JC Sounds Nature Ambient Pack Vol 1 (OpenGameArt, CC0) — Forest, Water, Weather subfolders; individual freesound CC0 tracks; named Acoustic Nature-style tracks (non-commercial — fine for personal/local use, swap before any commercial distribution); plus a couple of Pixabay tracks (royalty-free, no attribution). CATEGORIES (each is an independent mix/concurrency slot): birds, insects, frogs, water, wind, weather, settlement, cavern. The 'fire' category was removed and its 4 assets dropped. Fauna was split into animal types: birds (emphasized — prioritize NAMED-species recordings, e.g. via xeno-canto CC0/CC-BY) / insects / frogs. NOTE: asset 'name' values still carry a legacy 'fauna-' prefix (kept to preserve loader idempotency and on-disk paths) even though their category is now birds/insects — the prefix is cosmetic. TO BE SOURCED (user-supplied audio): named-species birds; frogs; settlement (crowd/market/blacksmith/harbor/bells, NO intelligible speech); cavern (cave/dungeon low reverberant tone, NO musical drones). Add new entries here then run scripts/load_ambient.py.",
 
   "assets": [
     {
-      "name": "fire-campfire-crackling",
-      "file": "AMB_Nature Pack Vol 1_ Fire & Elemental_Campfire Crackling.mp3",
-      "category": "fire",
-      "tags": ["indoor", "night", "dungeon", "cave", "forest"],
-      "default_volume": 0.4,
-      "play_probability": 1.0,
-      "min_play_duration_s": 45,
-      "max_play_duration_s": 120,
-      "fade_in_ms": 2000,
-      "fade_out_ms": 3000,
-      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)"
-    },
-    {
-      "name": "fire-dying-embers",
-      "file": "AMB_Nature Pack Vol 1_ Fire & Elemental_Dying Embers.mp3",
-      "category": "fire",
-      "tags": ["indoor", "night", "dungeon", "cave"],
-      "default_volume": 0.35,
-      "play_probability": 0.8,
-      "min_play_duration_s": 45,
-      "max_play_duration_s": 120,
-      "fade_in_ms": 2500,
-      "fade_out_ms": 3500,
-      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)"
-    },
-    {
-      "name": "fire-large-bonfire",
-      "file": "AMB_Nature Pack Vol 1_ Fire & Elemental_Large Bonfire.mp3",
-      "category": "fire",
-      "tags": ["field", "night", "urban"],
-      "default_volume": 0.45,
-      "play_probability": 1.0,
-      "min_play_duration_s": 45,
-      "max_play_duration_s": 120,
-      "fade_in_ms": 2000,
-      "fade_out_ms": 3000,
-      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)"
-    },
-    {
-      "name": "fire-torch-flame",
-      "file": "AMB_Nature Pack Vol 1_ Fire & Elemental_Torch Flame.mp3",
-      "category": "fire",
-      "tags": ["dungeon", "cave", "indoor"],
-      "default_volume": 0.35,
-      "play_probability": 1.0,
-      "min_play_duration_s": 45,
-      "max_play_duration_s": 120,
-      "fade_in_ms": 2000,
-      "fade_out_ms": 3000,
-      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)"
-    },
-
-    {
       "name": "fauna-autumn-forest",
       "file": "AMB_Nature Pack Vol 1_Forest Enviroments_Autumn Forest.mp3",
-      "category": "fauna",
+      "category": "birds",
       "tags": ["forest", "day", "dusk"],
       "default_volume": 0.35,
       "play_probability": 0.9,
@@ -71,7 +18,7 @@
     {
       "name": "fauna-enchanted-forest",
       "file": "AMB_Nature Pack Vol 1_Forest Enviroments_Enchanted Forest.mp3",
-      "category": "fauna",
+      "category": "birds",
       "tags": ["forest", "night", "dungeon"],
       "default_volume": 0.4,
       "play_probability": 0.7,
@@ -84,7 +31,7 @@
     {
       "name": "fauna-forest-clearing",
       "file": "AMB_Nature Pack Vol 1_Forest Enviroments_Forest Clearing.mp3",
-      "category": "fauna",
+      "category": "birds",
       "tags": ["forest", "field", "day"],
       "default_volume": 0.35,
       "play_probability": 1.0,
@@ -97,7 +44,7 @@
     {
       "name": "fauna-forest-day",
       "file": "AMB_Nature Pack Vol 1_Forest Enviroments_Forest Day.mp3",
-      "category": "fauna",
+      "category": "birds",
       "tags": ["forest", "day"],
       "default_volume": 0.35,
       "play_probability": 1.0,
@@ -110,7 +57,7 @@
     {
       "name": "fauna-forest-night",
       "file": "AMB_Nature Pack Vol 1_Forest Enviroments_Forest Night.mp3",
-      "category": "fauna",
+      "category": "birds",
       "tags": ["forest", "night"],
       "default_volume": 0.35,
       "play_probability": 1.0,
@@ -123,7 +70,7 @@
     {
       "name": "fauna-pine-forest",
       "file": "AMB_Nature Pack Vol 1_Forest Enviroments_Pine Forest .mp3",
-      "category": "fauna",
+      "category": "birds",
       "tags": ["forest", "mountain", "day"],
       "default_volume": 0.35,
       "play_probability": 0.9,
@@ -136,7 +83,7 @@
     {
       "name": "fauna-rainforest-canopy",
       "file": "AMB_Nature Pack Vol 1_Forest Enviroments_Rainforest Canopy.mp3",
-      "category": "fauna",
+      "category": "birds",
       "tags": ["forest", "day", "rain"],
       "default_volume": 0.4,
       "play_probability": 0.85,
@@ -149,7 +96,7 @@
     {
       "name": "fauna-spooky-forest",
       "file": "AMB_Nature Pack Vol 1_Forest Enviroments_Spooky Forest.mp3",
-      "category": "fauna",
+      "category": "birds",
       "tags": ["forest", "night", "dusk"],
       "default_volume": 0.4,
       "play_probability": 0.8,
@@ -320,7 +267,7 @@
     {
       "name": "fauna-summer-evening",
       "file": "AMB_Nature Pack Vol 1_Weather_Summer Evening.mp3",
-      "category": "fauna",
+      "category": "birds",
       "tags": ["field", "dusk", "day"],
       "default_volume": 0.35,
       "play_probability": 1.0,
@@ -360,7 +307,7 @@
     {
       "name": "fauna-crickets-woodpecker-dusk",
       "file": "Crickets and Woodpecker at Dusk.mp3",
-      "category": "fauna",
+      "category": "insects",
       "tags": ["field", "forest", "dusk"],
       "default_volume": 0.35,
       "play_probability": 0.9,
@@ -386,7 +333,7 @@
     {
       "name": "fauna-morning-bird-songs",
       "file": "Morning Bird Songs.mp3",
-      "category": "fauna",
+      "category": "birds",
       "tags": ["field", "forest", "dawn", "day"],
       "default_volume": 0.35,
       "play_probability": 1.0,
@@ -399,7 +346,7 @@
     {
       "name": "fauna-katydids-night",
       "file": "Katydids in the Night.mp3",
-      "category": "fauna",
+      "category": "insects",
       "tags": ["field", "forest", "night"],
       "default_volume": 0.35,
       "play_probability": 0.85,
@@ -426,7 +373,7 @@
     {
       "name": "fauna-hungary-meadow-morning",
       "file": "freesound_community-hungary-meadow-morning-birds-17373.mp3",
-      "category": "fauna",
+      "category": "birds",
       "tags": ["field", "day", "dawn"],
       "default_volume": 0.35,
       "play_probability": 1.0,
@@ -440,7 +387,7 @@
     {
       "name": "fauna-night-field-crickets",
       "file": "175020__sengjinn__ambience-night-field-cricket-01.wav",
-      "category": "fauna",
+      "category": "insects",
       "tags": ["field", "night"],
       "default_volume": 0.3,
       "play_probability": 1.0,
@@ -466,7 +413,7 @@
     {
       "name": "fauna-forest-birds-loop",
       "file": "723913__magnesus__forest-birds-ambient-seamless-loop.wav",
-      "category": "fauna",
+      "category": "birds",
       "tags": ["forest", "day", "dawn"],
       "default_volume": 0.35,
       "play_probability": 1.0,

@@ -6,8 +6,10 @@ import type { AmbientAsset, AmbientAssetCreate, AmbientAssetUpdate } from '../ty
 
 const MONO = 'monospace'
 
+// Each category is an independent mix/concurrency slot in the AmbientEngine.
+// Fauna was split into animal types (birds emphasized); 'fire' was removed.
 const CATEGORY_SUGGESTIONS = [
-  'wind', 'water', 'fauna', 'fire', 'weather', 'mechanical', 'crowd', 'accent',
+  'birds', 'insects', 'frogs', 'water', 'wind', 'weather', 'settlement', 'cavern',
 ]
 
 const TAG_SUGGESTIONS = [
@@ -81,7 +83,7 @@ export default function AmbientLibraryPage() {
             Atmospheric sound library
           </div>
           <div style={{ fontSize: 24, color: '#e8f0fe', fontWeight: 700, marginBottom: 8 }}>
-            Wind, water, fauna, and more
+            Birds, water, weather, and more
           </div>
           <div style={{ fontSize: 12, color: '#7a8aa0', marginBottom: 28, lineHeight: 1.5 }}>
             These ambient loops are global across all games. Tag a node in any game's editor with
