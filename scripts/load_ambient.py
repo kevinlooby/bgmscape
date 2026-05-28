@@ -16,7 +16,12 @@ Options:
     --base-url URL       Backend URL        [default: http://localhost:8000]
     --dry-run            Preview what would happen without writing anything
 
-Seed file format (see data/ambient_library_seed.json for a starter):
+The `file` field is the source filename. The loader recursively searches
+`--audio-dir` so source files can live in nested folders (e.g. a downloaded
+sample pack with its own subdirectory layout). The file is uploaded as
+`{asset_name}{source_extension}` so on-disk filenames stay short and unique.
+
+Seed file format (see data/ambient_library_seed.json for a full library):
 
     {
       "assets": [
@@ -78,25 +83,55 @@ def list_existing(base: str) -> dict[str, dict]:
     return {a["name"]: a for a in r.json()}
 
 
-def upload_asset(base: str, audio_dir: Path, entry: dict) -> None:
-    filename = entry["file"]
-    src = audio_dir / filename
-    if not src.exists():
-        die(f"Audio file not found: {src}")
+def _build_file_index(audio_dir: Path) -> dict[str, list[Path]]:
+    """Walk audio_dir recursively, grouping files by basename.
 
+    Returns {basename → [full path, …]} so the caller can detect ambiguous
+    matches (same filename in multiple subfolders).
+    """
+    index: dict[str, list[Path]] = {}
+    for p in audio_dir.rglob("*"):
+        if p.is_file():
+            index.setdefault(p.name, []).append(p)
+    return index
+
+
+def _resolve_source(audio_dir: Path, file_index: dict[str, list[Path]], filename: str) -> Path:
+    """Find a source file by basename anywhere under audio_dir."""
+    matches = file_index.get(filename, [])
+    if not matches:
+        die(f"Audio file not found anywhere under {audio_dir}: {filename}")
+    if len(matches) > 1:
+        info(f"Note: multiple matches for {filename}; using {matches[0]}")
+    return matches[0]
+
+
+def upload_asset(base: str, src: Path, entry: dict) -> None:
     metadata = {k: entry[k] for k in METADATA_FIELDS if k in entry}
 
-    mime = "audio/flac" if src.suffix.lower() == ".flac" else "audio/mpeg"
+    # Upload as {asset_name}{ext} so on-disk filenames stay short, unique by
+    # asset name, and decoupled from whatever the source pack named them.
+    stored_name = f"{entry['name']}{src.suffix.lower()}"
+
+    ext = src.suffix.lower()
+    mime = {
+        ".flac": "audio/flac",
+        ".wav":  "audio/wav",
+        ".ogg":  "audio/ogg",
+        ".m4a":  "audio/mp4",
+        ".aac":  "audio/aac",
+        ".opus": "audio/opus",
+    }.get(ext, "audio/mpeg")
     with src.open("rb") as fh:
         r = requests.post(
             f"{base}/api/ambient/assets",
-            files={"file": (src.name, fh, mime)},
+            files={"file": (stored_name, fh, mime)},
             data={"metadata": json.dumps(metadata)},
             timeout=300,
         )
     if not r.ok:
-        die(f"Upload failed for {filename} ({r.status_code}): {r.text}")
-    ok(f"Uploaded {entry['name']}  ←  {filename}")
+        die(f"Upload failed for {entry['name']} ({r.status_code}): {r.text}")
+    ok(f"Uploaded {entry['name']}  ←  {src.name}")
 
 
 def patch_asset(base: str, asset_id: str, entry: dict) -> None:
@@ -135,6 +170,11 @@ def main() -> None:
 
     info(f"Backend currently has {len(existing)} ambient asset(s)")
 
+    # Pre-walk the audio directory so we can fail fast on missing sources
+    # (and so each upload doesn't redo the walk).
+    file_index = _build_file_index(args.audio_dir)
+    info(f"Found {sum(len(v) for v in file_index.values())} files under {args.audio_dir}")
+
     for entry in assets:
         name = entry.get("name")
         if not name:
@@ -146,10 +186,14 @@ def main() -> None:
                 continue
             patch_asset(args.base_url, existing[name]["id"], entry)
         else:
+            filename = entry.get("file")
+            if not filename:
+                die(f"Entry missing 'file': {entry}")
+            src = _resolve_source(args.audio_dir, file_index, filename)
             if args.dry_run:
-                info(f"DRY-RUN: would UPLOAD {entry.get('file')} as {name}")
+                info(f"DRY-RUN: would UPLOAD {src.name} as {name}{src.suffix.lower()}")
                 continue
-            upload_asset(args.base_url, args.audio_dir, entry)
+            upload_asset(args.base_url, src, entry)
 
     ok("Done.")
 
