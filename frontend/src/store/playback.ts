@@ -34,6 +34,15 @@ interface PlaybackState {
   travelVarianceMs: number
   /** Ambient bus master volume (0..1). Multiplicative with the music master. */
   ambientBusVolume: number
+  /** Global base chance a matching ambient category starts a sound (0..1). */
+  ambientDensity: number
+  /** Per-already-playing-layer multiplier on the ambient start chance (0..1).
+   *  Lower = sounds rarely stack; 1 = no suppression. */
+  ambientCrowdingFalloff: number
+  /** Minimum silence after an ambient sound ends before its category may restart, in ms. */
+  ambientRestMinMs: number
+  /** Random extra ambient rest on top of the minimum, in ms. */
+  ambientRestVarianceMs: number
 
   /** Timestamp (Date.now()) when the next wander advance will fire. Null when wander is off. */
   nextAdvanceAt: number | null
@@ -56,6 +65,10 @@ interface PlaybackActions {
   setTravelMinMs: (v: number) => void
   setTravelVarianceMs: (v: number) => void
   setAmbientBusVolume: (v: number) => void
+  setAmbientDensity: (v: number) => void
+  setAmbientCrowdingFalloff: (v: number) => void
+  setAmbientRestMinMs: (v: number) => void
+  setAmbientRestVarianceMs: (v: number) => void
 }
 
 let _audioManager: AudioManager | null = null
@@ -109,6 +122,10 @@ const TUNING_KEYS = [
   'travelMinMs',
   'travelVarianceMs',
   'ambientBusVolume',
+  'ambientDensity',
+  'ambientCrowdingFalloff',
+  'ambientRestMinMs',
+  'ambientRestVarianceMs',
 ] as const
 
 type TuningKey = typeof TUNING_KEYS[number]
@@ -217,6 +234,10 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
   travelMinMs: 3_000,
   travelVarianceMs: 3_000,
   ambientBusVolume: 0.7,
+  ambientDensity: 0.6,
+  ambientCrowdingFalloff: 0.35,
+  ambientRestMinMs: 8_000,
+  ambientRestVarianceMs: 22_000,
 
   // Saved defaults from localStorage override the hardcoded values above where present
   ..._savedDefaults,
@@ -231,6 +252,22 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
   setAmbientBusVolume: (v) => {
     set({ ambientBusVolume: v })
     _ambientEngine?.setBusVolume(v)
+  },
+  setAmbientDensity: (v) => {
+    set({ ambientDensity: v })
+    _ambientEngine?.setDensity(v)
+  },
+  setAmbientCrowdingFalloff: (v) => {
+    set({ ambientCrowdingFalloff: v })
+    _ambientEngine?.setCrowdingFalloff(v)
+  },
+  setAmbientRestMinMs: (v) => {
+    set({ ambientRestMinMs: v })
+    _ambientEngine?.setRest(v, get().ambientRestVarianceMs)
+  },
+  setAmbientRestVarianceMs: (v) => {
+    set({ ambientRestVarianceMs: v })
+    _ambientEngine?.setRest(get().ambientRestMinMs, v)
   },
 
   // ── Actions ──────────────────────────────────────────────────────────────
@@ -290,9 +327,15 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
 
     // Refresh the ambient asset library (fire-and-forget — does not gate
     // music playback) and trigger the first node-arrival evaluation once
-    // it's done. Also push the saved bus volume so the engine reflects
-    // localStorage values picked up at store init.
-    _ambientEngine?.setBusVolume(get().ambientBusVolume)
+    // it's done. Also push all ambient tuning params so the engine reflects
+    // the localStorage values picked up at store init.
+    if (_ambientEngine) {
+      const s = get()
+      _ambientEngine.setBusVolume(s.ambientBusVolume)
+      _ambientEngine.setDensity(s.ambientDensity)
+      _ambientEngine.setCrowdingFalloff(s.ambientCrowdingFalloff)
+      _ambientEngine.setRest(s.ambientRestMinMs, s.ambientRestVarianceMs)
+    }
     void _refreshAmbientLibrary().then(() => {
       _ambientEngine?.onNodeChange(startNode.ambient_tags ?? [])
     })
