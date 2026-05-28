@@ -7,8 +7,8 @@ import { Position, type XYPosition } from 'reactflow'
 export interface FloatNode {
   position: XYPosition
   positionAbsolute?: XYPosition
-  width?: number
-  height?: number
+  width?: number | null
+  height?: number | null
 }
 
 /**
