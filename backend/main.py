@@ -7,10 +7,11 @@ from sqlalchemy import inspect, text
 from backend.config import settings
 from backend.db.base import Base
 from backend.db.session import engine
-from backend.api.routes import games, graphs, nodes, edges, audio, sessions
+from backend.api.routes import games, graphs, nodes, edges, audio, sessions, ambient
 
 # Import models so SQLAlchemy registers them before create_all
 import backend.models.graph  # noqa: F401
+import backend.models.ambient  # noqa: F401
 
 app = FastAPI(title="bgmscape API", version="0.1.0")
 
@@ -28,6 +29,7 @@ app.include_router(nodes.router, prefix="/api")
 app.include_router(edges.router, prefix="/api")
 app.include_router(audio.router, prefix="/api")
 app.include_router(sessions.router, prefix="/api")
+app.include_router(ambient.router, prefix="/api")
 
 
 @app.on_event("startup")
@@ -40,6 +42,9 @@ def startup():
         "loop_start": "REAL",
         "loop_end": "REAL",
         "is_transition": "BOOLEAN NOT NULL DEFAULT 0",
+        # JSON column storing a list of free-form tag strings; matched by
+        # the ambient engine against AmbientAsset.tags at runtime.
+        "ambient_tags": "JSON NOT NULL DEFAULT '[]'",
     })
     _ensure_columns("playback_sessions", {
         "lookahead_queue": "JSON",

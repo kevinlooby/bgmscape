@@ -14,7 +14,46 @@ export interface Node {
    * directional cues that aren't meant to loop.
    */
   is_transition: boolean
+  /**
+   * Free-form tags matched against the ambient asset library to pick which
+   * atmospheric sounds (wind, water, fauna, …) play at this node. Empty
+   * means no ambient layer for the node.
+   */
+  ambient_tags: string[]
 }
+
+// ── Ambient ──────────────────────────────────────────────────────────────────
+
+export interface AmbientAsset {
+  id: string
+  name: string
+  file_path: string
+  category: string
+  tags: string[]
+  default_volume: number
+  play_probability: number
+  min_play_duration_s: number
+  max_play_duration_s: number
+  fade_in_ms: number
+  fade_out_ms: number
+  license: string | null
+  created_at: string
+}
+
+export interface AmbientAssetCreate {
+  name: string
+  category: string
+  tags: string[]
+  default_volume: number
+  play_probability: number
+  min_play_duration_s: number
+  max_play_duration_s: number
+  fade_in_ms: number
+  fade_out_ms: number
+  license?: string | null
+}
+
+export type AmbientAssetUpdate = Partial<AmbientAssetCreate>
 
 export interface Edge {
   id: string
@@ -126,6 +165,7 @@ export interface GraphExport {
     loop_start: number | null
     loop_end: number | null
     is_transition?: boolean
+    ambient_tags?: string[]
   }>
   edges: Array<{
     id: string

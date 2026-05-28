@@ -31,6 +31,19 @@ export default function GameGridPage() {
         <span style={{ color: '#4a90d9', fontWeight: 700, fontSize: 16 }}>bgmscape</span>
         <div style={{ width: 1, height: 16, background: '#2d4a6e' }} />
         <span style={{ color: '#4a6a8a', fontSize: 12 }}>game library</span>
+        <div style={{ flex: 1 }} />
+        <button
+          onClick={() => navigate('/ambient')}
+          style={{
+            padding: '6px 12px', borderRadius: 4,
+            background: '#1e2a3a', color: '#8a9bb0',
+            border: '1px solid #2d4a6e', cursor: 'pointer',
+            fontFamily: MONO, fontSize: 12,
+          }}
+          title="Manage the global ambient (wind, water, fauna, …) sound library"
+        >
+          Ambient library
+        </button>
       </div>
 
       {/* Body */}
