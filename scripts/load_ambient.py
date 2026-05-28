@@ -51,6 +51,16 @@ from pathlib import Path
 import requests
 
 
+# Windows consoles default to cp1252, which can't encode the ✓/✗ status glyphs
+# printed below (raises UnicodeEncodeError mid-run). Force UTF-8 output so the
+# loader runs cleanly regardless of the host console's codepage.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
+
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
 def die(msg: str) -> None:
