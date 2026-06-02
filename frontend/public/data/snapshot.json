@@ -1,7 +1,3678 @@
 {
   "version": 1,
-  "exported_at": "2026-06-01T00:00:00Z",
-  "games": [],
-  "graphs": [],
-  "ambient_assets": []
+  "exported_at": "2026-06-02T05:46:54.364943Z",
+  "games": [
+    {
+      "id": "5c32aff7-6ec9-435d-81aa-966fc78991ce",
+      "name": "Test Game",
+      "slug": "test-game",
+      "default_graph_id": "9f0840aa-309f-41f8-8580-02275d11fa4f",
+      "created_at": "2026-05-27T06:03:45.616751",
+      "graphs": [
+        {
+          "id": "9f0840aa-309f-41f8-8580-02275d11fa4f",
+          "name": "Test Graph",
+          "created_at": "2026-05-22T06:16:42.597675",
+          "node_count": 2,
+          "is_default": true
+        }
+      ]
+    },
+    {
+      "id": "3be5d2d5-d764-464b-8992-603d1c961b58",
+      "name": "The Legend of Zelda: Ocarina of Time",
+      "slug": "oot",
+      "default_graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+      "created_at": "2026-05-27T06:03:45.626255",
+      "graphs": [
+        {
+          "id": "91b6199c-3830-4252-8ccb-9b9163be0533",
+          "name": "Ocarina of Time v1",
+          "created_at": "2026-05-24T18:55:11.581235",
+          "node_count": 18,
+          "is_default": false
+        },
+        {
+          "id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Ocarina of Time v2",
+          "created_at": "2026-05-26T00:29:39.638755",
+          "node_count": 77,
+          "is_default": true
+        }
+      ]
+    },
+    {
+      "id": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8",
+      "name": "Super Mario 64",
+      "slug": "sm64",
+      "default_graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+      "created_at": "2026-05-27T06:04:29.547957",
+      "graphs": [
+        {
+          "id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Super Mario 64 v1",
+          "created_at": "2026-05-27T06:07:01.839475",
+          "node_count": 28,
+          "is_default": true
+        }
+      ]
+    }
+  ],
+  "graphs": [
+    {
+      "id": "9f0840aa-309f-41f8-8580-02275d11fa4f",
+      "name": "Test Graph",
+      "game_id": "5c32aff7-6ec9-435d-81aa-966fc78991ce",
+      "created_at": "2026-05-22T06:16:42.597675",
+      "nodes": [
+        {
+          "id": "a96d92b3-3e3b-40b0-acf6-b168aa4db53e",
+          "graph_id": "9f0840aa-309f-41f8-8580-02275d11fa4f",
+          "name": "Hyrule Field",
+          "audio_file_path": null,
+          "region": null,
+          "canvas_x": -57.53749319351144,
+          "canvas_y": -96.98844199989432,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": []
+        },
+        {
+          "id": "533e4720-7e69-4307-b537-ed530aa8ce89",
+          "graph_id": "9f0840aa-309f-41f8-8580-02275d11fa4f",
+          "name": "Kokiri Forest",
+          "audio_file_path": null,
+          "region": null,
+          "canvas_x": 57.53749319351144,
+          "canvas_y": 96.98844199989432,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": []
+        }
+      ],
+      "edges": [
+        {
+          "id": "6ab6f3fb-7232-4858-9ab2-d7275d06ae5f",
+          "graph_id": "9f0840aa-309f-41f8-8580-02275d11fa4f",
+          "source_node_id": "a96d92b3-3e3b-40b0-acf6-b168aa4db53e",
+          "target_node_id": "533e4720-7e69-4307-b537-ed530aa8ce89",
+          "weight": 1.0,
+          "bidirectional": true
+        }
+      ]
+    },
+    {
+      "id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+      "name": "Super Mario 64 v1",
+      "game_id": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8",
+      "created_at": "2026-05-27T06:07:01.839475",
+      "nodes": [
+        {
+          "id": "37b669eb-d35a-4589-bd51-bbcf517303b7",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Castle Grounds",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-07 Inside The Castle Walls.mp3",
+          "region": "Castle",
+          "canvas_x": 264.5938655142994,
+          "canvas_y": -20.932734931289655,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "field",
+            "urban"
+          ]
+        },
+        {
+          "id": "f19fddee-a46a-4894-9a43-a43b78245fbd",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Castle Lobby",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-07 Inside The Castle Walls.mp3",
+          "region": "Castle",
+          "canvas_x": 43.093691187758786,
+          "canvas_y": -29.144220779013473,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "urban"
+          ]
+        },
+        {
+          "id": "c0ec8861-df38-4543-bf47-6fb0705cdba2",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Castle Basement",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-07 Inside The Castle Walls.mp3",
+          "region": "Castle",
+          "canvas_x": 380.6496683534148,
+          "canvas_y": -207.8113328020811,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "urban"
+          ]
+        },
+        {
+          "id": "82d1f9fe-0cf4-4ebc-b05e-2d2f1618c8d0",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Castle Upstairs",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-07 Inside The Castle Walls.mp3",
+          "region": "Castle",
+          "canvas_x": -236.34732441864827,
+          "canvas_y": 229.84692966323078,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "urban"
+          ]
+        },
+        {
+          "id": "cc7e6ed1-37fe-4215-9b22-0fa4f91932c1",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Endless Stairs",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-08 Looping Steps.mp3",
+          "region": "Castle",
+          "canvas_x": -600.4702032863173,
+          "canvas_y": 117.50088520816766,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "urban"
+          ]
+        },
+        {
+          "id": "8cc0a10c-8ace-4920-b613-1d2ac535910a",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Bob-omb Battlefield",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-05 Super Mario 64 Main Theme.mp3",
+          "region": "Lobby Wing",
+          "canvas_x": 81.18827554084804,
+          "canvas_y": 375.1945426510171,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "field"
+          ]
+        },
+        {
+          "id": "23146e67-e63b-4e5e-8fda-36c1a7bf982c",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Whomp's Fortress",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-05 Super Mario 64 Main Theme.mp3",
+          "region": "Lobby Wing",
+          "canvas_x": -21.99858914347241,
+          "canvas_y": 180.90178447793542,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "dungeon",
+            "field",
+            "indoor",
+            "mountain"
+          ]
+        },
+        {
+          "id": "477320d2-806d-4ed5-a118-f85b9e347c2b",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Princess's Secret Slide",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-06 Slider.mp3",
+          "region": "Lobby Wing",
+          "canvas_x": 197.78137745108887,
+          "canvas_y": 188.58448102331977,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "cave",
+            "dungeon",
+            "indoor"
+          ]
+        },
+        {
+          "id": "a78ce67a-33c7-4d8b-bb4d-13adc0dbd621",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Jolly Roger Bay",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-09 Dire, Dire Docks.mp3",
+          "region": "Lobby Wing",
+          "canvas_x": -106.62723600245641,
+          "canvas_y": -190.6491086741323,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "ocean"
+          ]
+        },
+        {
+          "id": "15e472ce-72eb-45b8-82b1-0f61cfb1d999",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Cool, Cool Mountain",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-11 Snow Mountain.mp3",
+          "region": "Lobby Wing",
+          "canvas_x": 160.80715803248353,
+          "canvas_y": -214.88156605663286,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "mountain",
+            "snow",
+            "winter"
+          ]
+        },
+        {
+          "id": "0080bd07-05e6-44d4-b579-ebf8becd6f87",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Big Boo's Haunt",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-12 Haunted House.mp3",
+          "region": "Lobby Wing",
+          "canvas_x": 11.344497746696847,
+          "canvas_y": -376.3255380421775,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "indoor",
+            "night"
+          ]
+        },
+        {
+          "id": "ec6e6813-d922-44b7-b76d-2e2a1e016778",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Merry-Go-Round",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-13 Merry-Go-Round.mp3",
+          "region": "Lobby Wing",
+          "canvas_x": 80.33605160637995,
+          "canvas_y": -618.8799097433249,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": []
+        },
+        {
+          "id": "be843f25-071e-4a52-8259-b9866cc48a91",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Tower of the Wing Cap",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-16 Powerful Mario.mp3",
+          "region": "Lobby Wing",
+          "canvas_x": -171.42470652180629,
+          "canvas_y": 19.59595682203292,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "cave",
+            "dungeon",
+            "indoor",
+            "night"
+          ]
+        },
+        {
+          "id": "e1acdf68-9b28-486a-9cbd-2732c2aefce4",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Hazy Maze Cave",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-14 Cave Dungeon.mp3",
+          "region": "Basement",
+          "canvas_x": 412.69990626706056,
+          "canvas_y": 141.80979666102348,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "cave",
+            "dungeon",
+            "indoor"
+          ]
+        },
+        {
+          "id": "6faf5715-6214-4cf0-9422-4b3b31a4f07d",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Cavern of the Metal Cap",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-17 Metallic Mario.mp3",
+          "region": "Basement",
+          "canvas_x": 458.8997666090077,
+          "canvas_y": 395.9572855139518,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "cave",
+            "dungeon"
+          ]
+        },
+        {
+          "id": "89f3f477-8f3f-434e-908d-4fc0d7d25d6c",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Lethal Lava Land",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-10 Lethal Lava Land.mp3",
+          "region": "Basement",
+          "canvas_x": 528.6236961870031,
+          "canvas_y": -45.10624019477604,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "cave",
+            "mountain"
+          ]
+        },
+        {
+          "id": "3f6a9bd9-fe38-4dfd-b2c7-d38f53e37bb5",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Shifting Sand Land",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-10 Lethal Lava Land.mp3",
+          "region": "Basement",
+          "canvas_x": 730.0213111507526,
+          "canvas_y": -133.67074189456267,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "desert"
+          ]
+        },
+        {
+          "id": "422d892f-595f-47ef-bfc9-f00c1e1cedea",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Dire, Dire Docks",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-09 Dire, Dire Docks.mp3",
+          "region": "Basement",
+          "canvas_x": 593.3969632583313,
+          "canvas_y": -306.06005542757055,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "cave",
+            "ocean"
+          ]
+        },
+        {
+          "id": "37fbb817-52dc-4df9-b27e-7f15b850cc41",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Vanish Cap Under the Moat",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-16 Powerful Mario.mp3",
+          "region": "Basement",
+          "canvas_x": 242.31990910155756,
+          "canvas_y": -419.22825970895167,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "cave",
+            "dungeon"
+          ]
+        },
+        {
+          "id": "91239403-727b-4f7e-b6cc-6d54075b9022",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Bowser in the Dark World",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-29 Koopa's Road.mp3",
+          "region": "Bowser",
+          "canvas_x": 454.6573749667565,
+          "canvas_y": -476.78519296918836,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": []
+        },
+        {
+          "id": "99c07b12-4b6f-469f-a71d-bcfd675ef428",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Snowman's Land",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-11 Snow Mountain.mp3",
+          "region": "Upstairs",
+          "canvas_x": -128.88670702930034,
+          "canvas_y": 440.36281880271,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "mountain",
+            "snow",
+            "winter"
+          ]
+        },
+        {
+          "id": "9de3ae02-07d6-41c9-aa7d-2118e13450d2",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Wet-Dry World",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-15 Piranha Plant's Lullaby.mp3",
+          "region": "Upstairs",
+          "canvas_x": -346.5056700480177,
+          "canvas_y": 472.4097351707241,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "river",
+            "urban"
+          ]
+        },
+        {
+          "id": "c4d37170-9ae4-4e9d-bd99-e60de71682a3",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Tall, Tall Mountain",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-10 Lethal Lava Land.mp3",
+          "region": "Upstairs",
+          "canvas_x": -450.7416429746037,
+          "canvas_y": 278.63915696281515,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "mountain"
+          ]
+        },
+        {
+          "id": "3b407aec-09ce-475f-97a7-05ab50cc8b75",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Tiny-Huge Island",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-10 Lethal Lava Land.mp3",
+          "region": "Upstairs",
+          "canvas_x": -385.87601597093595,
+          "canvas_y": 68.61633967634452,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "field",
+            "forest"
+          ]
+        },
+        {
+          "id": "052ecfe7-1cca-4274-8aca-9ed8342d5b23",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Tick Tock Clock",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-36 Piranha Plant's Lullaby-Piano.mp3",
+          "region": "Upstairs",
+          "canvas_x": -321.0581241456632,
+          "canvas_y": -141.68958465810388,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "indoor"
+          ]
+        },
+        {
+          "id": "48bed76e-c150-4385-8b3a-293d3efa986e",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Rainbow Ride",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-06 Slider.mp3",
+          "region": "Upstairs",
+          "canvas_x": -566.4640409732003,
+          "canvas_y": 465.68553991826906,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "indoor"
+          ]
+        },
+        {
+          "id": "74f6dcc1-aa8d-429d-b86a-5341213db003",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Bowser in the Fire Sea",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-29 Koopa's Road.mp3",
+          "region": "Bowser",
+          "canvas_x": -535.5332931256553,
+          "canvas_y": -92.69568855210605,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "cave",
+            "dungeon",
+            "indoor",
+            "mountain",
+            "ocean"
+          ]
+        },
+        {
+          "id": "a941ecee-3ef2-46d7-a607-836c2b0559b0",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "name": "Bowser in the Sky",
+          "audio_file_path": "0b4408fd-ea53-4f4b-bd34-deaf91b21fb8/1-29 Koopa's Road.mp3",
+          "region": "Bowser",
+          "canvas_x": -768.2074789377208,
+          "canvas_y": -101.182802874235,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "dungeon",
+            "indoor"
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "id": "156f02a0-346d-42d3-9d13-f1333ad9dca3",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "37b669eb-d35a-4589-bd51-bbcf517303b7",
+          "target_node_id": "f19fddee-a46a-4894-9a43-a43b78245fbd",
+          "weight": 1.5,
+          "bidirectional": true
+        },
+        {
+          "id": "14367eaa-09a1-4481-bdde-0395e60dc166",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "f19fddee-a46a-4894-9a43-a43b78245fbd",
+          "target_node_id": "c0ec8861-df38-4543-bf47-6fb0705cdba2",
+          "weight": 1.0,
+          "bidirectional": true
+        },
+        {
+          "id": "b643a48f-01a4-4778-a67a-aee4278a312f",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "f19fddee-a46a-4894-9a43-a43b78245fbd",
+          "target_node_id": "82d1f9fe-0cf4-4ebc-b05e-2d2f1618c8d0",
+          "weight": 1.0,
+          "bidirectional": true
+        },
+        {
+          "id": "aa224f37-5457-4812-b0f3-db186d5b16b4",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "f19fddee-a46a-4894-9a43-a43b78245fbd",
+          "target_node_id": "8cc0a10c-8ace-4920-b613-1d2ac535910a",
+          "weight": 2.0,
+          "bidirectional": true
+        },
+        {
+          "id": "9eb4e98f-546f-43ca-8f70-97ea0131de08",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "f19fddee-a46a-4894-9a43-a43b78245fbd",
+          "target_node_id": "23146e67-e63b-4e5e-8fda-36c1a7bf982c",
+          "weight": 1.2,
+          "bidirectional": true
+        },
+        {
+          "id": "7368eb23-c164-430c-8442-0ce06ceae274",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "f19fddee-a46a-4894-9a43-a43b78245fbd",
+          "target_node_id": "477320d2-806d-4ed5-a118-f85b9e347c2b",
+          "weight": 0.6,
+          "bidirectional": true
+        },
+        {
+          "id": "f6ccc836-633a-4eeb-981b-f570a1941fb8",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "f19fddee-a46a-4894-9a43-a43b78245fbd",
+          "target_node_id": "a78ce67a-33c7-4d8b-bb4d-13adc0dbd621",
+          "weight": 1.2,
+          "bidirectional": true
+        },
+        {
+          "id": "015ad5d0-0536-4a82-ba0f-96a3b2ef61cd",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "f19fddee-a46a-4894-9a43-a43b78245fbd",
+          "target_node_id": "15e472ce-72eb-45b8-82b1-0f61cfb1d999",
+          "weight": 1.2,
+          "bidirectional": true
+        },
+        {
+          "id": "b2204e6f-4566-45bc-bf66-3cd502461f67",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "f19fddee-a46a-4894-9a43-a43b78245fbd",
+          "target_node_id": "0080bd07-05e6-44d4-b579-ebf8becd6f87",
+          "weight": 1.0,
+          "bidirectional": true
+        },
+        {
+          "id": "3a47feb7-2644-453a-bfce-12680a3c8d63",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "f19fddee-a46a-4894-9a43-a43b78245fbd",
+          "target_node_id": "be843f25-071e-4a52-8259-b9866cc48a91",
+          "weight": 0.6,
+          "bidirectional": true
+        },
+        {
+          "id": "6def2699-ffbd-46ef-ae4f-1a15f6896116",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "0080bd07-05e6-44d4-b579-ebf8becd6f87",
+          "target_node_id": "ec6e6813-d922-44b7-b76d-2e2a1e016778",
+          "weight": 0.8,
+          "bidirectional": true
+        },
+        {
+          "id": "d3b03be6-f8ab-4781-b634-9449a7b92a3c",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "c0ec8861-df38-4543-bf47-6fb0705cdba2",
+          "target_node_id": "e1acdf68-9b28-486a-9cbd-2732c2aefce4",
+          "weight": 1.2,
+          "bidirectional": true
+        },
+        {
+          "id": "1810be93-7ef7-400c-8244-fdef595adada",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "e1acdf68-9b28-486a-9cbd-2732c2aefce4",
+          "target_node_id": "6faf5715-6214-4cf0-9422-4b3b31a4f07d",
+          "weight": 0.6,
+          "bidirectional": true
+        },
+        {
+          "id": "7d1916ff-ce7a-49d2-97fa-9bb644398d59",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "c0ec8861-df38-4543-bf47-6fb0705cdba2",
+          "target_node_id": "89f3f477-8f3f-434e-908d-4fc0d7d25d6c",
+          "weight": 1.2,
+          "bidirectional": true
+        },
+        {
+          "id": "b1a07357-c8a0-46ca-b062-6284a0f8d61e",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "c0ec8861-df38-4543-bf47-6fb0705cdba2",
+          "target_node_id": "3f6a9bd9-fe38-4dfd-b2c7-d38f53e37bb5",
+          "weight": 1.2,
+          "bidirectional": true
+        },
+        {
+          "id": "7af9eda0-6b63-4f8d-bce9-1bc1862c7f0a",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "c0ec8861-df38-4543-bf47-6fb0705cdba2",
+          "target_node_id": "422d892f-595f-47ef-bfc9-f00c1e1cedea",
+          "weight": 1.2,
+          "bidirectional": true
+        },
+        {
+          "id": "bb6c8ec8-bd05-471c-82b9-bb4f68a8e61c",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "c0ec8861-df38-4543-bf47-6fb0705cdba2",
+          "target_node_id": "37fbb817-52dc-4df9-b27e-7f15b850cc41",
+          "weight": 0.6,
+          "bidirectional": true
+        },
+        {
+          "id": "a1bada1c-b856-4fb3-88d9-55a5036f502a",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "c0ec8861-df38-4543-bf47-6fb0705cdba2",
+          "target_node_id": "91239403-727b-4f7e-b6cc-6d54075b9022",
+          "weight": 0.8,
+          "bidirectional": true
+        },
+        {
+          "id": "91913809-c2bf-4c33-bf1d-4bab8887f75c",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "82d1f9fe-0cf4-4ebc-b05e-2d2f1618c8d0",
+          "target_node_id": "99c07b12-4b6f-469f-a71d-bcfd675ef428",
+          "weight": 1.2,
+          "bidirectional": true
+        },
+        {
+          "id": "408936e6-662f-4733-a310-523dfc48526e",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "82d1f9fe-0cf4-4ebc-b05e-2d2f1618c8d0",
+          "target_node_id": "9de3ae02-07d6-41c9-aa7d-2118e13450d2",
+          "weight": 1.2,
+          "bidirectional": true
+        },
+        {
+          "id": "e79e112e-7256-4d25-aab9-a142fd203cbb",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "82d1f9fe-0cf4-4ebc-b05e-2d2f1618c8d0",
+          "target_node_id": "c4d37170-9ae4-4e9d-bd99-e60de71682a3",
+          "weight": 1.2,
+          "bidirectional": true
+        },
+        {
+          "id": "2cc871ea-01a1-4210-b166-2e8704f0524b",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "82d1f9fe-0cf4-4ebc-b05e-2d2f1618c8d0",
+          "target_node_id": "3b407aec-09ce-475f-97a7-05ab50cc8b75",
+          "weight": 1.2,
+          "bidirectional": true
+        },
+        {
+          "id": "015927ba-53e0-483b-b9c7-f21deb530287",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "82d1f9fe-0cf4-4ebc-b05e-2d2f1618c8d0",
+          "target_node_id": "052ecfe7-1cca-4274-8aca-9ed8342d5b23",
+          "weight": 1.0,
+          "bidirectional": true
+        },
+        {
+          "id": "75056e1a-40a8-4caa-b67f-23da894c75f2",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "82d1f9fe-0cf4-4ebc-b05e-2d2f1618c8d0",
+          "target_node_id": "48bed76e-c150-4385-8b3a-293d3efa986e",
+          "weight": 1.0,
+          "bidirectional": true
+        },
+        {
+          "id": "ae5bbf3d-282a-4140-93a3-386f1ad707f9",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "82d1f9fe-0cf4-4ebc-b05e-2d2f1618c8d0",
+          "target_node_id": "74f6dcc1-aa8d-429d-b86a-5341213db003",
+          "weight": 0.8,
+          "bidirectional": true
+        },
+        {
+          "id": "e04b805e-55f1-4b74-92c8-795c59ea0002",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "82d1f9fe-0cf4-4ebc-b05e-2d2f1618c8d0",
+          "target_node_id": "cc7e6ed1-37fe-4215-9b22-0fa4f91932c1",
+          "weight": 0.6,
+          "bidirectional": true
+        },
+        {
+          "id": "d1edcdc4-d71d-4f30-ba29-a8c277efd4ab",
+          "graph_id": "d211884b-46dd-42fb-a730-680aeb7d4496",
+          "source_node_id": "cc7e6ed1-37fe-4215-9b22-0fa4f91932c1",
+          "target_node_id": "a941ecee-3ef2-46d7-a607-836c2b0559b0",
+          "weight": 0.6,
+          "bidirectional": true
+        }
+      ]
+    },
+    {
+      "id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+      "name": "Ocarina of Time v2",
+      "game_id": "3be5d2d5-d764-464b-8992-603d1c961b58",
+      "created_at": "2026-05-26T00:29:39.638755",
+      "nodes": [
+        {
+          "id": "b7451a27-80e3-4691-b5f7-92c4f71a2a6e",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Hyrule Field",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/19. Hyrule Field Main Theme.flac",
+          "region": "Overworld",
+          "canvas_x": 40.40704458964914,
+          "canvas_y": 20.710729138576546,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "field"
+          ]
+        },
+        {
+          "id": "f7b4053d-3890-4f97-9697-2ad04f9f1aec",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Kokiri Forest",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/06. Kokiri Forest.flac",
+          "region": "Forest",
+          "canvas_x": -54.050157767693364,
+          "canvas_y": -280.00718974802686,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "forest"
+          ]
+        },
+        {
+          "id": "915e4f93-c566-420b-8334-849f844f8c02",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Lost Woods",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/36. Lost Woods.flac",
+          "region": "Forest",
+          "canvas_x": 173.8208422952845,
+          "canvas_y": -484.0157359000303,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "dusk",
+            "forest"
+          ]
+        },
+        {
+          "id": "657cc3ff-cafb-4714-933f-f414f7ce233b",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Sacred Forest Meadow",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/36. Lost Woods.flac",
+          "region": "Forest",
+          "canvas_x": -30.456784702883358,
+          "canvas_y": -775.5834012093387,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "dusk",
+            "field",
+            "forest"
+          ]
+        },
+        {
+          "id": "ac9ec79d-1736-4331-a295-82cfe893906d",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Lon Lon Ranch",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/29. Lon Lon Ranch.flac",
+          "region": "Overworld",
+          "canvas_x": 139.83620388200032,
+          "canvas_y": 223.1770991842124,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "field"
+          ]
+        },
+        {
+          "id": "a65caaf8-b662-4a67-a8fe-41c52329fc54",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Market",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/22. Market.flac",
+          "region": "Market",
+          "canvas_x": 356.9016177651631,
+          "canvas_y": -362.32759436097757,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "urban"
+          ]
+        },
+        {
+          "id": "05a618c8-0ec0-42e2-806e-c9c51139c9d0",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Temple of Time",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/45. Temple of Time.flac",
+          "region": "Market",
+          "canvas_x": 767.6826598530758,
+          "canvas_y": -627.3702706467449,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "dawn",
+            "day",
+            "dungeon",
+            "indoor",
+            "urban"
+          ]
+        },
+        {
+          "id": "9f0bc0d0-80ee-4322-806f-8fb56b2af779",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Hyrule Castle",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/24. Hyrule Castle Courtyard.flac",
+          "region": "Market",
+          "canvas_x": 411.7823605556674,
+          "canvas_y": -696.6631150517283,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "urban"
+          ]
+        },
+        {
+          "id": "44ba205a-9b77-4edf-b63c-778f1bbc43f0",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Kakariko Village",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/31. Kakariko Village.flac",
+          "region": "Kakariko",
+          "canvas_x": 462.8826963889669,
+          "canvas_y": 122.76362386865912,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "urban"
+          ]
+        },
+        {
+          "id": "1fa86ae3-18d6-4475-a94c-e013e12696b8",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Windmill Hut",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/58. Windmill Hut.flac",
+          "region": "Kakariko",
+          "canvas_x": 343.0976871573053,
+          "canvas_y": 307.2023378243806,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "urban"
+          ]
+        },
+        {
+          "id": "9b4252d2-a6f0-4774-abdf-92baee890a5f",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Fire Temple",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/62. Fire Temple.flac",
+          "region": "Dungeon",
+          "canvas_x": 846.1393171640434,
+          "canvas_y": 11.24635277444575,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "cave",
+            "dungeon",
+            "indoor",
+            "mountain"
+          ]
+        },
+        {
+          "id": "49d50f90-0f5a-4d1d-8ff8-5cadcc934180",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Goron City",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/34. Goron City.flac",
+          "region": "Death Mountain",
+          "canvas_x": 559.1266308955653,
+          "canvas_y": -276.0335850994505,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "cave",
+            "day",
+            "indoor",
+            "mountain",
+            "urban"
+          ]
+        },
+        {
+          "id": "f2514725-8bba-448c-a978-bee88723e15b",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Zora's Domain",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/40. Zora's Domain.flac",
+          "region": "Zora",
+          "canvas_x": 52.19740269927684,
+          "canvas_y": 424.84752207114053,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "cave",
+            "indoor",
+            "river"
+          ]
+        },
+        {
+          "id": "00633b7e-d2ee-4584-9054-b33b260b0309",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Spirit Temple",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/70. Spirit Temple.flac",
+          "region": "Dungeon",
+          "canvas_x": -588.9522692015879,
+          "canvas_y": 531.9072602303409,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "desert",
+            "dungeon",
+            "indoor"
+          ]
+        },
+        {
+          "id": "d2c1d260-4a86-4893-9625-89c7ff52e3fc",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Gerudo Valley",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/69. Gerudo Valley.flac",
+          "region": "Gerudo",
+          "canvas_x": -298.3455991268603,
+          "canvas_y": 235.2788938192523,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "desert",
+            "mountain"
+          ]
+        },
+        {
+          "id": "236f66ed-6cb6-4653-959d-9a5a25ebfdd8",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Inside the Deku Tree",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/12. Inside the Deku Tree.flac",
+          "region": "Dungeon",
+          "canvas_x": -375.26968328919827,
+          "canvas_y": -331.8456069544816,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "dungeon",
+            "forest",
+            "indoor"
+          ]
+        },
+        {
+          "id": "52c8ba11-acbe-4629-a6d1-6bc23b542a79",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Forest Temple",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/60. Forest Temple.flac",
+          "region": "Dungeon",
+          "canvas_x": 55.89952160508858,
+          "canvas_y": -1014.9282757009075,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "dungeon",
+            "forest",
+            "indoor"
+          ]
+        },
+        {
+          "id": "96ee33fa-f14f-4293-b461-6bc38f1a48ed",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Shadow Temple",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/68. Shadow Temple.flac",
+          "region": "Dungeon",
+          "canvas_x": 560.5484852968597,
+          "canvas_y": 340.2882567973411,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "cave",
+            "dungeon",
+            "indoor",
+            "night"
+          ]
+        },
+        {
+          "id": "30d19668-5e42-4102-84f8-324bd2a969d3",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Lake Hylia",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/19. Hyrule Field Main Theme.flac",
+          "region": "Overworld",
+          "canvas_x": -78.6200110502286,
+          "canvas_y": 248.04853235904577,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "river"
+          ]
+        },
+        {
+          "id": "c94a9dd6-eb1d-4807-96b1-8079d1dde4e7",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Zora's Fountain",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/40. Zora's Domain.flac",
+          "region": "Zora",
+          "canvas_x": 128.71357936158475,
+          "canvas_y": 772.5823354892965,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "river"
+          ]
+        },
+        {
+          "id": "b86e8ebc-429b-41fe-b07f-42ea3f564831",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Death Mountain Trail",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/19. Hyrule Field Main Theme.flac",
+          "region": "Death Mountain",
+          "canvas_x": 888.3726434650595,
+          "canvas_y": 227.09413938680063,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "mountain"
+          ]
+        },
+        {
+          "id": "a911e442-2d62-4986-b082-60a9c2e86e01",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Death Mountain Crater",
+          "audio_file_path": null,
+          "region": "Death Mountain",
+          "canvas_x": 1026.4584952145697,
+          "canvas_y": 398.326455113073,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "cave",
+            "mountain"
+          ]
+        },
+        {
+          "id": "c7af5b02-59dd-4a07-9158-5f39f735f81d",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Market (Ruins)",
+          "audio_file_path": null,
+          "region": "Market",
+          "canvas_x": -401.0028998722366,
+          "canvas_y": -11.701292685397886,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "urban"
+          ]
+        },
+        {
+          "id": "b3551460-416e-40e6-899c-34e91f0f3eb3",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Ganon's Castle Exterior",
+          "audio_file_path": null,
+          "region": "Endgame",
+          "canvas_x": -882.1747909469924,
+          "canvas_y": -47.477425545029334,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "dungeon",
+            "indoor",
+            "night",
+            "urban"
+          ]
+        },
+        {
+          "id": "fc4aee23-f287-4716-b539-bf61bc7b0fd9",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Dodongo's Cavern",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/37. Dodongo's Cavern.flac",
+          "region": "Dungeon",
+          "canvas_x": 733.4169884990494,
+          "canvas_y": -410.1313420164001,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "cave",
+            "dungeon",
+            "indoor"
+          ]
+        },
+        {
+          "id": "993373a4-ba21-4961-83c4-50677b6eb8e2",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Inside Jabu-Jabu's Belly",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/43. Inside Jabu-Jabu's Belly.flac",
+          "region": "Dungeon",
+          "canvas_x": 166.780035405425,
+          "canvas_y": 1055.2099854783353,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "cave",
+            "dungeon",
+            "indoor",
+            "river"
+          ]
+        },
+        {
+          "id": "ed49993e-b3bb-4c50-821c-55df5f248d3c",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Water Temple",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/65. Water Temple.flac",
+          "region": "Dungeon",
+          "canvas_x": -35.73980190505317,
+          "canvas_y": 626.5362731578663,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "dungeon",
+            "indoor",
+            "river"
+          ]
+        },
+        {
+          "id": "ace2a5e5-6cd5-489e-967d-6767a9d5b221",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Ice Cavern",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/63. Ice Cavern.flac",
+          "region": "Dungeon",
+          "canvas_x": -38.204558663421864,
+          "canvas_y": 975.3477411610763,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "cave",
+            "dungeon",
+            "indoor",
+            "mountain",
+            "snow",
+            "winter"
+          ]
+        },
+        {
+          "id": "5fa23aa2-d0f8-4042-a67a-3c0135c61633",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Great Fairy's Fountain (Death Mountain Trail)",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/41. Great Fairy's Fountain.flac",
+          "region": "Special",
+          "canvas_x": 1172.0924587320296,
+          "canvas_y": 233.437043693838,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "mountain",
+            "river"
+          ]
+        },
+        {
+          "id": "9e7c0334-0015-4d12-aa20-280acc753f2f",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Great Fairy's Fountain (Hyrule Castle)",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/41. Great Fairy's Fountain.flac",
+          "region": "Special",
+          "canvas_x": 267.2615045722363,
+          "canvas_y": -954.0810519824511,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "river",
+            "urban"
+          ]
+        },
+        {
+          "id": "7f34c106-8224-4ffb-8a55-534322ffffe7",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Great Fairy's Fountain (Zora's Fountain)",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/41. Great Fairy's Fountain.flac",
+          "region": "Special",
+          "canvas_x": 342.70824085275706,
+          "canvas_y": 923.1271120068808,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "river"
+          ]
+        },
+        {
+          "id": "4598e362-a59d-4b43-a7ba-bc8e9d64857b",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Great Fairy's Fountain (Death Mountain Crater)",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/41. Great Fairy's Fountain.flac",
+          "region": "Special",
+          "canvas_x": 1240.524173107611,
+          "canvas_y": 658.6335705727889,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "cave",
+            "mountain",
+            "river"
+          ]
+        },
+        {
+          "id": "023b8494-7a45-41e3-bead-45e9aae66f12",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Great Fairy's Fountain (Spirit Temple)",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/41. Great Fairy's Fountain.flac",
+          "region": "Special",
+          "canvas_x": -816.1022212207284,
+          "canvas_y": 433.8341502819667,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "desert",
+            "dungeon",
+            "indoor",
+            "river"
+          ]
+        },
+        {
+          "id": "3aaabe24-9f0d-4072-8c95-2974f1f400bb",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Great Fairy's Fountain (Ganon's Castle)",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/41. Great Fairy's Fountain.flac",
+          "region": "Special",
+          "canvas_x": -1094.771443424265,
+          "canvas_y": -176.4938271020676,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "dungeon",
+            "indoor",
+            "night",
+            "river",
+            "urban"
+          ]
+        },
+        {
+          "id": "ad104056-1eff-4311-bc92-e99861459f79",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Inside Ganon's Castle",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/77. Inside Ganon's Castle.flac",
+          "region": "Endgame",
+          "canvas_x": -1623.0453446668762,
+          "canvas_y": -41.200821929883396,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "dungeon",
+            "indoor",
+            "night",
+            "urban"
+          ]
+        },
+        {
+          "id": "e9c64075-1323-4f6a-aa3e-d6311f8feed1",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Ganon's Castle Bridge",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/75. Ganon's Castle Bridge.flac",
+          "region": "Endgame",
+          "canvas_x": -1273.6461238685604,
+          "canvas_y": -48.41631660714021,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "dungeon",
+            "indoor",
+            "night",
+            "urban"
+          ]
+        },
+        {
+          "id": "9f3dcb94-5f75-4be9-8083-22ab1a8c584a",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Ganon's Castle Underground",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/76. Ganon's Castle Underground.flac",
+          "region": "Endgame",
+          "canvas_x": -1833.7135573942803,
+          "canvas_y": -173.94608525944622,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "cave",
+            "dungeon",
+            "indoor",
+            "night",
+            "urban"
+          ]
+        },
+        {
+          "id": "67f43edc-a050-425e-b3a8-83852b99d446",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Ganondorf's Tower",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/48. Ganondorf's Theme.flac",
+          "region": "Endgame",
+          "canvas_x": -1904.5855488954512,
+          "canvas_y": 34.325758298333426,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "dungeon",
+            "indoor",
+            "night"
+          ]
+        },
+        {
+          "id": "6916c362-b8a2-4fa8-846c-b7d9f86f6a44",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "House",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/05. House.flac",
+          "region": "Various",
+          "canvas_x": 165.68836511899255,
+          "canvas_y": -160.1521816523955,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": []
+        },
+        {
+          "id": "219469e1-52f9-4b33-9ca7-15f3814a525d",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Shop",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/10. Shop.flac",
+          "region": "Market",
+          "canvas_x": 384.9598612480389,
+          "canvas_y": -141.85264945871495,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "urban"
+          ]
+        },
+        {
+          "id": "aae01d64-e21b-4134-9ada-db76c72588c9",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Potion Shop",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/42. Potion Shop.flac",
+          "region": "Kakariko",
+          "canvas_x": 588.2459748930652,
+          "canvas_y": -57.85864253463328,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "urban"
+          ]
+        },
+        {
+          "id": "8e3de57c-84bf-430d-acaf-4b6b387a5967",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Shooting Gallery",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/23. Shooting Gallery.flac",
+          "region": "Market",
+          "canvas_x": 762.5503193354432,
+          "canvas_y": -192.08976911584512,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "urban"
+          ]
+        },
+        {
+          "id": "f1867f10-ad4e-474f-a70c-fb9aee4a3820",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Kakariko Village (Adult)",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/56. Kakariko Village Orchestral Version.flac",
+          "region": "Kakariko",
+          "canvas_x": 680.2619366093005,
+          "canvas_y": 155.77041221048134,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "urban"
+          ]
+        },
+        {
+          "id": "4d33b064-cab0-4b6a-9681-0288a85ed26f",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Ingo's Lon Lon Ranch",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/54. Ingo's Theme.flac",
+          "region": "Overworld",
+          "canvas_x": 255.44332451343016,
+          "canvas_y": 508.9803729930529,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "field"
+          ]
+        },
+        {
+          "id": "c6fde6c0-01da-496f-8a06-9043cd67a170",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Minuet of Forest",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/59. Minuet of Forest.flac",
+          "region": "Forest",
+          "canvas_x": -163.5463626260868,
+          "canvas_y": -1030.3717459729776,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "forest"
+          ]
+        },
+        {
+          "id": "6357e90e-8dc2-43de-9756-8b1e55bcbfe6",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Bolero of Fire",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/61. Bolero of Fire.flac",
+          "region": "Death Mountain",
+          "canvas_x": 1250.6819639737223,
+          "canvas_y": 438.86339534722134,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "cave",
+            "mountain"
+          ]
+        },
+        {
+          "id": "1b3bdf06-1195-4eb5-abd4-6db922d7da47",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Serenade of Water",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/64. Serenade of Water.flac",
+          "region": "Overworld",
+          "canvas_x": -386.1073095503875,
+          "canvas_y": 437.00674783892737,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "river"
+          ]
+        },
+        {
+          "id": "eb7af80d-27b0-4ad6-8bcb-e4f11063980d",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Nocturne of Shadow",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/66. Nocturne of Shadow.flac",
+          "region": "Kakariko",
+          "canvas_x": 807.2525261762645,
+          "canvas_y": 431.56178819106486,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "night",
+            "urban"
+          ]
+        },
+        {
+          "id": "870e9076-6225-4cba-beb8-f07283c47d69",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Prelude of Light",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/67. Prelude of Light.flac",
+          "region": "Market",
+          "canvas_x": 1073.9095096540093,
+          "canvas_y": -595.7880960843942,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "urban"
+          ]
+        },
+        {
+          "id": "142ecb03-cd38-40dd-a9b0-7870a50a02a4",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Requiem of Spirit",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/71. Requiem of Spirit.flac",
+          "region": "Gerudo",
+          "canvas_x": -858.6961128274546,
+          "canvas_y": 649.6578552169008,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "desert"
+          ]
+        },
+        {
+          "id": "2c53019f-e97b-4b8b-908e-4ecbf07834b6",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Sheik (Sacred Forest Meadow)",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/51. Sheik's Theme.flac",
+          "region": "Forest",
+          "canvas_x": -283.35070308007374,
+          "canvas_y": -845.8536709855899,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "dusk",
+            "field",
+            "forest"
+          ]
+        },
+        {
+          "id": "64a70f8b-0961-4f60-8463-e11ba8f1eb62",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Sheik (Death Mountain Crater)",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/51. Sheik's Theme.flac",
+          "region": "Death Mountain",
+          "canvas_x": 1024.248871981441,
+          "canvas_y": 618.2953167075856,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "cave",
+            "mountain"
+          ]
+        },
+        {
+          "id": "fc346c2b-f7bf-4b91-abe8-d871f53a59f1",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Sheik (Lake Hylia)",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/51. Sheik's Theme.flac",
+          "region": "Overworld",
+          "canvas_x": -166.4026272355455,
+          "canvas_y": 449.52371440294206,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "river"
+          ]
+        },
+        {
+          "id": "e944c637-a6d6-4f93-859c-77b6fa82a7bf",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Sheik (Kakariko Village Adult)",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/51. Sheik's Theme.flac",
+          "region": "Kakariko",
+          "canvas_x": 622.6985535077398,
+          "canvas_y": 551.310822197773,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "urban"
+          ]
+        },
+        {
+          "id": "e3f24a1c-6d4d-48ab-9ab1-139b09dbc71c",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Sheik (Spirit Temple)",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/51. Sheik's Theme.flac",
+          "region": "Gerudo",
+          "canvas_x": -707.419081168072,
+          "canvas_y": 809.3784934197571,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "desert",
+            "dungeon",
+            "indoor"
+          ]
+        },
+        {
+          "id": "3f7b9d0e-cd39-4514-b579-df27ed46186a",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Sheik (Temple of Time)",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/51. Sheik's Theme.flac",
+          "region": "Market",
+          "canvas_x": 953.3907579598617,
+          "canvas_y": -411.772281182893,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "dawn",
+            "day",
+            "dungeon",
+            "indoor",
+            "urban"
+          ]
+        },
+        {
+          "id": "f82011a0-432e-4ab2-9733-a0d46ac250f4",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Kaepora Gaebora (Kokiri Forest)",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/21. Kaepora Gaebora's Theme.flac",
+          "region": "Forest",
+          "canvas_x": -39.49562297699453,
+          "canvas_y": -537.4620741595859,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "forest"
+          ]
+        },
+        {
+          "id": "4f98643f-28ec-48c9-a889-274713d90557",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Kaepora Gaebora (Death Mountain Trail)",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/21. Kaepora Gaebora's Theme.flac",
+          "region": "Death Mountain",
+          "canvas_x": 1063.9802010347087,
+          "canvas_y": 41.84464861557868,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "mountain"
+          ]
+        },
+        {
+          "id": "21a9a29e-7341-4c29-9738-235081bfe066",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Kaepora Gaebora (Lake Hylia)",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/21. Kaepora Gaebora's Theme.flac",
+          "region": "Overworld",
+          "canvas_x": -287.01409161047206,
+          "canvas_y": 633.5152214172134,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "river"
+          ]
+        },
+        {
+          "id": "c18b1925-b17f-4c37-bde4-39394d685e84",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Kaepora Gaebora (Gerudo Valley)",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/21. Kaepora Gaebora's Theme.flac",
+          "region": "Gerudo",
+          "canvas_x": -552.3830237968104,
+          "canvas_y": 293.01422096428536,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "desert",
+            "mountain"
+          ]
+        },
+        {
+          "id": "0904a4a3-e1ba-4cae-b566-ec8ce9a5f429",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Chamber of Sages",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/49. Chamber of Sages.flac",
+          "region": "Sacred Realm",
+          "canvas_x": 1025.0446408787966,
+          "canvas_y": -810.2315172153859,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": []
+        },
+        {
+          "id": "aa655b1a-4e66-4b0a-842d-005c9482a630",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Open Door of Temple of Time",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/46. Open Door of Temple of Time.flac",
+          "region": "Market",
+          "canvas_x": 844.5055627469328,
+          "canvas_y": -935.9319237630114,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "dawn",
+            "day",
+            "dungeon",
+            "indoor",
+            "urban"
+          ]
+        },
+        {
+          "id": "85593302-3383-429e-8b6d-9b9c8d6a48a2",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Master Sword",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/47. Master Sword.flac",
+          "region": "Market",
+          "canvas_x": 1074.569510960965,
+          "canvas_y": -1042.9822444855802,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "urban"
+          ]
+        },
+        {
+          "id": "92023c62-d659-49af-afeb-1cb3e9ecc6dc",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Enter Ganondorf",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/02. Enter Ganondorf.flac",
+          "region": "Market",
+          "canvas_x": 487.20746803065185,
+          "canvas_y": -956.2467139851054,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "urban"
+          ]
+        },
+        {
+          "id": "66254505-d161-4c37-bdec-64d2d1f1f63f",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Deku Tree",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/03. Deku Tree.flac",
+          "region": "Forest",
+          "canvas_x": -258.66429625577376,
+          "canvas_y": -518.3546764714565,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "forest"
+          ]
+        },
+        {
+          "id": "4550b0c1-5e54-483a-94cf-ea8c4b152f42",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Zelda's Theme",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/27. Zelda's Theme.flac",
+          "region": "Market",
+          "canvas_x": 187.91455136764498,
+          "canvas_y": -748.9051761853385,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "urban"
+          ]
+        },
+        {
+          "id": "563eada0-c063-412a-880f-8a1843f92446",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Horse Race",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/52. Horse Race.flac",
+          "region": "Overworld",
+          "canvas_x": -177.31304975956374,
+          "canvas_y": 51.59437092908116,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": []
+        },
+        {
+          "id": "e0a220ea-2f2d-4ecc-a79a-acafcbe33508",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Meet Zelda Again",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/73. Meet Zelda Again.flac",
+          "region": "Market",
+          "canvas_x": 658.6010793456684,
+          "canvas_y": -818.3183639315754,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "day",
+            "urban"
+          ]
+        },
+        {
+          "id": "7bed8af3-1020-49b8-aa86-71f53017f629",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Hyrule Field Morning",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/33. Hyrule Field Morning Theme.flac",
+          "region": "Overworld",
+          "canvas_x": 259.54062329095797,
+          "canvas_y": 38.88762166381767,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "dawn",
+            "day",
+            "field"
+          ]
+        },
+        {
+          "id": "8750d0c7-945a-4e19-a895-cc2810d90538",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Kotake & Koume",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/72. Kotake & Koume's Theme.flac",
+          "region": "Gerudo",
+          "canvas_x": -491.8492717087092,
+          "canvas_y": 765.4506292690929,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": [
+            "desert"
+          ]
+        },
+        {
+          "id": "42c0c1ef-be43-47e1-8e75-116da2981531",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Seal of Six Sages",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/81. Seal of Six Sages.flac",
+          "region": "Endgame",
+          "canvas_x": -2143.34416767496,
+          "canvas_y": 138.8505591738481,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": []
+        },
+        {
+          "id": "16bcefb3-8b56-4d5b-ac70-0c91bea59f1d",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Ocarina of Time (Zelda's Ocarina)",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/82. Ocarina of Time ~Zelda's Ocarina~.flac",
+          "region": "Endgame",
+          "canvas_x": -1989.2084324196596,
+          "canvas_y": 321.9524295459393,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": []
+        },
+        {
+          "id": "5d0c9515-892f-45f5-ad0d-aab917f87daa",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "End Credits A",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/83. End Credits A.flac",
+          "region": "Endgame",
+          "canvas_x": -1712.4546125607048,
+          "canvas_y": 291.09209633991503,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": []
+        },
+        {
+          "id": "d1c61021-bb9a-4f64-a4c4-244ac6e064de",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "End Credits B",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/84. End Credits B.flac",
+          "region": "Endgame",
+          "canvas_x": -1404.2572213218805,
+          "canvas_y": 202.67065473283097,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": []
+        },
+        {
+          "id": "aefc0040-7089-4002-97c9-9e52e4482ffd",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "End Credits C",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/85. End Credits C.flac",
+          "region": "Endgame",
+          "canvas_x": -1056.5348551412815,
+          "canvas_y": 86.67167957283266,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": []
+        },
+        {
+          "id": "74ea298d-d0a6-4aec-bc95-da5fc1997235",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "End Credits D",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/86. End Credits D.flac",
+          "region": "Endgame",
+          "canvas_x": -662.2051397836682,
+          "canvas_y": -43.856148330840945,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": []
+        },
+        {
+          "id": "73de729b-7334-4148-b47a-e7da88451a15",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "name": "Title Theme",
+          "audio_file_path": "3be5d2d5-d764-464b-8992-603d1c961b58/01. Title Theme.flac",
+          "region": "Various",
+          "canvas_x": -238.2738858606856,
+          "canvas_y": -159.79100335529247,
+          "loop_start": null,
+          "loop_end": null,
+          "is_transition": false,
+          "ambient_tags": []
+        }
+      ],
+      "edges": [
+        {
+          "id": "6dcb7878-3752-4ac6-b43a-864af4dfaa97",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "b7451a27-80e3-4691-b5f7-92c4f71a2a6e",
+          "target_node_id": "a65caaf8-b662-4a67-a8fe-41c52329fc54",
+          "weight": 2.0,
+          "bidirectional": true
+        },
+        {
+          "id": "b4ad13f6-66bc-4622-8e05-7885fcab9d1e",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "b7451a27-80e3-4691-b5f7-92c4f71a2a6e",
+          "target_node_id": "44ba205a-9b77-4edf-b63c-778f1bbc43f0",
+          "weight": 1.5,
+          "bidirectional": true
+        },
+        {
+          "id": "fcffd636-80bd-428e-89e5-fdf55f0d5683",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "b7451a27-80e3-4691-b5f7-92c4f71a2a6e",
+          "target_node_id": "f7b4053d-3890-4f97-9697-2ad04f9f1aec",
+          "weight": 1.5,
+          "bidirectional": true
+        },
+        {
+          "id": "fe8f229a-57db-4006-b934-d3ce909d9d88",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "b7451a27-80e3-4691-b5f7-92c4f71a2a6e",
+          "target_node_id": "ac9ec79d-1736-4331-a295-82cfe893906d",
+          "weight": 1.5,
+          "bidirectional": true
+        },
+        {
+          "id": "6e8f4c91-a14b-4107-a67b-acd782423bf8",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "b7451a27-80e3-4691-b5f7-92c4f71a2a6e",
+          "target_node_id": "f2514725-8bba-448c-a978-bee88723e15b",
+          "weight": 1.0,
+          "bidirectional": true
+        },
+        {
+          "id": "2673f982-7379-4b64-a474-33d6901be4f5",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "b7451a27-80e3-4691-b5f7-92c4f71a2a6e",
+          "target_node_id": "d2c1d260-4a86-4893-9625-89c7ff52e3fc",
+          "weight": 1.0,
+          "bidirectional": true
+        },
+        {
+          "id": "2eb6d1f4-0813-4f74-bcb2-c8a03a8c6aef",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "a65caaf8-b662-4a67-a8fe-41c52329fc54",
+          "target_node_id": "05a618c8-0ec0-42e2-806e-c9c51139c9d0",
+          "weight": 1.5,
+          "bidirectional": true
+        },
+        {
+          "id": "98dd93c9-8bb7-485c-8668-6d0940e09902",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "a65caaf8-b662-4a67-a8fe-41c52329fc54",
+          "target_node_id": "9f0bc0d0-80ee-4322-806f-8fb56b2af779",
+          "weight": 0.8,
+          "bidirectional": true
+        },
+        {
+          "id": "302bce1a-673b-4e1d-8704-04453832a0af",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "f7b4053d-3890-4f97-9697-2ad04f9f1aec",
+          "target_node_id": "915e4f93-c566-420b-8334-849f844f8c02",
+          "weight": 1.2,
+          "bidirectional": true
+        },
+        {
+          "id": "7a096653-a1ed-47dc-b4f3-d6efd10ee415",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "915e4f93-c566-420b-8334-849f844f8c02",
+          "target_node_id": "657cc3ff-cafb-4714-933f-f414f7ce233b",
+          "weight": 1.0,
+          "bidirectional": true
+        },
+        {
+          "id": "17c0ac03-5b4d-48f5-ae8f-dca027db5b0b",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "657cc3ff-cafb-4714-933f-f414f7ce233b",
+          "target_node_id": "52c8ba11-acbe-4629-a6d1-6bc23b542a79",
+          "weight": 0.7,
+          "bidirectional": true
+        },
+        {
+          "id": "e58173c7-1a68-4ead-8dad-6a0c10ac675b",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "44ba205a-9b77-4edf-b63c-778f1bbc43f0",
+          "target_node_id": "49d50f90-0f5a-4d1d-8ff8-5cadcc934180",
+          "weight": 1.0,
+          "bidirectional": true
+        },
+        {
+          "id": "3bf79fd6-a918-4663-bf31-61706426e02d",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "44ba205a-9b77-4edf-b63c-778f1bbc43f0",
+          "target_node_id": "1fa86ae3-18d6-4475-a94c-e013e12696b8",
+          "weight": 1.0,
+          "bidirectional": true
+        },
+        {
+          "id": "e265cd11-3633-45be-9d2f-b1ea4362ce0f",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "44ba205a-9b77-4edf-b63c-778f1bbc43f0",
+          "target_node_id": "96ee33fa-f14f-4293-b461-6bc38f1a48ed",
+          "weight": 0.6,
+          "bidirectional": true
+        },
+        {
+          "id": "5de78b64-11d9-48cf-ab97-ce1e1ba64d89",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "49d50f90-0f5a-4d1d-8ff8-5cadcc934180",
+          "target_node_id": "9b4252d2-a6f0-4774-abdf-92baee890a5f",
+          "weight": 0.7,
+          "bidirectional": true
+        },
+        {
+          "id": "9734a58b-e005-41c1-81c0-e4c376dc2641",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "d2c1d260-4a86-4893-9625-89c7ff52e3fc",
+          "target_node_id": "00633b7e-d2ee-4584-9054-b33b260b0309",
+          "weight": 0.7,
+          "bidirectional": true
+        },
+        {
+          "id": "5c6200d2-6f8b-49f1-a5f2-190f2e74e1cf",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "b7451a27-80e3-4691-b5f7-92c4f71a2a6e",
+          "target_node_id": "30d19668-5e42-4102-84f8-324bd2a969d3",
+          "weight": 1.0,
+          "bidirectional": true
+        },
+        {
+          "id": "56f71b0f-ec99-4177-9d0e-9fe1af29e602",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "f2514725-8bba-448c-a978-bee88723e15b",
+          "target_node_id": "30d19668-5e42-4102-84f8-324bd2a969d3",
+          "weight": 0.8,
+          "bidirectional": true
+        },
+        {
+          "id": "09fda1d6-0add-4a61-a2bf-7266ce2559ad",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "f2514725-8bba-448c-a978-bee88723e15b",
+          "target_node_id": "c94a9dd6-eb1d-4807-96b1-8079d1dde4e7",
+          "weight": 1.2,
+          "bidirectional": true
+        },
+        {
+          "id": "9bb6e2d1-efdb-420b-9f10-7b70da45698b",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "44ba205a-9b77-4edf-b63c-778f1bbc43f0",
+          "target_node_id": "b86e8ebc-429b-41fe-b07f-42ea3f564831",
+          "weight": 1.0,
+          "bidirectional": true
+        },
+        {
+          "id": "fdde35c9-bea4-4031-b141-996304768548",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "b86e8ebc-429b-41fe-b07f-42ea3f564831",
+          "target_node_id": "a911e442-2d62-4986-b082-60a9c2e86e01",
+          "weight": 1.0,
+          "bidirectional": true
+        },
+        {
+          "id": "5a8a7229-44f7-402b-ade3-e021769f9458",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "a911e442-2d62-4986-b082-60a9c2e86e01",
+          "target_node_id": "9b4252d2-a6f0-4774-abdf-92baee890a5f",
+          "weight": 0.8,
+          "bidirectional": true
+        },
+        {
+          "id": "d8968fe0-7060-4c6f-9701-7ff924cfa0f2",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "b7451a27-80e3-4691-b5f7-92c4f71a2a6e",
+          "target_node_id": "c7af5b02-59dd-4a07-9158-5f39f735f81d",
+          "weight": 1.5,
+          "bidirectional": true
+        },
+        {
+          "id": "f4b4a29b-abc9-40d8-9952-d8697ce067e5",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "c7af5b02-59dd-4a07-9158-5f39f735f81d",
+          "target_node_id": "b3551460-416e-40e6-899c-34e91f0f3eb3",
+          "weight": 1.0,
+          "bidirectional": true
+        },
+        {
+          "id": "28193156-3429-4bd0-9ef4-19c349db4fa4",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "49d50f90-0f5a-4d1d-8ff8-5cadcc934180",
+          "target_node_id": "fc4aee23-f287-4716-b539-bf61bc7b0fd9",
+          "weight": 0.7,
+          "bidirectional": true
+        },
+        {
+          "id": "9ca64bcd-e9d3-4ba4-beb1-e7919067a9f1",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "c94a9dd6-eb1d-4807-96b1-8079d1dde4e7",
+          "target_node_id": "993373a4-ba21-4961-83c4-50677b6eb8e2",
+          "weight": 0.7,
+          "bidirectional": true
+        },
+        {
+          "id": "046d06ef-e065-48c0-a287-9610d64c2c40",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "30d19668-5e42-4102-84f8-324bd2a969d3",
+          "target_node_id": "ed49993e-b3bb-4c50-821c-55df5f248d3c",
+          "weight": 0.7,
+          "bidirectional": true
+        },
+        {
+          "id": "4a989e53-97d7-456c-8501-c3fbdc6115f7",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "c94a9dd6-eb1d-4807-96b1-8079d1dde4e7",
+          "target_node_id": "ace2a5e5-6cd5-489e-967d-6767a9d5b221",
+          "weight": 0.6,
+          "bidirectional": true
+        },
+        {
+          "id": "7a751539-9a4d-4d4b-b4e5-d83aadaf53b9",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "49d50f90-0f5a-4d1d-8ff8-5cadcc934180",
+          "target_node_id": "915e4f93-c566-420b-8334-849f844f8c02",
+          "weight": 0.5,
+          "bidirectional": true
+        },
+        {
+          "id": "8c56b85c-d5be-4939-9c4a-7b4e6d117086",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "b86e8ebc-429b-41fe-b07f-42ea3f564831",
+          "target_node_id": "5fa23aa2-d0f8-4042-a67a-3c0135c61633",
+          "weight": 0.5,
+          "bidirectional": true
+        },
+        {
+          "id": "44c7809a-4c94-4136-9f86-199513e23647",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "9f0bc0d0-80ee-4322-806f-8fb56b2af779",
+          "target_node_id": "9e7c0334-0015-4d12-aa20-280acc753f2f",
+          "weight": 0.5,
+          "bidirectional": true
+        },
+        {
+          "id": "820e441a-11f0-4b3b-aa3e-b1be3bd21f13",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "c94a9dd6-eb1d-4807-96b1-8079d1dde4e7",
+          "target_node_id": "7f34c106-8224-4ffb-8a55-534322ffffe7",
+          "weight": 0.5,
+          "bidirectional": true
+        },
+        {
+          "id": "4f2b2210-165e-4414-8644-42ab2533aaa8",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "a911e442-2d62-4986-b082-60a9c2e86e01",
+          "target_node_id": "4598e362-a59d-4b43-a7ba-bc8e9d64857b",
+          "weight": 0.5,
+          "bidirectional": true
+        },
+        {
+          "id": "e82ad46b-823e-4bb2-a672-7aabc4ce9988",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "00633b7e-d2ee-4584-9054-b33b260b0309",
+          "target_node_id": "023b8494-7a45-41e3-bead-45e9aae66f12",
+          "weight": 0.5,
+          "bidirectional": true
+        },
+        {
+          "id": "153f0c9c-97fa-45fe-a8a7-7209bfae26c6",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "b3551460-416e-40e6-899c-34e91f0f3eb3",
+          "target_node_id": "3aaabe24-9f0d-4072-8c95-2974f1f400bb",
+          "weight": 0.5,
+          "bidirectional": true
+        },
+        {
+          "id": "f72aa55b-4f48-4b48-b90f-0015920f1a61",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "b3551460-416e-40e6-899c-34e91f0f3eb3",
+          "target_node_id": "e9c64075-1323-4f6a-aa3e-d6311f8feed1",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "2181d442-10ac-4207-8553-10696d2369e2",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "e9c64075-1323-4f6a-aa3e-d6311f8feed1",
+          "target_node_id": "ad104056-1eff-4311-bc92-e99861459f79",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "ff3010e5-218a-4106-9b10-a77c949715ac",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "ad104056-1eff-4311-bc92-e99861459f79",
+          "target_node_id": "9f3dcb94-5f75-4be9-8083-22ab1a8c584a",
+          "weight": 0.7,
+          "bidirectional": true
+        },
+        {
+          "id": "c2a395c9-9cdc-4149-b4d8-12a3e81aeea3",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "ad104056-1eff-4311-bc92-e99861459f79",
+          "target_node_id": "67f43edc-a050-425e-b3a8-83852b99d446",
+          "weight": 0.8,
+          "bidirectional": true
+        },
+        {
+          "id": "ed97dcd4-a617-422f-a339-b5c6e3927fd6",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "6916c362-b8a2-4fa8-846c-b7d9f86f6a44",
+          "target_node_id": "f7b4053d-3890-4f97-9697-2ad04f9f1aec",
+          "weight": 0.5,
+          "bidirectional": true
+        },
+        {
+          "id": "a320122d-1260-499e-bc71-57714627cb59",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "6916c362-b8a2-4fa8-846c-b7d9f86f6a44",
+          "target_node_id": "44ba205a-9b77-4edf-b63c-778f1bbc43f0",
+          "weight": 0.5,
+          "bidirectional": true
+        },
+        {
+          "id": "cb0f2f0e-3e41-4b37-b168-31567b84872f",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "219469e1-52f9-4b33-9ca7-15f3814a525d",
+          "target_node_id": "a65caaf8-b662-4a67-a8fe-41c52329fc54",
+          "weight": 0.8,
+          "bidirectional": true
+        },
+        {
+          "id": "f0bcbf78-b834-44fe-bf30-8480458799d5",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "219469e1-52f9-4b33-9ca7-15f3814a525d",
+          "target_node_id": "44ba205a-9b77-4edf-b63c-778f1bbc43f0",
+          "weight": 0.7,
+          "bidirectional": true
+        },
+        {
+          "id": "8b64d2c1-7751-446f-acda-5303118d04c2",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "aae01d64-e21b-4134-9ada-db76c72588c9",
+          "target_node_id": "44ba205a-9b77-4edf-b63c-778f1bbc43f0",
+          "weight": 0.7,
+          "bidirectional": true
+        },
+        {
+          "id": "fdce6ffb-5f65-42e8-ae14-40520325ae8f",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "aae01d64-e21b-4134-9ada-db76c72588c9",
+          "target_node_id": "a65caaf8-b662-4a67-a8fe-41c52329fc54",
+          "weight": 0.7,
+          "bidirectional": true
+        },
+        {
+          "id": "6df8521d-d11e-4194-8dd4-639ecd9523cf",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "8e3de57c-84bf-430d-acaf-4b6b387a5967",
+          "target_node_id": "a65caaf8-b662-4a67-a8fe-41c52329fc54",
+          "weight": 0.6,
+          "bidirectional": true
+        },
+        {
+          "id": "8b020828-baf3-4283-b5b8-ca5a597e25a2",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "8e3de57c-84bf-430d-acaf-4b6b387a5967",
+          "target_node_id": "f1867f10-ad4e-474f-a70c-fb9aee4a3820",
+          "weight": 0.6,
+          "bidirectional": true
+        },
+        {
+          "id": "6d30de93-79cf-4006-87c6-e72eee543087",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "f1867f10-ad4e-474f-a70c-fb9aee4a3820",
+          "target_node_id": "44ba205a-9b77-4edf-b63c-778f1bbc43f0",
+          "weight": 1.0,
+          "bidirectional": true
+        },
+        {
+          "id": "e95f11de-694f-4d95-b473-3488ad21099b",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "4d33b064-cab0-4b6a-9681-0288a85ed26f",
+          "target_node_id": "ac9ec79d-1736-4331-a295-82cfe893906d",
+          "weight": 1.0,
+          "bidirectional": true
+        },
+        {
+          "id": "3e9e579b-0b94-4f10-b788-e0f7233cdc98",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "657cc3ff-cafb-4714-933f-f414f7ce233b",
+          "target_node_id": "2c53019f-e97b-4b8b-908e-4ecbf07834b6",
+          "weight": 0.6,
+          "bidirectional": false
+        },
+        {
+          "id": "345ba447-5a17-4fe3-9323-b487247b30a0",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "2c53019f-e97b-4b8b-908e-4ecbf07834b6",
+          "target_node_id": "c6fde6c0-01da-496f-8a06-9043cd67a170",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "650a2f2c-aa1f-404a-9865-cf0f8d5908fc",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "c6fde6c0-01da-496f-8a06-9043cd67a170",
+          "target_node_id": "657cc3ff-cafb-4714-933f-f414f7ce233b",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "55b00f9c-87e0-4877-b499-80cbb449a51e",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "a911e442-2d62-4986-b082-60a9c2e86e01",
+          "target_node_id": "64a70f8b-0961-4f60-8463-e11ba8f1eb62",
+          "weight": 0.6,
+          "bidirectional": false
+        },
+        {
+          "id": "3d901b62-6cab-44ba-8b71-f58640e57d25",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "64a70f8b-0961-4f60-8463-e11ba8f1eb62",
+          "target_node_id": "6357e90e-8dc2-43de-9756-8b1e55bcbfe6",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "cb129e1d-21e8-47b5-8645-35d6a52c3282",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "6357e90e-8dc2-43de-9756-8b1e55bcbfe6",
+          "target_node_id": "a911e442-2d62-4986-b082-60a9c2e86e01",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "4dbffb75-2746-4474-9ab0-82b4c42f82c9",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "30d19668-5e42-4102-84f8-324bd2a969d3",
+          "target_node_id": "fc346c2b-f7bf-4b91-abe8-d871f53a59f1",
+          "weight": 0.6,
+          "bidirectional": false
+        },
+        {
+          "id": "f424fcca-266c-4379-b55c-9e776089b88a",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "fc346c2b-f7bf-4b91-abe8-d871f53a59f1",
+          "target_node_id": "1b3bdf06-1195-4eb5-abd4-6db922d7da47",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "51982df8-9244-4842-93d0-6f560f6389ce",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "1b3bdf06-1195-4eb5-abd4-6db922d7da47",
+          "target_node_id": "30d19668-5e42-4102-84f8-324bd2a969d3",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "77533efa-f55f-4cdd-8540-70b3a4a96a1f",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "f1867f10-ad4e-474f-a70c-fb9aee4a3820",
+          "target_node_id": "e944c637-a6d6-4f93-859c-77b6fa82a7bf",
+          "weight": 0.6,
+          "bidirectional": false
+        },
+        {
+          "id": "88ad86d6-3e38-4a3f-bb4a-7bea6d621c16",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "e944c637-a6d6-4f93-859c-77b6fa82a7bf",
+          "target_node_id": "eb7af80d-27b0-4ad6-8bcb-e4f11063980d",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "4cec63c6-c35f-4419-94a8-1712c1bd7f5c",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "eb7af80d-27b0-4ad6-8bcb-e4f11063980d",
+          "target_node_id": "f1867f10-ad4e-474f-a70c-fb9aee4a3820",
+          "weight": 0.6,
+          "bidirectional": false
+        },
+        {
+          "id": "184c055d-ee17-4dc6-878a-619140e630f3",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "eb7af80d-27b0-4ad6-8bcb-e4f11063980d",
+          "target_node_id": "96ee33fa-f14f-4293-b461-6bc38f1a48ed",
+          "weight": 0.7,
+          "bidirectional": true
+        },
+        {
+          "id": "1a37b682-da0a-4a69-a59e-bf98c9eb292d",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "00633b7e-d2ee-4584-9054-b33b260b0309",
+          "target_node_id": "e3f24a1c-6d4d-48ab-9ab1-139b09dbc71c",
+          "weight": 0.6,
+          "bidirectional": false
+        },
+        {
+          "id": "2c0113e5-21eb-4b7a-8aec-ce252d8cc015",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "e3f24a1c-6d4d-48ab-9ab1-139b09dbc71c",
+          "target_node_id": "142ecb03-cd38-40dd-a9b0-7870a50a02a4",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "04a5901d-faf5-413c-89e3-243caa761283",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "142ecb03-cd38-40dd-a9b0-7870a50a02a4",
+          "target_node_id": "00633b7e-d2ee-4584-9054-b33b260b0309",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "dac9e279-6f40-4ad3-8a2b-adbe8be0ef2c",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "05a618c8-0ec0-42e2-806e-c9c51139c9d0",
+          "target_node_id": "3f7b9d0e-cd39-4514-b579-df27ed46186a",
+          "weight": 0.6,
+          "bidirectional": false
+        },
+        {
+          "id": "52694641-df12-4202-9cc2-7d8c7c7316ca",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "3f7b9d0e-cd39-4514-b579-df27ed46186a",
+          "target_node_id": "870e9076-6225-4cba-beb8-f07283c47d69",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "1f445ca4-16b2-4161-b776-9743c17398af",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "870e9076-6225-4cba-beb8-f07283c47d69",
+          "target_node_id": "05a618c8-0ec0-42e2-806e-c9c51139c9d0",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "cce6a8b8-1d59-4db2-b83b-b34cecd415ed",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "f7b4053d-3890-4f97-9697-2ad04f9f1aec",
+          "target_node_id": "f82011a0-432e-4ab2-9733-a0d46ac250f4",
+          "weight": 0.4,
+          "bidirectional": true
+        },
+        {
+          "id": "09aed9b0-2157-4eba-91e5-56793debe3df",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "b86e8ebc-429b-41fe-b07f-42ea3f564831",
+          "target_node_id": "4f98643f-28ec-48c9-a889-274713d90557",
+          "weight": 0.4,
+          "bidirectional": true
+        },
+        {
+          "id": "eeb90d51-cabb-4f56-9b63-c4016bc79625",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "30d19668-5e42-4102-84f8-324bd2a969d3",
+          "target_node_id": "21a9a29e-7341-4c29-9738-235081bfe066",
+          "weight": 0.4,
+          "bidirectional": true
+        },
+        {
+          "id": "31154594-cf96-4b37-b84e-ca5b8c83cf0e",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "d2c1d260-4a86-4893-9625-89c7ff52e3fc",
+          "target_node_id": "c18b1925-b17f-4c37-bde4-39394d685e84",
+          "weight": 0.4,
+          "bidirectional": true
+        },
+        {
+          "id": "50c73efb-6333-4bc5-b27f-86822de77beb",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "05a618c8-0ec0-42e2-806e-c9c51139c9d0",
+          "target_node_id": "aa655b1a-4e66-4b0a-842d-005c9482a630",
+          "weight": 0.2,
+          "bidirectional": false
+        },
+        {
+          "id": "b01404e1-1b09-4738-9599-f45011c532b0",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "aa655b1a-4e66-4b0a-842d-005c9482a630",
+          "target_node_id": "85593302-3383-429e-8b6d-9b9c8d6a48a2",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "124d0b49-0563-46a4-bfa0-942faa9f0b6c",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "85593302-3383-429e-8b6d-9b9c8d6a48a2",
+          "target_node_id": "0904a4a3-e1ba-4cae-b566-ec8ce9a5f429",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "9a91b0da-9b2d-4e68-99a6-334faf9d734d",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "0904a4a3-e1ba-4cae-b566-ec8ce9a5f429",
+          "target_node_id": "05a618c8-0ec0-42e2-806e-c9c51139c9d0",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "b469b98a-de85-4a9b-a165-3a9ea04f2f7e",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "9f0bc0d0-80ee-4322-806f-8fb56b2af779",
+          "target_node_id": "92023c62-d659-49af-afeb-1cb3e9ecc6dc",
+          "weight": 0.3,
+          "bidirectional": false
+        },
+        {
+          "id": "898038a5-0d41-4280-a3dd-6da6c2a66d5f",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "92023c62-d659-49af-afeb-1cb3e9ecc6dc",
+          "target_node_id": "9f0bc0d0-80ee-4322-806f-8fb56b2af779",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "5c588dec-cecc-4c8b-b870-9d8771cf3394",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "f7b4053d-3890-4f97-9697-2ad04f9f1aec",
+          "target_node_id": "66254505-d161-4c37-bdec-64d2d1f1f63f",
+          "weight": 0.6,
+          "bidirectional": false
+        },
+        {
+          "id": "d482f65e-1936-49ae-869d-6491a38e180a",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "66254505-d161-4c37-bdec-64d2d1f1f63f",
+          "target_node_id": "236f66ed-6cb6-4653-959d-9a5a25ebfdd8",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "c8280a32-059e-4bca-86af-298241073e7f",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "236f66ed-6cb6-4653-959d-9a5a25ebfdd8",
+          "target_node_id": "f7b4053d-3890-4f97-9697-2ad04f9f1aec",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "771e5182-544c-4cf8-aa1b-9be39c68557e",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "9f0bc0d0-80ee-4322-806f-8fb56b2af779",
+          "target_node_id": "4550b0c1-5e54-483a-94cf-ea8c4b152f42",
+          "weight": 0.6,
+          "bidirectional": true
+        },
+        {
+          "id": "e56d1c6b-ed54-43bf-b94a-3a753c9c0644",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "ac9ec79d-1736-4331-a295-82cfe893906d",
+          "target_node_id": "563eada0-c063-412a-880f-8a1843f92446",
+          "weight": 0.6,
+          "bidirectional": true
+        },
+        {
+          "id": "29b5e8ca-fcb3-4fc3-9442-0205b3f734cd",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "05a618c8-0ec0-42e2-806e-c9c51139c9d0",
+          "target_node_id": "e0a220ea-2f2d-4ecc-a79a-acafcbe33508",
+          "weight": 0.5,
+          "bidirectional": true
+        },
+        {
+          "id": "f4ce1ae1-e491-45f5-b8fd-724f1d7a35d6",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "b7451a27-80e3-4691-b5f7-92c4f71a2a6e",
+          "target_node_id": "7bed8af3-1020-49b8-aa86-71f53017f629",
+          "weight": 0.5,
+          "bidirectional": true
+        },
+        {
+          "id": "66439bd0-41d0-44d2-84af-4ba7a1bd33db",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "00633b7e-d2ee-4584-9054-b33b260b0309",
+          "target_node_id": "8750d0c7-945a-4e19-a895-cc2810d90538",
+          "weight": 0.5,
+          "bidirectional": true
+        },
+        {
+          "id": "55ed06ba-ab4a-4d67-9e11-dee22002ec47",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "67f43edc-a050-425e-b3a8-83852b99d446",
+          "target_node_id": "42c0c1ef-be43-47e1-8e75-116da2981531",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "368ae485-6684-4549-a31b-505e52731734",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "42c0c1ef-be43-47e1-8e75-116da2981531",
+          "target_node_id": "16bcefb3-8b56-4d5b-ac70-0c91bea59f1d",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "4d810f7f-33f9-47c5-bde1-7b356c57d93d",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "16bcefb3-8b56-4d5b-ac70-0c91bea59f1d",
+          "target_node_id": "5d0c9515-892f-45f5-ad0d-aab917f87daa",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "4f0d9ad2-619c-4767-92a7-646c628a01a4",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "5d0c9515-892f-45f5-ad0d-aab917f87daa",
+          "target_node_id": "d1c61021-bb9a-4f64-a4c4-244ac6e064de",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "934f68a5-298a-4141-bb94-05fc84a1b6c8",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "d1c61021-bb9a-4f64-a4c4-244ac6e064de",
+          "target_node_id": "aefc0040-7089-4002-97c9-9e52e4482ffd",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "9a23a45c-652c-4a28-abd1-520561959ca5",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "aefc0040-7089-4002-97c9-9e52e4482ffd",
+          "target_node_id": "74ea298d-d0a6-4aec-bc95-da5fc1997235",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "b3ea5f2d-d2c8-4085-ab94-03cdfd9b4038",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "74ea298d-d0a6-4aec-bc95-da5fc1997235",
+          "target_node_id": "73de729b-7334-4148-b47a-e7da88451a15",
+          "weight": 1.0,
+          "bidirectional": false
+        },
+        {
+          "id": "ebcb4ac5-a70f-446b-ab26-22b74c088c4c",
+          "graph_id": "a875a7fb-d67e-4c71-b206-1e3841b1c637",
+          "source_node_id": "73de729b-7334-4148-b47a-e7da88451a15",
+          "target_node_id": "6916c362-b8a2-4fa8-846c-b7d9f86f6a44",
+          "weight": 1.0,
+          "bidirectional": true
+        }
+      ]
+    }
+  ],
+  "ambient_assets": [
+    {
+      "id": "22e64345-1528-4036-b86e-415ab239a037",
+      "name": "fauna-autumn-forest",
+      "file_path": "_ambient/fauna-autumn-forest.mp3",
+      "category": "birds",
+      "tags": [
+        "forest",
+        "day",
+        "dusk"
+      ],
+      "default_volume": 0.35,
+      "play_probability": 0.9,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 150.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)",
+      "created_at": "2026-05-28T01:25:18.548410"
+    },
+    {
+      "id": "e870680c-410d-4512-a78a-f6a9124c3547",
+      "name": "fauna-enchanted-forest",
+      "file_path": "_ambient/fauna-enchanted-forest.mp3",
+      "category": "birds",
+      "tags": [
+        "forest",
+        "night",
+        "dungeon"
+      ],
+      "default_volume": 0.4,
+      "play_probability": 0.7,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 150.0,
+      "fade_in_ms": 3500,
+      "fade_out_ms": 4500,
+      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)",
+      "created_at": "2026-05-28T01:25:20.650001"
+    },
+    {
+      "id": "a84b1efa-11ab-4304-a429-1dde42ef91e2",
+      "name": "fauna-forest-clearing",
+      "file_path": "_ambient/fauna-forest-clearing.mp3",
+      "category": "birds",
+      "tags": [
+        "forest",
+        "field",
+        "day"
+      ],
+      "default_volume": 0.35,
+      "play_probability": 1.0,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 150.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)",
+      "created_at": "2026-05-28T01:25:22.752318"
+    },
+    {
+      "id": "7c91b904-19cc-44e9-9164-2e8050cc55db",
+      "name": "fauna-forest-day",
+      "file_path": "_ambient/fauna-forest-day.mp3",
+      "category": "birds",
+      "tags": [
+        "forest",
+        "day"
+      ],
+      "default_volume": 0.35,
+      "play_probability": 1.0,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 150.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)",
+      "created_at": "2026-05-28T01:25:24.863130"
+    },
+    {
+      "id": "535bee41-3067-442a-9910-881971189d26",
+      "name": "fauna-forest-night",
+      "file_path": "_ambient/fauna-forest-night.mp3",
+      "category": "birds",
+      "tags": [
+        "forest",
+        "night"
+      ],
+      "default_volume": 0.35,
+      "play_probability": 1.0,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 150.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)",
+      "created_at": "2026-05-28T01:25:26.991897"
+    },
+    {
+      "id": "cb96be3d-88e9-45dd-a171-42a63d8899cc",
+      "name": "fauna-pine-forest",
+      "file_path": "_ambient/fauna-pine-forest.mp3",
+      "category": "birds",
+      "tags": [
+        "forest",
+        "mountain",
+        "day"
+      ],
+      "default_volume": 0.35,
+      "play_probability": 0.9,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 150.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)",
+      "created_at": "2026-05-28T01:25:29.117228"
+    },
+    {
+      "id": "711d2c50-a1fe-4e17-895b-74d63619003f",
+      "name": "fauna-rainforest-canopy",
+      "file_path": "_ambient/fauna-rainforest-canopy.mp3",
+      "category": "birds",
+      "tags": [
+        "forest",
+        "day",
+        "rain"
+      ],
+      "default_volume": 0.4,
+      "play_probability": 0.85,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 150.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)",
+      "created_at": "2026-05-28T01:25:31.244230"
+    },
+    {
+      "id": "00c06188-b0be-4690-ba78-6415ae581fcc",
+      "name": "fauna-spooky-forest",
+      "file_path": "_ambient/fauna-spooky-forest.mp3",
+      "category": "birds",
+      "tags": [
+        "forest",
+        "night",
+        "dusk"
+      ],
+      "default_volume": 0.4,
+      "play_probability": 0.8,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 150.0,
+      "fade_in_ms": 3500,
+      "fade_out_ms": 4500,
+      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)",
+      "created_at": "2026-05-28T01:25:33.343876"
+    },
+    {
+      "id": "795ae05e-c2d7-4343-8e5b-055f065c2fd0",
+      "name": "water-underground-river",
+      "file_path": "_ambient/water-underground-river.mp3",
+      "category": "water",
+      "tags": [
+        "cave",
+        "dungeon",
+        "river"
+      ],
+      "default_volume": 0.4,
+      "play_probability": 1.0,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 180.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)",
+      "created_at": "2026-05-28T01:25:35.459783"
+    },
+    {
+      "id": "a530592c-3e61-4849-a8bb-5b9dba22a7a0",
+      "name": "water-mountain-stream",
+      "file_path": "_ambient/water-mountain-stream.mp3",
+      "category": "water",
+      "tags": [
+        "mountain",
+        "river",
+        "day"
+      ],
+      "default_volume": 0.4,
+      "play_probability": 1.0,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 180.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)",
+      "created_at": "2026-05-28T01:25:37.567869"
+    },
+    {
+      "id": "c6cbb6bb-1278-4d57-90b0-7fea2781f02a",
+      "name": "water-ocean-waves",
+      "file_path": "_ambient/water-ocean-waves.mp3",
+      "category": "water",
+      "tags": [
+        "ocean"
+      ],
+      "default_volume": 0.45,
+      "play_probability": 1.0,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 180.0,
+      "fade_in_ms": 3500,
+      "fade_out_ms": 4500,
+      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)",
+      "created_at": "2026-05-28T01:25:39.664759"
+    },
+    {
+      "id": "f8966a7e-6a18-4b9e-a674-3362b091dd77",
+      "name": "water-peaceful-lake",
+      "file_path": "_ambient/water-peaceful-lake.mp3",
+      "category": "water",
+      "tags": [
+        "field",
+        "day",
+        "river"
+      ],
+      "default_volume": 0.35,
+      "play_probability": 1.0,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 180.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)",
+      "created_at": "2026-05-28T01:25:41.798686"
+    },
+    {
+      "id": "92da5c1a-d0dc-4d04-b922-dfbca8796e03",
+      "name": "water-swamp",
+      "file_path": "_ambient/water-swamp.mp3",
+      "category": "water",
+      "tags": [
+        "forest",
+        "night",
+        "dungeon"
+      ],
+      "default_volume": 0.4,
+      "play_probability": 0.85,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 180.0,
+      "fade_in_ms": 3500,
+      "fade_out_ms": 4500,
+      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)",
+      "created_at": "2026-05-28T01:25:43.923157"
+    },
+    {
+      "id": "f28eed77-15f0-4881-94af-9cf340186a26",
+      "name": "water-waterfall",
+      "file_path": "_ambient/water-waterfall.mp3",
+      "category": "water",
+      "tags": [
+        "mountain",
+        "river",
+        "day"
+      ],
+      "default_volume": 0.5,
+      "play_probability": 0.9,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 180.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)",
+      "created_at": "2026-05-28T01:25:46.045064"
+    },
+    {
+      "id": "1eff16cc-f383-4679-8f6e-f0e27e51195f",
+      "name": "wind-desert",
+      "file_path": "_ambient/wind-desert.mp3",
+      "category": "wind",
+      "tags": [
+        "desert",
+        "day",
+        "night"
+      ],
+      "default_volume": 0.4,
+      "play_probability": 1.0,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 150.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)",
+      "created_at": "2026-05-28T01:25:48.137151"
+    },
+    {
+      "id": "3ccb7d76-90bb-4a80-9383-b9fb86361f66",
+      "name": "weather-fog",
+      "file_path": "_ambient/weather-fog.mp3",
+      "category": "weather",
+      "tags": [
+        "mountain",
+        "forest",
+        "dawn",
+        "dusk"
+      ],
+      "default_volume": 0.3,
+      "play_probability": 0.5,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 150.0,
+      "fade_in_ms": 4000,
+      "fade_out_ms": 5000,
+      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)",
+      "created_at": "2026-05-28T01:25:50.272894"
+    },
+    {
+      "id": "dd9c3e7e-62b0-4273-9859-fc43f28b8c93",
+      "name": "weather-heavy-thunderstorm",
+      "file_path": "_ambient/weather-heavy-thunderstorm.mp3",
+      "category": "weather",
+      "tags": [
+        "rain",
+        "field",
+        "urban",
+        "forest"
+      ],
+      "default_volume": 0.55,
+      "play_probability": 0.6,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 180.0,
+      "fade_in_ms": 4000,
+      "fade_out_ms": 5000,
+      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)",
+      "created_at": "2026-05-28T01:25:52.393044"
+    },
+    {
+      "id": "1fcc05f7-d652-40cc-aa5e-330c5fc2bcfc",
+      "name": "weather-light-rain",
+      "file_path": "_ambient/weather-light-rain.mp3",
+      "category": "weather",
+      "tags": [
+        "rain",
+        "field",
+        "forest",
+        "urban"
+      ],
+      "default_volume": 0.5,
+      "play_probability": 1.0,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 180.0,
+      "fade_in_ms": 4000,
+      "fade_out_ms": 5000,
+      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)",
+      "created_at": "2026-05-28T01:25:54.476027"
+    },
+    {
+      "id": "d0653efd-c557-4310-bd85-b1bc94e9e068",
+      "name": "weather-morning-mist",
+      "file_path": "_ambient/weather-morning-mist.mp3",
+      "category": "weather",
+      "tags": [
+        "field",
+        "forest",
+        "dawn"
+      ],
+      "default_volume": 0.3,
+      "play_probability": 0.85,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 150.0,
+      "fade_in_ms": 4000,
+      "fade_out_ms": 5000,
+      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)",
+      "created_at": "2026-05-28T01:25:56.591890"
+    },
+    {
+      "id": "b2f740a0-8cfb-4f25-86a9-c8b3d957e097",
+      "name": "wind-mountain-peak",
+      "file_path": "_ambient/wind-mountain-peak.mp3",
+      "category": "wind",
+      "tags": [
+        "mountain",
+        "day"
+      ],
+      "default_volume": 0.4,
+      "play_probability": 1.0,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 150.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)",
+      "created_at": "2026-05-28T01:25:58.715561"
+    },
+    {
+      "id": "d72bd9ff-b951-42db-9529-7d10875a42b3",
+      "name": "fauna-summer-evening",
+      "file_path": "_ambient/fauna-summer-evening.mp3",
+      "category": "birds",
+      "tags": [
+        "field",
+        "dusk",
+        "day"
+      ],
+      "default_volume": 0.35,
+      "play_probability": 1.0,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 150.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)",
+      "created_at": "2026-05-28T01:26:00.869375"
+    },
+    {
+      "id": "828da0cf-70c4-4979-b3ce-a56bafe1c88c",
+      "name": "wind-winter",
+      "file_path": "_ambient/wind-winter.mp3",
+      "category": "wind",
+      "tags": [
+        "winter",
+        "snow",
+        "mountain",
+        "night"
+      ],
+      "default_volume": 0.45,
+      "play_probability": 1.0,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 150.0,
+      "fade_in_ms": 3500,
+      "fade_out_ms": 4500,
+      "license": "JC Sounds Nature Pack Vol 1 (OpenGameArt CC0)",
+      "created_at": "2026-05-28T01:26:02.979662"
+    },
+    {
+      "id": "146bd077-ff42-4dfd-8ca9-0da6199c8d88",
+      "name": "wind-winter-snow",
+      "file_path": "_ambient/wind-winter-snow.mp3",
+      "category": "wind",
+      "tags": [
+        "winter",
+        "snow",
+        "night",
+        "mountain"
+      ],
+      "default_volume": 0.4,
+      "play_probability": 0.85,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 150.0,
+      "fade_in_ms": 3500,
+      "fade_out_ms": 4500,
+      "license": "Acoustic Nature (non-commercial)",
+      "created_at": "2026-05-28T01:26:05.060781"
+    },
+    {
+      "id": "f468fa41-ef6e-4bf2-8c87-3cc7128a861f",
+      "name": "fauna-crickets-woodpecker-dusk",
+      "file_path": "_ambient/fauna-crickets-woodpecker-dusk.mp3",
+      "category": "insects",
+      "tags": [
+        "field",
+        "forest",
+        "dusk"
+      ],
+      "default_volume": 0.35,
+      "play_probability": 0.9,
+      "min_play_duration_s": 45.0,
+      "max_play_duration_s": 120.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "Acoustic Nature (non-commercial)",
+      "created_at": "2026-05-28T01:26:07.145154"
+    },
+    {
+      "id": "9c91397d-edf4-4106-9d36-f79b66173d77",
+      "name": "water-babbling-brook",
+      "file_path": "_ambient/water-babbling-brook.mp3",
+      "category": "water",
+      "tags": [
+        "river",
+        "forest",
+        "day"
+      ],
+      "default_volume": 0.4,
+      "play_probability": 1.0,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 180.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "Acoustic Nature (non-commercial)",
+      "created_at": "2026-05-28T01:26:09.253741"
+    },
+    {
+      "id": "2c6d9da7-41a2-4fbd-88ff-a865c9c7ee93",
+      "name": "fauna-morning-bird-songs",
+      "file_path": "_ambient/fauna-morning-bird-songs.mp3",
+      "category": "birds",
+      "tags": [
+        "field",
+        "forest",
+        "dawn",
+        "day"
+      ],
+      "default_volume": 0.35,
+      "play_probability": 1.0,
+      "min_play_duration_s": 45.0,
+      "max_play_duration_s": 120.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "Acoustic Nature (non-commercial)",
+      "created_at": "2026-05-28T01:26:11.370914"
+    },
+    {
+      "id": "315e9b0f-8de6-4375-b941-1325f55714e0",
+      "name": "fauna-katydids-night",
+      "file_path": "_ambient/fauna-katydids-night.mp3",
+      "category": "insects",
+      "tags": [
+        "field",
+        "forest",
+        "night"
+      ],
+      "default_volume": 0.35,
+      "play_probability": 0.85,
+      "min_play_duration_s": 45.0,
+      "max_play_duration_s": 120.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "Acoustic Nature (non-commercial)",
+      "created_at": "2026-05-28T01:26:13.472984"
+    },
+    {
+      "id": "35efb53e-bb6f-4bc3-bf5d-2a0f4e029f89",
+      "name": "wind-gusty",
+      "file_path": "_ambient/wind-gusty.mp3",
+      "category": "wind",
+      "tags": [
+        "field",
+        "mountain",
+        "day"
+      ],
+      "default_volume": 0.4,
+      "play_probability": 0.9,
+      "min_play_duration_s": 30.0,
+      "max_play_duration_s": 90.0,
+      "fade_in_ms": 2500,
+      "fade_out_ms": 3500,
+      "license": "Pixabay (royalty-free, no attribution)",
+      "created_at": "2026-05-28T01:26:15.557366"
+    },
+    {
+      "id": "8b5e61b8-a6aa-4f2a-8553-fe258a1e6ec2",
+      "name": "fauna-hungary-meadow-morning",
+      "file_path": "_ambient/fauna-hungary-meadow-morning.mp3",
+      "category": "birds",
+      "tags": [
+        "field",
+        "day",
+        "dawn"
+      ],
+      "default_volume": 0.35,
+      "play_probability": 1.0,
+      "min_play_duration_s": 45.0,
+      "max_play_duration_s": 120.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "Pixabay (royalty-free, no attribution)",
+      "created_at": "2026-05-28T01:26:17.678145"
+    },
+    {
+      "id": "ea1ee195-de46-4632-870f-97d74b202186",
+      "name": "fauna-night-field-crickets",
+      "file_path": "_ambient/fauna-night-field-crickets.wav",
+      "category": "insects",
+      "tags": [
+        "field",
+        "night"
+      ],
+      "default_volume": 0.3,
+      "play_probability": 1.0,
+      "min_play_duration_s": 45.0,
+      "max_play_duration_s": 120.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "freesound (sengjinn, CC0)",
+      "created_at": "2026-05-28T01:26:19.865881"
+    },
+    {
+      "id": "9e143edb-5f27-474a-aca6-3abb8741eee8",
+      "name": "water-river-stream",
+      "file_path": "_ambient/water-river-stream.wav",
+      "category": "water",
+      "tags": [
+        "river",
+        "forest",
+        "day",
+        "night"
+      ],
+      "default_volume": 0.4,
+      "play_probability": 1.0,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 180.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "freesound (steaq, CC0)",
+      "created_at": "2026-05-28T01:26:21.946623"
+    },
+    {
+      "id": "86499b7f-aa85-4466-bb7e-9cdf02c1e71f",
+      "name": "fauna-forest-birds-loop",
+      "file_path": "_ambient/fauna-forest-birds-loop.wav",
+      "category": "birds",
+      "tags": [
+        "forest",
+        "day",
+        "dawn"
+      ],
+      "default_volume": 0.35,
+      "play_probability": 1.0,
+      "min_play_duration_s": 45.0,
+      "max_play_duration_s": 120.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "freesound (Magnesus, CC0)",
+      "created_at": "2026-05-28T01:26:24.055479"
+    },
+    {
+      "id": "997737ae-4cbc-4e7c-bbb0-8778440ce0e3",
+      "name": "birds-dawn-chorus",
+      "file_path": "_ambient/birds-dawn-chorus.wav",
+      "category": "birds",
+      "tags": [
+        "forest",
+        "field",
+        "dawn",
+        "day"
+      ],
+      "default_volume": 0.35,
+      "play_probability": 1.0,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 150.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "freesound (squashy555, CC0)",
+      "created_at": "2026-05-28T05:49:28.287314"
+    },
+    {
+      "id": "41e6d2ec-40ab-408d-b3f1-302110b1a5dc",
+      "name": "birds-morning-forest",
+      "file_path": "_ambient/birds-morning-forest.wav",
+      "category": "birds",
+      "tags": [
+        "forest",
+        "dawn",
+        "day"
+      ],
+      "default_volume": 0.35,
+      "play_probability": 0.9,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 150.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "freesound (reinsamba, CC-BY)",
+      "created_at": "2026-05-28T05:49:30.978888"
+    },
+    {
+      "id": "6323ef43-b2da-49c3-a2d6-3528a4313c09",
+      "name": "birds-nightingale-brook",
+      "file_path": "_ambient/birds-nightingale-brook.wav",
+      "category": "birds",
+      "tags": [
+        "forest",
+        "river",
+        "night",
+        "dusk"
+      ],
+      "default_volume": 0.35,
+      "play_probability": 0.8,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 150.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "freesound (reinsamba, CC-BY)",
+      "created_at": "2026-05-28T05:49:33.656825"
+    },
+    {
+      "id": "019c6d38-a77c-4445-9aca-6e623c4694c1",
+      "name": "birds-skylark-field",
+      "file_path": "_ambient/birds-skylark-field.wav",
+      "category": "birds",
+      "tags": [
+        "field",
+        "day"
+      ],
+      "default_volume": 0.3,
+      "play_probability": 0.8,
+      "min_play_duration_s": 25.0,
+      "max_play_duration_s": 60.0,
+      "fade_in_ms": 2500,
+      "fade_out_ms": 3500,
+      "license": "freesound (reinsamba, CC-BY)",
+      "created_at": "2026-05-28T05:49:35.827161"
+    },
+    {
+      "id": "4b5a0193-22e7-434c-9611-7531937eb4a7",
+      "name": "birds-cuckoo-forest",
+      "file_path": "_ambient/birds-cuckoo-forest.wav",
+      "category": "birds",
+      "tags": [
+        "forest",
+        "day",
+        "dusk"
+      ],
+      "default_volume": 0.3,
+      "play_probability": 0.7,
+      "min_play_duration_s": 45.0,
+      "max_play_duration_s": 90.0,
+      "fade_in_ms": 2500,
+      "fade_out_ms": 3500,
+      "license": "freesound (reinsamba, CC-BY)",
+      "created_at": "2026-05-28T05:49:38.180888"
+    },
+    {
+      "id": "d104c507-eb0a-4eb0-b2c1-139147ddb8d5",
+      "name": "birds-crow-spooky",
+      "file_path": "_ambient/birds-crow-spooky.wav",
+      "category": "birds",
+      "tags": [
+        "field",
+        "forest",
+        "dusk",
+        "night",
+        "mountain"
+      ],
+      "default_volume": 0.3,
+      "play_probability": 0.65,
+      "min_play_duration_s": 45.0,
+      "max_play_duration_s": 120.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "freesound (reinsamba, CC-BY)",
+      "created_at": "2026-05-28T05:49:40.760413"
+    },
+    {
+      "id": "106aeaf8-af03-4dcf-a2ac-7e0160c470d5",
+      "name": "birds-tawny-owl-night",
+      "file_path": "_ambient/birds-tawny-owl-night.mp3",
+      "category": "birds",
+      "tags": [
+        "night",
+        "forest",
+        "dungeon"
+      ],
+      "default_volume": 0.35,
+      "play_probability": 0.7,
+      "min_play_duration_s": 25.0,
+      "max_play_duration_s": 60.0,
+      "fade_in_ms": 2500,
+      "fade_out_ms": 3500,
+      "license": "Orange Free Sounds (CC-BY 3.0, credit sean.townsend)",
+      "created_at": "2026-05-28T05:49:42.872230"
+    },
+    {
+      "id": "a2f4ac58-e055-45b0-a85d-6ecd2aae44cb",
+      "name": "birds-tern-coast",
+      "file_path": "_ambient/birds-tern-coast.mp3",
+      "category": "birds",
+      "tags": [
+        "ocean"
+      ],
+      "default_volume": 0.4,
+      "play_probability": 0.9,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 150.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "BigSoundBank (CC0)",
+      "created_at": "2026-05-28T05:49:45.003269"
+    },
+    {
+      "id": "2a1e616c-cc42-4f7f-8a1b-33e668d9e7eb",
+      "name": "frogs-pond-toads",
+      "file_path": "_ambient/frogs-pond-toads.wav",
+      "category": "frogs",
+      "tags": [
+        "river",
+        "forest",
+        "night"
+      ],
+      "default_volume": 0.35,
+      "play_probability": 0.85,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 150.0,
+      "fade_in_ms": 3500,
+      "fade_out_ms": 4500,
+      "license": "freesound (Benboncan, CC-BY)",
+      "created_at": "2026-05-28T05:49:49.836332"
+    },
+    {
+      "id": "b4bb000a-5600-48c7-ac58-c0ca62334d45",
+      "name": "frogs-pond",
+      "file_path": "_ambient/frogs-pond.wav",
+      "category": "frogs",
+      "tags": [
+        "river",
+        "forest",
+        "night"
+      ],
+      "default_volume": 0.35,
+      "play_probability": 0.8,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 150.0,
+      "fade_in_ms": 3500,
+      "fade_out_ms": 4500,
+      "license": "freesound (Benboncan, CC-BY)",
+      "created_at": "2026-05-28T05:49:52.889342"
+    },
+    {
+      "id": "7452990d-f87f-4cab-ba3b-c98e2bb1e67c",
+      "name": "frogs-croaking",
+      "file_path": "_ambient/frogs-croaking.wav",
+      "category": "frogs",
+      "tags": [
+        "river",
+        "night"
+      ],
+      "default_volume": 0.3,
+      "play_probability": 0.7,
+      "min_play_duration_s": 45.0,
+      "max_play_duration_s": 120.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "freesound (Benboncan, CC-BY)",
+      "created_at": "2026-05-28T05:49:56.249503"
+    },
+    {
+      "id": "738db1e6-996e-4da7-8b6e-1ddf36e265a8",
+      "name": "water-waves-seagulls",
+      "file_path": "_ambient/water-waves-seagulls.wav",
+      "category": "water",
+      "tags": [
+        "ocean"
+      ],
+      "default_volume": 0.45,
+      "play_probability": 0.9,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 180.0,
+      "fade_in_ms": 3500,
+      "fade_out_ms": 4500,
+      "license": "freesound (juskiddink, CC-BY)",
+      "created_at": "2026-05-28T05:49:59.615223"
+    },
+    {
+      "id": "35cf2cec-1c95-4a2c-857b-b412ba0a477a",
+      "name": "cavern-dungeon",
+      "file_path": "_ambient/cavern-dungeon.ogg",
+      "category": "cavern",
+      "tags": [
+        "dungeon",
+        "cave",
+        "indoor"
+      ],
+      "default_volume": 0.4,
+      "play_probability": 0.9,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 180.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "OpenGameArt (CC0)",
+      "created_at": "2026-05-28T05:50:01.751263"
+    },
+    {
+      "id": "e828558b-ab54-4986-a6ee-6a56ed38a45e",
+      "name": "cavern-cave-drips",
+      "file_path": "_ambient/cavern-cave-drips.mp3",
+      "category": "cavern",
+      "tags": [
+        "cave",
+        "dungeon",
+        "indoor"
+      ],
+      "default_volume": 0.4,
+      "play_probability": 0.85,
+      "min_play_duration_s": 60.0,
+      "max_play_duration_s": 150.0,
+      "fade_in_ms": 3000,
+      "fade_out_ms": 4000,
+      "license": "BigSoundBank (CC0)",
+      "created_at": "2026-05-28T05:50:03.914160"
+    },
+    {
+      "id": "c09df0fb-68b3-44cd-b0a5-72d9fbac26b3",
+      "name": "settlement-church-bell",
+      "file_path": "_ambient/settlement-church-bell.mp3",
+      "category": "settlement",
+      "tags": [
+        "urban",
+        "indoor"
+      ],
+      "default_volume": 0.3,
+      "play_probability": 0.4,
+      "min_play_duration_s": 20.0,
+      "max_play_duration_s": 45.0,
+      "fade_in_ms": 2000,
+      "fade_out_ms": 3000,
+      "license": "BigSoundBank (CC0)",
+      "created_at": "2026-05-28T05:50:06.036593"
+    }
+  ]
 }
