@@ -1,5 +1,7 @@
 import client from './client'
 import type { AudioUploadResponse, LoopAnalysisResult } from '../types'
+import { STATIC_MODE } from '../static/mode'
+import { writeNotSupported } from '../static/staticDataSource'
 
 /**
  * Build the streaming URL for an audio file given its relative path
@@ -30,6 +32,7 @@ export const httpFetcher: AudioFetcher = async (key) => {
 }
 
 export const uploadAudio = (gameId: string, file: File): Promise<AudioUploadResponse> => {
+  if (STATIC_MODE) return writeNotSupported('uploadAudio')
   const form = new FormData()
   form.append('file', file)
   return client
@@ -39,8 +42,12 @@ export const uploadAudio = (gameId: string, file: File): Promise<AudioUploadResp
     .then(r => r.data)
 }
 
-export const deleteAudio = (folder: string, filename: string): Promise<void> =>
-  client.delete(`/api/audio/${folder}/${encodeURIComponent(filename)}`).then(() => undefined)
+export const deleteAudio = (folder: string, filename: string): Promise<void> => {
+  if (STATIC_MODE) return writeNotSupported('deleteAudio')
+  return client.delete(`/api/audio/${folder}/${encodeURIComponent(filename)}`).then(() => undefined)
+}
 
-export const analyzeAudioLoop = (folder: string, filename: string): Promise<LoopAnalysisResult> =>
-  client.post(`/api/audio/${folder}/${encodeURIComponent(filename)}/analyze`).then(r => r.data)
+export const analyzeAudioLoop = (folder: string, filename: string): Promise<LoopAnalysisResult> => {
+  if (STATIC_MODE) return writeNotSupported('analyzeAudioLoop')
+  return client.post(`/api/audio/${folder}/${encodeURIComponent(filename)}/analyze`).then(r => r.data)
+}
