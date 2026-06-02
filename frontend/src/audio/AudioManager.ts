@@ -1,12 +1,26 @@
 // AudioManager — Web Audio API based audio engine for bgmscape.
 // Framework-agnostic: no React imports. Wrap with useAudio.ts for React usage.
 
+import type { AudioFetcher } from '../api/audio'
+import { httpFetcher } from '../api/audio'
+
 const DEFAULT_FADE_IN_DURATION   = 1    // seconds
 const DEFAULT_FADE_OUT_DURATION  = 1.5  // seconds
 
 export class AudioManager {
   private context: AudioContext | null = null
   private masterGain: GainNode | null = null
+  private fetcher: AudioFetcher
+
+  /**
+   * The fetcher decides how a URL-like key is turned into bytes. Defaulting
+   * to `httpFetcher` preserves the historical behavior; in static-deploy mode
+   * the App passes a fetcher that resolves keys against a local directory
+   * handle instead of the network.
+   */
+  constructor(fetcher: AudioFetcher = httpFetcher) {
+    this.fetcher = fetcher
+  }
 
   // Currently playing source + its gain node
   private currentSource: AudioBufferSourceNode | null = null
@@ -56,9 +70,7 @@ export class AudioManager {
       return this.bufferCache.get(url)!
     }
     const ctx = this.getContext()
-    const response = await fetch(url)
-    if (!response.ok) throw new Error(`Failed to fetch audio: ${url} (${response.status})`)
-    const arrayBuffer = await response.arrayBuffer()
+    const arrayBuffer = await this.fetcher(url)
     const audioBuffer = await ctx.decodeAudioData(arrayBuffer)
     this.bufferCache.set(url, audioBuffer)
     return audioBuffer

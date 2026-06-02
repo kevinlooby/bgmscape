@@ -18,6 +18,8 @@
 import type { AmbientAsset } from '../types'
 import type { AudioManager } from './AudioManager'
 import { ambientAssetUrl } from '../api/ambient'
+import type { AudioFetcher } from '../api/audio'
+import { httpFetcher } from '../api/audio'
 
 export interface SelectedAsset {
   asset: AmbientAsset
@@ -82,6 +84,7 @@ interface ActivePlay {
 
 export class AmbientEngine {
   private am: AudioManager
+  private fetcher: AudioFetcher
   private context: AudioContext | null = null
   private ambientBus: GainNode | null = null
 
@@ -137,8 +140,9 @@ export class AmbientEngine {
    */
   private restTimers: Map<string, ReturnType<typeof setTimeout>> = new Map()
 
-  constructor(audioManager: AudioManager) {
+  constructor(audioManager: AudioManager, fetcher: AudioFetcher = httpFetcher) {
     this.am = audioManager
+    this.fetcher = fetcher
   }
 
   // ── Setup ──────────────────────────────────────────────────────────────────
@@ -320,9 +324,7 @@ export class AmbientEngine {
     if (this.bufferCache.has(asset.id)) return this.bufferCache.get(asset.id)!
     if (!this.context) return null
     try {
-      const resp = await fetch(ambientAssetUrl(asset.id))
-      if (!resp.ok) return null
-      const arr = await resp.arrayBuffer()
+      const arr = await this.fetcher(ambientAssetUrl(asset.id))
       const buf = await this.context.decodeAudioData(arr)
       this.bufferCache.set(asset.id, buf)
       return buf

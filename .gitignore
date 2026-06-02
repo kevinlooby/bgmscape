@@ -137,6 +137,8 @@ audio_files/
 # Staging folders for game soundtracks (unzipped OST source files). The seed
 # JSONs in data/ are tracked; the audio_files referenced by them are not.
 data/*_audio/
+# Staging folder for downloaded ambient assets (referenced by the ambient seed).
+data/ambient_downloads/
 
 # Local Claude Code launch configs
 .claude/
