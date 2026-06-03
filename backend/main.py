@@ -54,6 +54,9 @@ def startup():
     _ensure_columns("graphs", {
         "game_id": "VARCHAR(36)",
     })
+    _ensure_columns("ambient_assets", {
+        "review_status": "VARCHAR(20) NOT NULL DEFAULT 'unreviewed'",
+    })
 
 
 def _ensure_columns(table: str, columns: dict[str, str]) -> None:

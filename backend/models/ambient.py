@@ -36,6 +36,10 @@ class AmbientAsset(Base):
     # License is captured so future distribution decisions can filter
     # (e.g. "drop all non-CC0 for app-store build"). Free-form string.
     license: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    # Vetting state set from the Vetting tab in /ambient. `marked_for_removal`
+    # is excluded by the runtime ambient engine (selectActiveAssets) so the
+    # listener stops hearing the track immediately, before deletion.
+    review_status: Mapped[str] = mapped_column(String(20), nullable=False, default="unreviewed")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     def __repr__(self) -> str:

@@ -1,8 +1,13 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import * as ambientApi from '../api/ambient'
 import { ambientAssetUrl } from '../api/ambient'
-import type { AmbientAsset, AmbientAssetCreate, AmbientAssetUpdate } from '../types'
+import type {
+  AmbientAsset,
+  AmbientAssetCreate,
+  AmbientAssetUpdate,
+  AmbientReviewStatus,
+} from '../types'
 
 const MONO = 'monospace'
 
@@ -30,31 +35,65 @@ const DEFAULT_FORM: AmbientAssetCreate = {
   license: '',
 }
 
+type Tab = 'library' | 'vetting'
+
+const STATUS_LABEL: Record<AmbientReviewStatus, string> = {
+  unreviewed: 'Unreviewed',
+  included: 'Included',
+  marked_for_removal: 'Marked for removal',
+}
+
+/** Read tab + pre-selected asset from the URL hash (e.g. `#vet?asset=abc`). */
+function readUrlHash(): { tab: Tab; assetId: string | null } {
+  if (typeof window === 'undefined') return { tab: 'library', assetId: null }
+  const hash = window.location.hash
+  const match = hash.match(/^#(\w+)(?:\?asset=([^&]+))?/)
+  if (!match) return { tab: 'library', assetId: null }
+  const tab: Tab = match[1] === 'vet' ? 'vetting' : 'library'
+  const assetId = match[2] ? decodeURIComponent(match[2]) : null
+  return { tab, assetId }
+}
+
+function writeUrlHash(tab: Tab, assetId: string | null): void {
+  if (typeof window === 'undefined') return
+  let target = ''
+  if (tab === 'vetting') target = '#vet' + (assetId ? `?asset=${encodeURIComponent(assetId)}` : '')
+  const next = window.location.pathname + window.location.search + target
+  if (window.location.pathname + window.location.search + window.location.hash !== next) {
+    window.history.replaceState(null, '', next)
+  }
+}
+
 export default function AmbientLibraryPage() {
   const navigate = useNavigate()
   const [assets, setAssets] = useState<AmbientAsset[] | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [filterCategory, setFilterCategory] = useState<string>('')
-  const [editingId, setEditingId] = useState<string | null>(null)
 
-  const load = () => {
+  // Hash-driven tab + selected-asset state. Initialised once from the URL so
+  // clicking a status badge on the Library tab (which navigates to
+  // `#vet?asset=<id>`) opens straight to that asset.
+  const initial = useMemo(readUrlHash, [])
+  const [tab, setTab] = useState<Tab>(initial.tab)
+  const [vetSelectedId, setVetSelectedId] = useState<string | null>(initial.assetId)
+
+  const load = useCallback(() => {
     ambientApi.listAmbientAssets()
       .then(setAssets)
       .catch(e => setError(e instanceof Error ? e.message : 'Failed to load ambient library'))
-  }
+  }, [])
 
-  useEffect(() => { load() }, [])
+  useEffect(() => { load() }, [load])
 
-  const filtered = useMemo(() => {
-    if (!assets) return []
-    if (!filterCategory) return assets
-    return assets.filter(a => a.category === filterCategory)
-  }, [assets, filterCategory])
+  // Mirror tab/selection back into the URL so a reload keeps you in place and
+  // the back/forward buttons feel sensible.
+  useEffect(() => {
+    writeUrlHash(tab, tab === 'vetting' ? vetSelectedId : null)
+  }, [tab, vetSelectedId])
 
-  const allCategories = useMemo(() => {
-    if (!assets) return []
-    return Array.from(new Set(assets.map(a => a.category))).sort()
-  }, [assets])
+  const goToVetting = useCallback((assetId: string) => {
+    setVetSelectedId(assetId)
+    setTab('vetting')
+  }, [])
 
   return (
     <div style={{
@@ -78,16 +117,32 @@ export default function AmbientLibraryPage() {
 
       {/* Body */}
       <div style={{ flex: 1, padding: '32px 24px 40px', display: 'flex', justifyContent: 'center' }}>
-        <div style={{ width: '100%', maxWidth: 1000 }}>
+        <div style={{ width: '100%', maxWidth: 1100 }}>
           <div style={{ fontSize: 11, color: '#4a6a8a', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 14 }}>
             Atmospheric sound library
           </div>
           <div style={{ fontSize: 24, color: '#e8f0fe', fontWeight: 700, marginBottom: 8 }}>
             Birds, water, weather, and more
           </div>
-          <div style={{ fontSize: 12, color: '#7a8aa0', marginBottom: 28, lineHeight: 1.5 }}>
+          <div style={{ fontSize: 12, color: '#7a8aa0', marginBottom: 24, lineHeight: 1.5 }}>
             These ambient loops are global across all games. Tag a node in any game's editor with
             one of these tags and the engine will mix the matching ambient layers under the music.
+          </div>
+
+          {/* Tab toggle */}
+          <div style={{ display: 'flex', gap: 6, marginBottom: 24 }}>
+            <button
+              onClick={() => setTab('library')}
+              style={tab === 'library' ? tabButtonActiveStyle : tabButtonStyle}
+            >
+              Library
+            </button>
+            <button
+              onClick={() => setTab('vetting')}
+              style={tab === 'vetting' ? tabButtonActiveStyle : tabButtonStyle}
+            >
+              Vetting
+            </button>
           </div>
 
           {error && (
@@ -96,61 +151,110 @@ export default function AmbientLibraryPage() {
             </div>
           )}
 
-          <UploadForm onCreated={load} onError={setError} />
+          {tab === 'library' && (
+            <LibraryTab
+              assets={assets}
+              onCreated={load}
+              onError={setError}
+              onBadgeClick={goToVetting}
+            />
+          )}
 
-          {/* Filter + table */}
-          <div style={{ marginTop: 32 }}>
-            <div style={{
-              display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 12,
-            }}>
-              <div style={{ fontSize: 11, color: '#4a6a8a', letterSpacing: 2, textTransform: 'uppercase' }}>
-                Library {assets ? `(${assets.length})` : ''}
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <label style={{ fontSize: 11, color: '#7a8aa0' }}>Filter category</label>
-                <select
-                  value={filterCategory}
-                  onChange={e => setFilterCategory(e.target.value)}
-                  style={selectStyle}
-                >
-                  <option value="">all</option>
-                  {allCategories.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
-              </div>
-            </div>
-
-            {assets === null && !error && (
-              <div style={{ fontSize: 12, color: '#4a6a8a' }}>loading…</div>
-            )}
-
-            {assets && filtered.length === 0 && (
-              <div style={{
-                padding: 24, border: '1px dashed #2d4a6e', borderRadius: 6,
-                color: '#4a6a8a', fontSize: 13, lineHeight: 1.6,
-              }}>
-                No assets yet. Upload your first ambient loop above.
-              </div>
-            )}
-
-            {filtered.length > 0 && (
-              <div style={{ border: '1px solid #2d4a6e', borderRadius: 6, overflow: 'hidden' }}>
-                {filtered.map(asset => (
-                  <AssetRow
-                    key={asset.id}
-                    asset={asset}
-                    expanded={editingId === asset.id}
-                    onToggle={() => setEditingId(editingId === asset.id ? null : asset.id)}
-                    onSaved={load}
-                    onDeleted={load}
-                    onError={setError}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+          {tab === 'vetting' && (
+            <VettingTab
+              assets={assets}
+              selectedId={vetSelectedId}
+              setSelectedId={setVetSelectedId}
+              onMutated={load}
+              onError={setError}
+            />
+          )}
         </div>
       </div>
     </div>
+  )
+}
+
+// ── Library tab ──────────────────────────────────────────────────────────────
+
+function LibraryTab({
+  assets, onCreated, onError, onBadgeClick,
+}: {
+  assets: AmbientAsset[] | null
+  onCreated: () => void
+  onError: (msg: string) => void
+  onBadgeClick: (assetId: string) => void
+}) {
+  const [filterCategory, setFilterCategory] = useState<string>('')
+  const [editingId, setEditingId] = useState<string | null>(null)
+
+  const filtered = useMemo(() => {
+    if (!assets) return []
+    if (!filterCategory) return assets
+    return assets.filter(a => a.category === filterCategory)
+  }, [assets, filterCategory])
+
+  const allCategories = useMemo(() => {
+    if (!assets) return []
+    return Array.from(new Set(assets.map(a => a.category))).sort()
+  }, [assets])
+
+  return (
+    <>
+      <UploadForm onCreated={onCreated} onError={onError} />
+
+      {/* Filter + table */}
+      <div style={{ marginTop: 32 }}>
+        <div style={{
+          display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 12,
+        }}>
+          <div style={{ fontSize: 11, color: '#4a6a8a', letterSpacing: 2, textTransform: 'uppercase' }}>
+            Library {assets ? `(${assets.length})` : ''}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <label style={{ fontSize: 11, color: '#7a8aa0' }}>Filter category</label>
+            <select
+              value={filterCategory}
+              onChange={e => setFilterCategory(e.target.value)}
+              style={selectStyle}
+            >
+              <option value="">all</option>
+              {allCategories.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+        </div>
+
+        {assets === null && (
+          <div style={{ fontSize: 12, color: '#4a6a8a' }}>loading…</div>
+        )}
+
+        {assets && filtered.length === 0 && (
+          <div style={{
+            padding: 24, border: '1px dashed #2d4a6e', borderRadius: 6,
+            color: '#4a6a8a', fontSize: 13, lineHeight: 1.6,
+          }}>
+            No assets yet. Upload your first ambient loop above.
+          </div>
+        )}
+
+        {filtered.length > 0 && (
+          <div style={{ border: '1px solid #2d4a6e', borderRadius: 6, overflow: 'hidden' }}>
+            {filtered.map(asset => (
+              <AssetRow
+                key={asset.id}
+                asset={asset}
+                expanded={editingId === asset.id}
+                onToggle={() => setEditingId(editingId === asset.id ? null : asset.id)}
+                onSaved={onCreated}
+                onDeleted={onCreated}
+                onError={onError}
+                onBadgeClick={onBadgeClick}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </>
   )
 }
 
@@ -305,7 +409,7 @@ function UploadForm({ onCreated, onError }: { onCreated: () => void; onError: (m
 // ── Asset row ────────────────────────────────────────────────────────────────
 
 function AssetRow({
-  asset, expanded, onToggle, onSaved, onDeleted, onError,
+  asset, expanded, onToggle, onSaved, onDeleted, onError, onBadgeClick,
 }: {
   asset: AmbientAsset
   expanded: boolean
@@ -313,19 +417,27 @@ function AssetRow({
   onSaved: () => void
   onDeleted: () => void
   onError: (msg: string) => void
+  onBadgeClick: (assetId: string) => void
 }) {
   return (
     <div style={{ borderBottom: '1px solid #2d4a6e', background: expanded ? '#0c1822' : 'transparent' }}>
       <div
         onClick={onToggle}
         style={{
-          display: 'grid', gridTemplateColumns: '1.5fr 0.8fr 2fr 0.6fr 0.6fr 0.6fr',
+          display: 'grid', gridTemplateColumns: '1.4fr 0.7fr 0.9fr 1.7fr 0.5fr 0.5fr 0.6fr',
           gap: 12, padding: '12px 16px', alignItems: 'center', cursor: 'pointer',
         }}
       >
         <div style={{ color: '#e8f0fe', fontSize: 13 }}>{asset.name}</div>
         <div>
           <span style={categoryBadge}>{asset.category}</span>
+        </div>
+        <div>
+          <StatusBadge
+            status={asset.review_status}
+            onClick={(e) => { e.stopPropagation(); onBadgeClick(asset.id) }}
+            title="Open in Vetting tab"
+          />
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
           {asset.tags.length === 0 && (
@@ -494,6 +606,454 @@ function EditPanel({
   )
 }
 
+// ── Vetting tab ──────────────────────────────────────────────────────────────
+
+type StatusFilter = 'unreviewed' | 'all' | 'included' | 'marked_for_removal'
+
+function VettingTab({
+  assets, selectedId, setSelectedId, onMutated, onError,
+}: {
+  assets: AmbientAsset[] | null
+  selectedId: string | null
+  setSelectedId: (id: string | null) => void
+  onMutated: () => void
+  onError: (msg: string) => void
+}) {
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('unreviewed')
+  const [categoryFilter, setCategoryFilter] = useState<string>('')
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+
+  const allCategories = useMemo(() => {
+    if (!assets) return []
+    return Array.from(new Set(assets.map(a => a.category))).sort()
+  }, [assets])
+
+  const counts = useMemo(() => {
+    const c = { unreviewed: 0, included: 0, marked_for_removal: 0 }
+    for (const a of assets ?? []) c[a.review_status]++
+    return c
+  }, [assets])
+
+  const filtered = useMemo(() => {
+    if (!assets) return []
+    let list = assets
+    if (statusFilter !== 'all') list = list.filter(a => a.review_status === statusFilter)
+    if (categoryFilter) list = list.filter(a => a.category === categoryFilter)
+    return list
+  }, [assets, statusFilter, categoryFilter])
+
+  // Keep the currently-loaded asset visible in the list even if a status change
+  // would otherwise filter it out — prevents the player from going blank mid-vet
+  // right after the user clicks Include or Mark for removal.
+  const displayList = useMemo(() => {
+    if (!selectedId || !assets) return filtered
+    if (filtered.some(a => a.id === selectedId)) return filtered
+    const sel = assets.find(a => a.id === selectedId)
+    return sel ? [sel, ...filtered] : filtered
+  }, [filtered, selectedId, assets])
+
+  // Auto-select first asset in the list when the page opens or the filter
+  // narrows to a set that doesn't include the current selection.
+  useEffect(() => {
+    if (!assets) return
+    if (selectedId && assets.some(a => a.id === selectedId)) return
+    if (filtered.length > 0) setSelectedId(filtered[0].id)
+  }, [assets, selectedId, filtered, setSelectedId])
+
+  const selected = useMemo(
+    () => assets?.find(a => a.id === selectedId) ?? null,
+    [assets, selectedId],
+  )
+
+  const setStatus = useCallback(async (id: string, status: AmbientReviewStatus) => {
+    try {
+      await ambientApi.updateAmbientAsset(id, { review_status: status })
+      onMutated()
+    } catch (e: unknown) {
+      onError(e instanceof Error ? e.message : 'Failed to update review status')
+    }
+  }, [onMutated, onError])
+
+  const movePrev = useCallback(() => {
+    if (!selected) return
+    const idx = displayList.findIndex(a => a.id === selected.id)
+    if (idx > 0) setSelectedId(displayList[idx - 1].id)
+  }, [selected, displayList, setSelectedId])
+
+  const moveNext = useCallback(() => {
+    if (!selected) return
+    const idx = displayList.findIndex(a => a.id === selected.id)
+    if (idx >= 0 && idx < displayList.length - 1) setSelectedId(displayList[idx + 1].id)
+  }, [selected, displayList, setSelectedId])
+
+  // Keyboard shortcuts. Guarded against typing into the filter dropdown / inputs.
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const active = document.activeElement as HTMLElement | null
+      if (active) {
+        const tag = active.tagName
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || active.isContentEditable) return
+      }
+      if (!selected) return
+      switch (e.key) {
+        case ' ':
+        case 'Spacebar':
+          e.preventDefault()
+          if (audioRef.current) {
+            if (audioRef.current.paused) void audioRef.current.play().catch(() => {})
+            else audioRef.current.pause()
+          }
+          break
+        case '1':
+          void setStatus(selected.id, 'unreviewed')
+          break
+        case '2':
+          void setStatus(selected.id, 'included')
+          break
+        case '3':
+          void setStatus(selected.id, 'marked_for_removal')
+          break
+        case 'j':
+        case 'J':
+        case 'ArrowRight':
+          e.preventDefault()
+          moveNext()
+          break
+        case 'k':
+        case 'K':
+        case 'ArrowLeft':
+          e.preventDefault()
+          movePrev()
+          break
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [selected, setStatus, moveNext, movePrev])
+
+  const markedAssets = useMemo(
+    () => (assets ?? []).filter(a => a.review_status === 'marked_for_removal'),
+    [assets],
+  )
+
+  const bulkDelete = async () => {
+    if (markedAssets.length === 0) return
+    const lines = markedAssets.map(a => `  • ${a.name}`).join('\n')
+    if (!confirm(
+      `Delete ${markedAssets.length} marked-for-removal asset${markedAssets.length === 1 ? '' : 's'}?` +
+      ` This removes the audio file${markedAssets.length === 1 ? '' : 's'} too.\n\n${lines}`,
+    )) return
+
+    let failed = 0
+    for (const a of markedAssets) {
+      try {
+        await ambientApi.deleteAmbientAsset(a.id)
+      } catch {
+        failed++
+      }
+    }
+    if (failed > 0) onError(`${failed} delete${failed === 1 ? '' : 's'} failed`)
+    onMutated()
+  }
+
+  if (!assets) {
+    return <div style={{ fontSize: 12, color: '#4a6a8a' }}>loading…</div>
+  }
+
+  return (
+    <div>
+      <div style={{
+        display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
+        gap: 20, alignItems: 'start',
+      }}>
+        {/* Left column — list */}
+        <div>
+          <div style={{ fontSize: 11, color: '#7a8aa0', marginBottom: 10 }}>
+            <span style={{ color: statusColor('unreviewed') }}>{counts.unreviewed} unreviewed</span>
+            {' · '}
+            <span style={{ color: statusColor('included') }}>{counts.included} included</span>
+            {' · '}
+            <span style={{ color: statusColor('marked_for_removal') }}>{counts.marked_for_removal} marked for removal</span>
+          </div>
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10 }}>
+            {(['unreviewed', 'all', 'included', 'marked_for_removal'] as StatusFilter[]).map(s => (
+              <button
+                key={s}
+                onClick={() => setStatusFilter(s)}
+                style={statusFilter === s ? filterChipActiveStyle : filterChipStyle}
+              >
+                {s === 'all' ? 'All' : STATUS_LABEL[s]}
+              </button>
+            ))}
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+            <label style={{ fontSize: 11, color: '#7a8aa0' }}>Category</label>
+            <select
+              value={categoryFilter}
+              onChange={e => setCategoryFilter(e.target.value)}
+              style={selectStyle}
+            >
+              <option value="">all</option>
+              {allCategories.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+            <div style={{ marginLeft: 'auto', fontSize: 11, color: '#4a6a8a' }}>
+              {displayList.length} shown
+            </div>
+          </div>
+
+          {displayList.length === 0 && (
+            <div style={{
+              padding: 18, border: '1px dashed #2d4a6e', borderRadius: 6,
+              color: '#4a6a8a', fontSize: 12,
+            }}>
+              No assets match the current filter.
+            </div>
+          )}
+
+          {displayList.length > 0 && (
+            <div style={{
+              border: '1px solid #2d4a6e', borderRadius: 6, overflow: 'hidden',
+              maxHeight: 'calc(100vh - 320px)', overflowY: 'auto',
+            }}>
+              {displayList.map(asset => {
+                const isSelected = asset.id === selectedId
+                return (
+                  <div
+                    key={asset.id}
+                    onClick={() => setSelectedId(asset.id)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 10,
+                      padding: '10px 12px', cursor: 'pointer',
+                      borderBottom: '1px solid #1a2a3a',
+                      background: isSelected ? '#172638' : 'transparent',
+                    }}
+                  >
+                    <StatusDot status={asset.review_status} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{
+                        color: isSelected ? '#e8f0fe' : '#c8d8e8', fontSize: 12,
+                        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                      }}>
+                        {asset.name}
+                      </div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, marginTop: 3 }}>
+                        <span style={categoryBadge}>{asset.category}</span>
+                        {asset.tags.slice(0, 4).map(t => (
+                          <span key={t} style={tagChip}>{t}</span>
+                        ))}
+                        {asset.tags.length > 4 && (
+                          <span style={{ ...tagChip, color: '#4a6a8a' }}>+{asset.tags.length - 4}</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
+          {/* Bulk delete sits beneath the list */}
+          <div style={{ marginTop: 16 }}>
+            <button
+              onClick={bulkDelete}
+              disabled={markedAssets.length === 0}
+              style={markedAssets.length === 0 ? dangerButtonDisabledStyle : dangerButtonStyle}
+            >
+              Delete all marked for removal ({markedAssets.length})
+            </button>
+          </div>
+        </div>
+
+        {/* Right column — player + actions */}
+        <div style={{ position: 'sticky', top: 16 }}>
+          {!selected && (
+            <div style={{
+              padding: 24, border: '1px dashed #2d4a6e', borderRadius: 8,
+              color: '#4a6a8a', fontSize: 13, textAlign: 'center',
+            }}>
+              Pick a track on the left to start listening.
+            </div>
+          )}
+
+          {selected && (
+            <VettingPlayer
+              asset={selected}
+              audioRef={audioRef}
+              onStatus={(status) => void setStatus(selected.id, status)}
+              onPrev={movePrev}
+              onNext={moveNext}
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function VettingPlayer({
+  asset, audioRef, onStatus, onPrev, onNext,
+}: {
+  asset: AmbientAsset
+  audioRef: React.MutableRefObject<HTMLAudioElement | null>
+  onStatus: (status: AmbientReviewStatus) => void
+  onPrev: () => void
+  onNext: () => void
+}) {
+  return (
+    <div style={{
+      background: '#0f1923', border: '1px solid #2d4a6e', borderRadius: 8, padding: 18,
+    }}>
+      <div style={{
+        fontSize: 18, color: '#e8f0fe', fontWeight: 700, marginBottom: 6,
+        wordBreak: 'break-word',
+      }}>
+        {asset.name}
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+        <span style={categoryBadge}>{asset.category}</span>
+        {asset.tags.map(t => <span key={t} style={tagChip}>{t}</span>)}
+      </div>
+      {asset.license && (
+        <div style={{ fontSize: 11, color: '#4a6a8a', marginBottom: 10 }}>
+          License: {asset.license}
+        </div>
+      )}
+
+      <audio
+        ref={audioRef}
+        key={asset.id}
+        controls
+        autoPlay
+        src={ambientAssetUrl(asset.id)}
+        style={{ width: '100%', marginBottom: 14 }}
+      />
+
+      <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
+        {(['unreviewed', 'included', 'marked_for_removal'] as AmbientReviewStatus[]).map(s => (
+          <button
+            key={s}
+            onClick={() => onStatus(s)}
+            style={asset.review_status === s ? statusButtonActiveStyle(s) : statusButtonStyle(s)}
+          >
+            {STATUS_LABEL[s]}
+          </button>
+        ))}
+      </div>
+
+      <div style={{ display: 'flex', gap: 6, marginBottom: 14 }}>
+        <button onClick={onPrev} style={secondaryButtonStyle}>← Prev</button>
+        <button onClick={onNext} style={secondaryButtonStyle}>Next →</button>
+      </div>
+
+      <div style={{
+        background: '#0a1520', border: '1px solid #1a2a3a', borderRadius: 6,
+        padding: 10, fontSize: 11, color: '#7a8aa0', marginBottom: 10,
+      }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', rowGap: 4, columnGap: 12 }}>
+          <span>Default volume</span><span style={{ color: '#90b8e8' }}>{asset.default_volume.toFixed(2)}</span>
+          <span>Play probability</span><span style={{ color: '#90b8e8' }}>{asset.play_probability.toFixed(2)}</span>
+          <span>Play duration</span><span style={{ color: '#90b8e8' }}>{asset.min_play_duration_s}–{asset.max_play_duration_s}s</span>
+          <span>Fade in / out</span><span style={{ color: '#90b8e8' }}>{asset.fade_in_ms} / {asset.fade_out_ms} ms</span>
+        </div>
+        <div style={{ marginTop: 6, fontSize: 10, color: '#4a6a8a', wordBreak: 'break-all' }}>
+          {asset.file_path}
+        </div>
+      </div>
+
+      <div style={{ fontSize: 10, color: '#4a6a8a', lineHeight: 1.5 }}>
+        Keyboard: <code style={kbdStyle}>Space</code> play/pause ·
+        {' '}<code style={kbdStyle}>1</code>/<code style={kbdStyle}>2</code>/<code style={kbdStyle}>3</code> unreviewed/include/mark ·
+        {' '}<code style={kbdStyle}>J</code>/<code style={kbdStyle}>K</code> next/prev
+      </div>
+    </div>
+  )
+}
+
+// ── Status helpers ───────────────────────────────────────────────────────────
+
+function statusColor(status: AmbientReviewStatus): string {
+  switch (status) {
+    case 'unreviewed': return '#8a9bb0'
+    case 'included': return '#4ade80'
+    case 'marked_for_removal': return '#f87171'
+  }
+}
+
+function statusBg(status: AmbientReviewStatus): string {
+  switch (status) {
+    case 'unreviewed': return '#1e2a3a'
+    case 'included': return '#143824'
+    case 'marked_for_removal': return '#3a1e1e'
+  }
+}
+
+function statusBorder(status: AmbientReviewStatus): string {
+  switch (status) {
+    case 'unreviewed': return '#2d4a6e'
+    case 'included': return '#2f7a4a'
+    case 'marked_for_removal': return '#8a3a3a'
+  }
+}
+
+function StatusBadge({
+  status, onClick, title,
+}: {
+  status: AmbientReviewStatus
+  onClick?: (e: React.MouseEvent) => void
+  title?: string
+}) {
+  return (
+    <span
+      onClick={onClick}
+      title={title}
+      style={{
+        display: 'inline-flex', alignItems: 'center', gap: 5,
+        padding: '2px 8px', borderRadius: 10,
+        background: statusBg(status),
+        border: `1px solid ${statusBorder(status)}`,
+        color: statusColor(status),
+        fontSize: 10, letterSpacing: 0.5,
+        cursor: onClick ? 'pointer' : 'default',
+        userSelect: 'none',
+      }}
+    >
+      <StatusDot status={status} />
+      {STATUS_LABEL[status]}
+    </span>
+  )
+}
+
+function StatusDot({ status }: { status: AmbientReviewStatus }) {
+  return (
+    <span style={{
+      display: 'inline-block', width: 7, height: 7, borderRadius: '50%',
+      background: statusColor(status),
+    }} />
+  )
+}
+
+function statusButtonStyle(status: AmbientReviewStatus): React.CSSProperties {
+  return {
+    padding: '7px 12px', borderRadius: 4,
+    background: '#0a1520',
+    color: statusColor(status),
+    border: `1px solid ${statusBorder(status)}`,
+    cursor: 'pointer', fontFamily: MONO, fontSize: 12,
+  }
+}
+
+function statusButtonActiveStyle(status: AmbientReviewStatus): React.CSSProperties {
+  return {
+    padding: '7px 12px', borderRadius: 4,
+    background: statusBg(status),
+    color: statusColor(status),
+    border: `1px solid ${statusColor(status)}`,
+    cursor: 'pointer', fontFamily: MONO, fontSize: 12, fontWeight: 700,
+  }
+}
+
 // ── Small form helpers ──────────────────────────────────────────────────────
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -559,6 +1119,38 @@ const dangerButtonStyle: React.CSSProperties = {
   fontFamily: MONO, fontSize: 12,
 }
 
+const dangerButtonDisabledStyle: React.CSSProperties = {
+  ...dangerButtonStyle,
+  background: '#1a1416', color: '#5a3030', borderColor: '#3a2424',
+  cursor: 'not-allowed',
+}
+
+const tabButtonStyle: React.CSSProperties = {
+  padding: '8px 18px', borderRadius: 4,
+  background: '#0f1923', color: '#8a9bb0',
+  border: '1px solid #2d4a6e', cursor: 'pointer',
+  fontFamily: MONO, fontSize: 13,
+}
+
+const tabButtonActiveStyle: React.CSSProperties = {
+  ...tabButtonStyle,
+  background: '#1e4a8a', color: '#e8f0fe',
+  borderColor: '#4a90d9', fontWeight: 700,
+}
+
+const filterChipStyle: React.CSSProperties = {
+  padding: '4px 10px', borderRadius: 12,
+  background: '#0f1923', color: '#8a9bb0',
+  border: '1px solid #2d4a6e', cursor: 'pointer',
+  fontFamily: MONO, fontSize: 11,
+}
+
+const filterChipActiveStyle: React.CSSProperties = {
+  ...filterChipStyle,
+  background: '#1e4a8a', color: '#e8f0fe',
+  borderColor: '#4a90d9', fontWeight: 700,
+}
+
 const categoryBadge: React.CSSProperties = {
   display: 'inline-block', padding: '2px 8px', borderRadius: 10,
   background: '#1e2a3a', border: '1px solid #2d4a6e',
@@ -569,4 +1161,9 @@ const tagChip: React.CSSProperties = {
   display: 'inline-block', padding: '1px 7px', borderRadius: 8,
   background: '#162230', color: '#8aa8c8', fontSize: 10,
   border: '1px solid #2d4a6e',
+}
+
+const kbdStyle: React.CSSProperties = {
+  background: '#1a2a3a', border: '1px solid #2d4a6e', borderRadius: 3,
+  padding: '0 4px', color: '#90b8e8', fontFamily: MONO, fontSize: 10,
 }

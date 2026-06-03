@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional
+from typing import Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+
+ReviewStatus = Literal["unreviewed", "included", "marked_for_removal"]
 
 
 class AmbientAssetBase(BaseModel):
@@ -19,6 +22,7 @@ class AmbientAssetBase(BaseModel):
     fade_in_ms: int = Field(2000, ge=0)
     fade_out_ms: int = Field(3000, ge=0)
     license: Optional[str] = None
+    review_status: ReviewStatus = "unreviewed"
 
     @model_validator(mode="after")
     def _check_duration_range(self) -> "AmbientAssetBase":
@@ -44,6 +48,7 @@ class AmbientAssetUpdate(BaseModel):
     fade_in_ms: Optional[int] = Field(None, ge=0)
     fade_out_ms: Optional[int] = Field(None, ge=0)
     license: Optional[str] = None
+    review_status: Optional[ReviewStatus] = None
 
 
 class AmbientAssetSchema(AmbientAssetBase):

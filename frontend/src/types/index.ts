@@ -24,6 +24,13 @@ export interface Node {
 
 // ── Ambient ──────────────────────────────────────────────────────────────────
 
+/**
+ * Vetting state set in the Vetting tab of /ambient. The runtime ambient engine
+ * filters `marked_for_removal` out of selectActiveAssets, so flagging an asset
+ * stops it from playing immediately; deletion is a separate manual step.
+ */
+export type AmbientReviewStatus = 'unreviewed' | 'included' | 'marked_for_removal'
+
 export interface AmbientAsset {
   id: string
   name: string
@@ -37,6 +44,7 @@ export interface AmbientAsset {
   fade_in_ms: number
   fade_out_ms: number
   license: string | null
+  review_status: AmbientReviewStatus
   created_at: string
 }
 
@@ -51,6 +59,7 @@ export interface AmbientAssetCreate {
   fade_in_ms: number
   fade_out_ms: number
   license?: string | null
+  review_status?: AmbientReviewStatus
 }
 
 export type AmbientAssetUpdate = Partial<AmbientAssetCreate>
