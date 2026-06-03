@@ -122,6 +122,9 @@ def _serialize_ambient_asset(asset: AmbientAsset) -> dict:
         "fade_in_ms": asset.fade_in_ms,
         "fade_out_ms": asset.fade_out_ms,
         "license": asset.license,
+        # review_status is exported so the static-mode runtime engine can apply
+        # the same marked-for-removal filter the HTTP-mode engine does.
+        "review_status": asset.review_status,
         "created_at": asset.created_at.isoformat() if asset.created_at else None,
     }
 

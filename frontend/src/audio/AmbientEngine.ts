@@ -45,6 +45,10 @@ export function selectActiveAssets(
   const byCategory = new Map<string, SelectedAsset[]>()
 
   for (const asset of library) {
+    // Vetting suppression: a curator-tagged asset never plays. Both the
+    // runtime engine and the editor's Preview button see this identical
+    // filtered result (single source of truth).
+    if (asset.review_status === 'marked_for_removal') continue
     let score = 0
     for (const t of asset.tags) if (nodeTagSet.has(t)) score++
     if (score === 0) continue
