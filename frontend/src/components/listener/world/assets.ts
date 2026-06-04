@@ -33,12 +33,17 @@ export interface WorldAssets {
  * Atlas manifest. Each entry is a Pixi `Assets.load`-able URL — typically a
  * `.json` spritesheet definition that references its sibling `.png`.
  *
- * Empty entries mean "atlas not yet authored" — the loader skips them and
+ * `null` means "atlas not yet authored" — the loader skips that slot and
  * leaves the corresponding `WorldAssets` field null. Fill these in as the
  * real packs arrive.
+ *
+ * `terrain.json` is built by `scripts/build_world_atlas.py` from the Cainos
+ * "Pixel Art Top Down – Basic" source pack. Re-run that script (with
+ * `--cainos-dir` pointing at the unzipped pack) any time the EXTRACTS list
+ * changes; commit the regenerated PNG + JSON together.
  */
 const MANIFEST: Record<keyof Omit<WorldAssets, 'ready'>, string | null> = {
-  terrain: null,   // → '/world/terrain.json' once Cainos foundation is packed
+  terrain: '/world/terrain.json',
   critters: null,  // → '/world/critters.json' once bird + critter pack is packed
   effects: null,   // → '/world/effects.json' once weather + VFX pack is packed
 }

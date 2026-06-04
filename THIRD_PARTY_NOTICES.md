@@ -26,14 +26,20 @@ have not yet been packed into atlases or committed to `frontend/public/world/`.
 #### Cainos — Pixel Art Top Down – Basic
 - **Creator**: Cainos
 - **Source**: <https://cainos.itch.io/pixel-art-top-down-basic>
+- **Pack version shipped**: v1.2.3
 - **License**: Pay-what-you-want via itch.io. Commercial use permitted.
   **Redistribution of the raw asset files is not permitted** — bundled
   spritesheets under `frontend/public/world/` are derivative compositions
   used inside the app, not redistribution of the original pack.
-- **Used for**: foundation terrain tiles (grass, dirt, water with autotile
-  shorelines, paths, basic foliage), flat-terrain subset only. Cliffs and
-  multi-layer elevation are deferred per the world-simulation plan.
-- **Status**: (not yet shipped)
+- **Used for**: foundation terrain tiles. Initial revision ships only 5
+  grass variants (plain grass and decorated grass with small leaves /
+  flowers / tufts) composed into `frontend/public/world/terrain.png` +
+  `terrain.json`. Stone paths and stone-floor tiles are deferred to a
+  follow-up that adds proper autotile rendering and supplemental packs
+  for solid stone floors. See `scripts/build_world_atlas.py` for the
+  exact source-coordinate map (`EXTRACTS`).
+- **Frames shipped**: `grass-00` … `grass-04`
+- **Status**: shipped (terrain atlas only — plants/props/path deferred)
 
 #### Kenney — Tiny Dungeon
 - **Creator**: Kenney
