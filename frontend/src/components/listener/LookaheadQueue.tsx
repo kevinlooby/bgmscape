@@ -2,8 +2,6 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { lookaheadSession } from '../../api/sessions'
 import type { LookaheadStep } from '../../types'
 
-const MONO = 'monospace'
-
 // Simple region → color palette (same 8 colors cycling)
 const REGION_COLORS = [
   '#4a90d9', '#90b848', '#d98840', '#c060c0',
@@ -76,26 +74,12 @@ export default function LookaheadQueue({
 
   return (
     <div>
-      {/* Header row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-        <span style={{ fontSize: 10, color: '#4a6a8a', letterSpacing: 2, textTransform: 'uppercase' }}>
-          Lookahead
-        </span>
-        <div style={{ flex: 1, height: 1, background: '#1a2a3a' }} />
-        <button
-          onClick={doFetch}
-          disabled={loading}
-          title="Refresh lookahead"
-          style={{
-            background: 'none', border: '1px solid #2d4a6e', borderRadius: 3,
-            color: loading ? '#2d4a6e' : '#6a8aaa', cursor: loading ? 'default' : 'pointer',
-            fontSize: 11, fontFamily: MONO, padding: '2px 8px',
-          }}
-        >
-          ↺ refresh
-        </button>
-      </div>
-
+      {/* The wrapping CollapsiblePanel provides the title + chevron, and the
+       *  list auto-tops-up when it drops below 6 entries — so this component
+       *  no longer needs its own header bar or refresh button.
+       *
+       *  If you ever need to surface the manual-refresh action again, pass it
+       *  to CollapsiblePanel via `headerExtra` from the panel's call site. */}
       {error && (
         <div style={{ fontSize: 11, color: '#f87171', marginBottom: 8 }}>{error}</div>
       )}

@@ -8,6 +8,7 @@ import EditorPage from './pages/EditorPage'
 import ListenerPage from './pages/ListenerPage'
 import GameGridPage from './pages/GameGridPage'
 import AmbientLibraryPage from './pages/AmbientLibraryPage'
+import SettingsPage from './pages/SettingsPage'
 import { STATIC_MODE } from './static/mode'
 import { staticFetcher } from './static/staticFetcher'
 import PickerGate from './static/PickerGate'
@@ -66,6 +67,7 @@ function App() {
           path="/ambient"
           element={STATIC_MODE ? <LocalOnlyMessage feature="The ambient library" /> : <AmbientLibraryPage />}
         />
+        <Route path="/settings" element={<SettingsPage />} />
         {/* Legacy redirects */}
         <Route path="/editor" element={<Navigate to="/" replace />} />
       </Routes>
