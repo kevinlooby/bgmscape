@@ -80,11 +80,13 @@ export class PixiWorld {
   /** Persistent layers — created once in mount, populated on each snapshot. */
   private bgLayer: Graphics | null = null
   private terrainLayer: Container | null = null
+  private propsLayer: Container | null = null
   private timeTintLayer: Graphics | null = null
   private weatherTintLayer: Graphics | null = null
 
   /** Loaded once on mount; null until the assets promise resolves. */
   private terrainSheet: Spritesheet | null = null
+  private propsSheet: Spritesheet | null = null
 
   /** Set the moment destroy() is called. */
   private _destroyed = false
@@ -126,22 +128,32 @@ export class PixiWorld {
     parent.appendChild(app.canvas)
 
     // Layer order, bottom to top:
-    //   bgLayer       — solid color rect (cheaper than re-clearing renderer.bg)
-    //   terrainLayer  — tile sprites
+    //   bgLayer          — solid color rect (cheaper than re-clearing renderer.bg)
+    //   terrainLayer     — tile sprites
+    //   propsLayer       — overlay sprites (trees, bushes, tufts, rocks)
     //   weatherTintLayer — fog / rain / snow wash
     //   timeTintLayer    — day / dawn / dusk / night
     this.bgLayer = new Graphics()
     this.terrainLayer = new Container()
     this.terrainLayer.label = 'terrain'
+    this.propsLayer = new Container()
+    this.propsLayer.label = 'props'
     this.weatherTintLayer = new Graphics()
     this.timeTintLayer = new Graphics()
-    app.stage.addChild(this.bgLayer, this.terrainLayer, this.weatherTintLayer, this.timeTintLayer)
+    app.stage.addChild(
+      this.bgLayer,
+      this.terrainLayer,
+      this.propsLayer,
+      this.weatherTintLayer,
+      this.timeTintLayer,
+    )
 
     // Kick off the asset load — when it resolves, apply the latest snapshot
     // (which may have arrived before assets were ready).
     const assets = await loadWorldAssets()
     if (this._destroyed) return
     this.terrainSheet = assets.terrain
+    this.propsSheet = assets.props
     this._ready = true
 
     // Apply whatever snapshot is current, or the empty-state default.
@@ -167,9 +179,11 @@ export class PixiWorld {
     }
     this.bgLayer = null
     this.terrainLayer = null
+    this.propsLayer = null
     this.weatherTintLayer = null
     this.timeTintLayer = null
     this.terrainSheet = null
+    this.propsSheet = null
   }
 
   // ── private ─────────────────────────────────────────────────────────────
@@ -188,9 +202,9 @@ export class PixiWorld {
 
     const seed = snapshot?.currentNodeId ? seedFromString(snapshot.currentNodeId) : FALLBACK_SEED
 
-    // Tile regen is the expensive bit — only do it when seed has changed.
+    // Scene regen is the expensive bit — only do it when seed has changed.
     if (seed !== this._lastRenderedSeed) {
-      this._renderTiles(seed, profile)
+      this._renderScene(seed, profile)
       this._lastRenderedSeed = seed
     }
 
@@ -209,34 +223,57 @@ export class PixiWorld {
     }
   }
 
-  private _renderTiles(seed: number, profile: BiomeProfile): void {
-    if (!this.terrainLayer) return
+  private _renderScene(seed: number, profile: BiomeProfile): void {
+    if (!this.terrainLayer || !this.propsLayer) return
 
-    // Clear old tiles + free GPU resources. Sprite.destroy() with default
-    // options keeps the underlying texture cached on the sheet — only the
-    // per-sprite allocation is reclaimed.
+    // Clear old sprites from both layers + free GPU resources. Sprite.destroy()
+    // with default options keeps the underlying texture cached on the sheet —
+    // only the per-sprite allocation is reclaimed.
     for (const child of this.terrainLayer.removeChildren()) {
+      child.destroy()
+    }
+    for (const child of this.propsLayer.removeChildren()) {
       child.destroy()
     }
 
     if (!this.terrainSheet) return
 
     const availableFrames = Object.keys(this.terrainSheet.textures)
+    const propFrames = this.propsSheet ? Object.keys(this.propsSheet.textures) : []
     const cols = Math.floor(this.opts.width / TILE_SIZE)
     const rows = Math.floor(this.opts.height / TILE_SIZE)
-    const tilemap: TileMap = generateMap(seed, profile, { cols, rows, availableFrames })
+    const tilemap: TileMap = generateMap(seed, profile, {
+      cols, rows, tileSize: TILE_SIZE, availableFrames, propFrames,
+    })
 
-    if (tilemap.tiles.length === 0) return  // indoor + no terrain frames → bg only
-
+    // ── Tiles ──────────────────────────────────────────────────────────────
+    // Indoor + no terrain frames → tilemap.tiles is empty and bg shows through.
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         const tile = tilemap.tiles[r * cols + c]
+        if (!tile) continue
         const texture = this.terrainSheet.textures[tile.frame]
         if (!texture) continue  // frame name no longer in atlas (shouldn't happen)
         const sprite = new Sprite(texture)
         sprite.x = c * TILE_SIZE
         sprite.y = r * TILE_SIZE
         this.terrainLayer.addChild(sprite)
+      }
+    }
+
+    // ── Overlays ──────────────────────────────────────────────────────────
+    // Already y-sorted by generateMap. Each sprite is anchored at
+    // bottom-center, so (overlay.x, overlay.y) is the *foot* of the sprite —
+    // a tree's trunk lands at that y, canopy extends upward into the scene.
+    if (this.propsSheet && tilemap.overlays.length > 0) {
+      for (const overlay of tilemap.overlays) {
+        const texture = this.propsSheet.textures[overlay.frame]
+        if (!texture) continue
+        const sprite = new Sprite(texture)
+        sprite.anchor.set(0.5, 1.0)
+        sprite.x = overlay.x
+        sprite.y = overlay.y
+        this.propsLayer.addChild(sprite)
       }
     }
   }
