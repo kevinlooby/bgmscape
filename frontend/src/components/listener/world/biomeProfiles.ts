@@ -124,7 +124,7 @@ export const TIME_TINTS: Readonly<Record<TimeOfDay, { color: number; alpha: numb
   day:   { color: 0xffffff, alpha: 0 },     // no tint
   dawn:  { color: 0xff9c64, alpha: 0.18 },  // soft warm orange
   dusk:  { color: 0x6a4a82, alpha: 0.22 },  // purple-orange
-  night: { color: 0x14224a, alpha: 0.45 },  // deep blue, noticeably darker
+  night: { color: 0x0a1430, alpha: 0.60 },  // deep navy — leaves about 40% of tile color visible
 }
 
 /**
