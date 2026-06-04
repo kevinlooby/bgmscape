@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { Loader2, Pencil, Settings, Volume2 } from 'lucide-react'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
+import { Loader2, Map, Network, Pencil, Settings, Volume2 } from 'lucide-react'
 import { usePlayback } from '../store/playback'
 import * as gamesApi from '../api/games'
 import ListenerGraphView from '../components/listener/ListenerGraphView'
+import WorldSimulation from '../components/listener/WorldSimulation'
 import { NowPlayingCard } from '../components/listener/NowPlayingCard'
 import { PlaybackControls } from '../components/listener/PlaybackControls'
 import { AtmosphereCard } from '../components/listener/AtmosphereCard'
@@ -22,6 +23,23 @@ import type { Game, Node } from '../types'
 export default function ListenerPage() {
   const { gameSlug, graphId: directGraphId } = useParams<{ gameSlug?: string; graphId?: string }>()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  // Right-column view selection: graph by default, pixel-art world when
+  // ?world=1 is set. Toggle button in the header flips it. URL-only for now
+  // so a bookmark like /listen/oot?world=1 sticks; once the world view is
+  // mature enough to be the default we'll flip this default and the toggle
+  // direction swaps accordingly.
+  const worldEnabled = searchParams.get('world') === '1'
+
+  const toggleWorldView = () => {
+    const next = new URLSearchParams(searchParams)
+    if (worldEnabled) next.delete('world')
+    else next.set('world', '1')
+    // replace:true — toggling a view shouldn't pile up browser history
+    // entries that the back button has to step through.
+    setSearchParams(next, { replace: true })
+  }
 
   const {
     sessionId, graph, currentNode, playing, wanderActive, transitioning, nominatedNextNodeId,
@@ -161,6 +179,21 @@ export default function ListenerPage() {
           onTeleport={teleportTo}
         />
       )}
+
+      {/* View toggle: graph ⇄ pixel-art world. Icon shows the *destination*
+          (the view you'd flip to) so the action reads "switch to map" or
+          "switch to graph" at a glance. */}
+      <IconButton
+        aria-label={worldEnabled ? 'Switch to graph view' : 'Switch to world view'}
+        title={worldEnabled ? 'Switch to graph view' : 'Switch to world view'}
+        size="md"
+        variant="secondary"
+        onClick={toggleWorldView}
+      >
+        {worldEnabled
+          ? <Network size={iconSize.md} />
+          : <Map size={iconSize.md} />}
+      </IconButton>
 
       <IconButton
         aria-label="Settings"
@@ -338,7 +371,7 @@ export default function ListenerPage() {
 
         {/* ── Right column ─ "World" ──────────────────────────────────────── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: space.lg }}>
-          {graph && <ListenerGraphView />}
+          {graph && (worldEnabled ? <WorldSimulation /> : <ListenerGraphView />)}
         </div>
       </div>
     </div>
