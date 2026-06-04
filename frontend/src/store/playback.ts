@@ -32,6 +32,8 @@ interface PlaybackState {
   travelMinMs: number
   /** Random additional travel time on top of the minimum, in ms. */
   travelVarianceMs: number
+  /** Master volume for the music bus (0..1). Applied via AudioManager.setVolume. */
+  musicVolume: number
   /** Ambient bus master volume (0..1). Multiplicative with the music master. */
   ambientBusVolume: number
   /** Global base chance a matching ambient category starts a sound (0..1). */
@@ -55,7 +57,6 @@ interface PlaybackActions {
   setWanderActive: (active: boolean) => Promise<void>
   steerTo: (nodeId: string) => Promise<void>
   teleportTo: (nodeId: string) => Promise<void>
-  setVolume: (gain: number) => void
   reset: () => void
 
   // ── Tunable param setters ────────────────────────────────────────────────
@@ -64,6 +65,7 @@ interface PlaybackActions {
   setFadeInDuration: (v: number) => void
   setTravelMinMs: (v: number) => void
   setTravelVarianceMs: (v: number) => void
+  setMusicVolume: (v: number) => void
   setAmbientBusVolume: (v: number) => void
   setAmbientDensity: (v: number) => void
   setAmbientCrowdingFalloff: (v: number) => void
@@ -121,6 +123,7 @@ const TUNING_KEYS = [
   'fadeInDuration',
   'travelMinMs',
   'travelVarianceMs',
+  'musicVolume',
   'ambientBusVolume',
   'ambientDensity',
   'ambientCrowdingFalloff',
@@ -233,6 +236,7 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
   fadeInDuration: 1,
   travelMinMs: 3_000,
   travelVarianceMs: 3_000,
+  musicVolume: 1,
   ambientBusVolume: 0.7,
   ambientDensity: 0.6,
   ambientCrowdingFalloff: 0.35,
@@ -249,6 +253,10 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
   setFadeInDuration: (v) => set({ fadeInDuration: v }),
   setTravelMinMs: (v) => set({ travelMinMs: v }),
   setTravelVarianceMs: (v) => set({ travelVarianceMs: v }),
+  setMusicVolume: (v) => {
+    set({ musicVolume: v })
+    _audioManager?.setVolume(v)
+  },
   setAmbientBusVolume: (v) => {
     set({ ambientBusVolume: v })
     _ambientEngine?.setBusVolume(v)
@@ -272,10 +280,6 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
 
   // ── Actions ──────────────────────────────────────────────────────────────
 
-  setVolume: (gain) => {
-    _audioManager?.setVolume(gain)
-  },
-
   reset: () => {
     cancelWanderTimer()
     _audioManager?.fadeOut(0.5).catch(() => {})
@@ -297,6 +301,10 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
     const audio = getAudio()
     await audio.resume()
     audio.unpause()  // ensure master gain is at full volume for the new session
+    // Apply the user's saved music volume (loaded from localStorage on store
+    // init). Without this, the AudioManager always starts at its hardcoded 1.0
+    // and the slider in Settings would silently disagree with what plays.
+    audio.setVolume(get().musicVolume)
 
     const [session, graph] = await Promise.all([
       sessionsApi.createSession(graphId, startingNodeId),
