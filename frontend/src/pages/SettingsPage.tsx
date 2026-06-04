@@ -20,10 +20,10 @@ export default function SettingsPage() {
 
   const {
     dwellVarianceMs, fadeOutDuration, fadeInDuration,
-    travelMinMs, travelVarianceMs, ambientBusVolume,
+    travelMinMs, travelVarianceMs, musicVolume, ambientBusVolume,
     ambientDensity, ambientCrowdingFalloff, ambientRestMinMs, ambientRestVarianceMs,
     setDwellVarianceMs, setFadeOutDuration, setFadeInDuration,
-    setTravelMinMs, setTravelVarianceMs, setAmbientBusVolume,
+    setTravelMinMs, setTravelVarianceMs, setMusicVolume, setAmbientBusVolume,
     setAmbientDensity, setAmbientCrowdingFalloff, setAmbientRestMinMs, setAmbientRestVarianceMs,
   } = usePlayback()
 
@@ -36,7 +36,7 @@ export default function SettingsPage() {
   const handleSaveDefaults = () => {
     saveDefaults({
       dwellVarianceMs, fadeOutDuration, fadeInDuration,
-      travelMinMs, travelVarianceMs, ambientBusVolume,
+      travelMinMs, travelVarianceMs, musicVolume, ambientBusVolume,
       ambientDensity, ambientCrowdingFalloff, ambientRestMinMs, ambientRestVarianceMs,
     })
     setSavedFlash(true)
@@ -94,6 +94,18 @@ export default function SettingsPage() {
             below to persist them across reloads.
           </p>
         </div>
+
+        <Card>
+          <SectionTitle>Music</SectionTitle>
+          <SliderRow
+            label="Volume"
+            tooltip="Master volume for the music track. Same slider as the speaker icon in the listener header — they stay in sync."
+            value={musicVolume}
+            min={0} max={1} step={0.05}
+            format={v => v.toFixed(2)}
+            onChange={setMusicVolume}
+          />
+        </Card>
 
         <Card>
           <SectionTitle>Wander</SectionTitle>

@@ -25,12 +25,11 @@ export default function ListenerPage() {
 
   const {
     sessionId, graph, currentNode, playing, wanderActive, transitioning, nominatedNextNodeId,
-    wanderHistory,
-    startSession, advance, setPlaying, setWanderActive, steerTo, teleportTo, reset, setVolume,
+    wanderHistory, musicVolume,
+    startSession, advance, setPlaying, setWanderActive, steerTo, teleportTo, reset, setMusicVolume,
   } = usePlayback()
 
   const [error, setError] = useState<string | null>(null)
-  const [volume, setVolumeLocal] = useState(1)
   const [game, setGame] = useState<Game | null>(null)
 
   const isWide = useMediaQuery(`(min-width: ${breakpoint.wide}px)`)
@@ -99,9 +98,7 @@ export default function ListenerPage() {
   }, [resolvedGraphId, sessionId, resolveError, startSession])
 
   const handleVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const v = parseFloat(e.target.value)
-    setVolumeLocal(v)
-    setVolume(v)
+    setMusicVolume(parseFloat(e.target.value))
   }
 
   const neighbors = useMemo((): Node[] => {
@@ -141,10 +138,10 @@ export default function ListenerPage() {
         }}>
           <Volume2 size={14} />
           <input
-            type="range" min={0} max={1} step={0.05} value={volume}
+            type="range" min={0} max={1} step={0.05} value={musicVolume}
             onChange={handleVolume}
             style={{ width: 88, cursor: 'pointer', accentColor: color.accent }}
-            aria-label="Volume"
+            aria-label="Music volume"
           />
         </label>
       )}
