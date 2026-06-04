@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { Loader2, Pencil, Settings, Volume2 } from 'lucide-react'
 import { usePlayback } from '../store/playback'
 import * as gamesApi from '../api/games'
 import ListenerGraphView from '../components/listener/ListenerGraphView'
+import WorldSimulation from '../components/listener/WorldSimulation'
 import { NowPlayingCard } from '../components/listener/NowPlayingCard'
 import { PlaybackControls } from '../components/listener/PlaybackControls'
 import { AtmosphereCard } from '../components/listener/AtmosphereCard'
@@ -22,6 +23,12 @@ import type { Game, Node } from '../types'
 export default function ListenerPage() {
   const { gameSlug, graphId: directGraphId } = useParams<{ gameSlug?: string; graphId?: string }>()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+
+  // Temporary opt-in: ?world=1 swaps the React Flow graph view for the new
+  // Pixi pixel-art world simulation. Graph stays default until the world
+  // view is solid enough to take over by default (planned PR sequence).
+  const worldEnabled = searchParams.get('world') === '1'
 
   const {
     sessionId, graph, currentNode, playing, wanderActive, transitioning, nominatedNextNodeId,
@@ -338,7 +345,7 @@ export default function ListenerPage() {
 
         {/* ── Right column ─ "World" ──────────────────────────────────────── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: space.lg }}>
-          {graph && <ListenerGraphView />}
+          {graph && (worldEnabled ? <WorldSimulation /> : <ListenerGraphView />)}
         </div>
       </div>
     </div>
