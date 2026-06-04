@@ -2,37 +2,59 @@
  * PixiWorld — imperative controller for the listener-page pixel-art scene.
  *
  * Owns one Pixi v8 `Application` and the layered Containers that make up the
- * scene (background, terrain, props, critters, particles, overlay). React's
- * `WorldSimulation` component is a thin shell that constructs an instance,
- * calls `mount(el)`, pushes state via `update(snapshot)`, and calls `destroy()`
- * on unmount. No state lives in React — Pixi's scene graph is the source of
- * truth for what's on screen.
+ * scene (background fill, terrain, then tint overlays for time-of-day and
+ * weather). The React `WorldSimulation` component is a thin shell that
+ * constructs an instance, calls `mount(el)`, pushes state via
+ * `update(snapshot)`, and calls `destroy()` on unmount.
  *
- * The class is intentionally **plain JS without React**: declarative scene
- * description via `@pixi/react` adds bundle weight and reconciler overhead we
- * don't need for an animation-only view. The procedurally generated map
- * doesn't map well to a virtual-DOM model.
+ * Why imperative (no `@pixi/react`): the scene is procedurally generated,
+ * not declaratively composed. Reconciling tens of thousands of tiles every
+ * React render would burn cycles for no benefit; pushing a snapshot once
+ * per state change is cheaper and more predictable.
  *
  * StrictMode safety: `destroy()` is safe to call at any point in the
  * lifecycle — before `mount()` resolves, after it resolves, or repeatedly.
  * Internal `_destroyed` flag short-circuits double-destroys and lets the
  * async mount path abort if cleanup ran first.
+ *
+ * Re-render strategy: tiles only regenerate when the *node id* changes
+ * (cheap path: just twiddle alpha on the tint overlays). This keeps the
+ * 500ms ambient-poll → snapshot push lightweight.
  */
 
-import { Application, Container, Sprite, TextureSource } from 'pixi.js'
+import { Application, Container, Graphics, Sprite, TextureSource } from 'pixi.js'
+import type { Spritesheet } from 'pixi.js'
 import { loadWorldAssets } from './assets'
+import { resolveBiome } from './biomeResolver'
+import {
+  INDOOR_BG,
+  OUTDOOR_BG,
+  TIME_TINTS,
+  WEATHER_TINTS,
+  type BiomeProfile,
+} from './biomeProfiles'
+import { generateMap, seedFromString, type TileMap } from './proceduralMap'
 
 // Use nearest-neighbor filtering globally so pixel art stays crisp at any
 // scale. Set once at module load — affects every TextureSource created
 // afterward, which is all of them.
 TextureSource.defaultOptions.scaleMode = 'nearest'
 
+const TILE_SIZE = 32
+
+/**
+ * Used for the very first scene (before any snapshot arrives) and as a
+ * fallback when currentNodeId is null (e.g. session not yet started).
+ * Picked so the empty-state scene still looks intentional, not broken.
+ */
+const FALLBACK_SEED = 0xbeef
+
 export interface WorldSnapshot {
-  /** Current node id (or null if no session). Drives biome resolution. */
+  /** Current node id (or null if no session). Drives biome + seed. */
   currentNodeId: string | null
   /** Current node name — humans-readable for debugging. */
   currentNodeName: string | null
-  /** Current node ambient_tags — drives biome variant selection. */
+  /** Current node ambient_tags — drives biome resolution. */
   ambientTags: string[]
   /** Live ambient categories playing right now ('birds', 'water', …). */
   activeAmbient: string[]
@@ -41,175 +63,204 @@ export interface WorldSnapshot {
 }
 
 export interface PixiWorldOptions {
-  /** Logical canvas width in pixels. Defaults to 800. */
   width?: number
-  /** Logical canvas height in pixels. Defaults to 416. */
   height?: number
-  /** Background colour shown when no terrain is drawn. */
   background?: number
 }
 
 const DEFAULTS: Required<PixiWorldOptions> = {
   width: 800,
   height: 416,
-  background: 0x0a1520,
+  background: OUTDOOR_BG,
 }
-
-const TILE_SIZE = 32
 
 export class PixiWorld {
   private opts: Required<PixiWorldOptions>
   private app: Application | null = null
-  /** Set to true the moment destroy() is called. Async paths that started
-   *  before destroy must check this and bail before mutating the scene. */
+  /** Persistent layers — created once in mount, populated on each snapshot. */
+  private bgLayer: Graphics | null = null
+  private terrainLayer: Container | null = null
+  private timeTintLayer: Graphics | null = null
+  private weatherTintLayer: Graphics | null = null
+
+  /** Loaded once on mount; null until the assets promise resolves. */
+  private terrainSheet: Spritesheet | null = null
+
+  /** Set the moment destroy() is called. */
   private _destroyed = false
-  /** Resolves when mount finishes successfully OR rejects when destroyed
-   *  before mount could finish. Lets tests / callers await the scene. */
-  private _ready: Promise<void> | null = null
+  /** Set once mount's async setup finishes successfully. */
+  private _ready = false
+  /** Stash the most recent snapshot when update() arrives before _ready. */
+  private _pendingSnapshot: WorldSnapshot | null = null
+  /** Last seed actually rendered — skip tile regeneration if unchanged. */
+  private _lastRenderedSeed: number | null = null
 
   constructor(options: PixiWorldOptions = {}) {
     this.opts = { ...DEFAULTS, ...options }
   }
 
-  /**
-   * Attach the Pixi canvas to a parent element and build the initial scene.
-   *
-   * Async because Pixi v8's `Application.init` is async and we also wait on
-   * `loadWorldAssets()`. Safe to discard the returned promise — callers that
-   * don't need to wait can fire-and-forget. The cleanup contract: if the
-   * caller calls destroy() before this promise settles, the in-flight scene
-   * setup detects it and bails before touching the DOM.
-   */
+  // ── public lifecycle ────────────────────────────────────────────────────
+
   async mount(parent: HTMLElement): Promise<void> {
     if (this._destroyed) return
-    if (this.app) return  // already mounted
+    if (this.app) return
 
-    this._ready = (async () => {
-      const app = new Application()
-      await app.init({
-        width: this.opts.width,
-        height: this.opts.height,
-        backgroundColor: this.opts.background,
-        antialias: false,
-        autoDensity: true,
-        // Cap at the device pixel ratio so retina screens stay crisp without
-        // tanking perf on a 3x display.
-        resolution: Math.min(window.devicePixelRatio || 1, 2),
-      })
+    const app = new Application()
+    await app.init({
+      width: this.opts.width,
+      height: this.opts.height,
+      backgroundColor: this.opts.background,
+      antialias: false,
+      autoDensity: true,
+      resolution: Math.min(window.devicePixelRatio || 1, 2),
+    })
 
-      // If destroy was called while init() was awaiting, throw away the new
-      // Application before it touches the DOM.
-      if (this._destroyed) {
-        app.destroy({ removeView: true }, true)
-        return
-      }
+    // Cleanup may have fired during init. Throw away the new Application
+    // before it touches the DOM.
+    if (this._destroyed) {
+      app.destroy({ removeView: true }, true)
+      return
+    }
 
-      this.app = app
-      parent.appendChild(app.canvas)
+    this.app = app
+    parent.appendChild(app.canvas)
 
-      // Build the initial scene. From here on, scene mutations happen
-      // synchronously and don't need to re-check _destroyed.
-      await this._buildScene()
-    })()
+    // Layer order, bottom to top:
+    //   bgLayer       — solid color rect (cheaper than re-clearing renderer.bg)
+    //   terrainLayer  — tile sprites
+    //   weatherTintLayer — fog / rain / snow wash
+    //   timeTintLayer    — day / dawn / dusk / night
+    this.bgLayer = new Graphics()
+    this.terrainLayer = new Container()
+    this.terrainLayer.label = 'terrain'
+    this.weatherTintLayer = new Graphics()
+    this.timeTintLayer = new Graphics()
+    app.stage.addChild(this.bgLayer, this.terrainLayer, this.weatherTintLayer, this.timeTintLayer)
 
-    return this._ready
+    // Kick off the asset load — when it resolves, apply the latest snapshot
+    // (which may have arrived before assets were ready).
+    const assets = await loadWorldAssets()
+    if (this._destroyed) return
+    this.terrainSheet = assets.terrain
+    this._ready = true
+
+    // Apply whatever snapshot is current, or the empty-state default.
+    this._applySnapshot(this._pendingSnapshot ?? null)
   }
 
-  /**
-   * Push a state snapshot from React into the scene. Today this is mostly a
-   * placeholder — we log the snapshot so we can see the data flowing during
-   * development. Future PRs read this to swap biomes, trigger transitions,
-   * spawn critters, etc.
-   */
   update(snapshot: WorldSnapshot): void {
-    if (!this.app || this._destroyed) return
-    // Intentionally inert in PR B — the next PR wires biome selection here.
-    // Kept as a debug hook so it's visible that data is reaching the scene
-    // and ready to drive behaviour.
-    // eslint-disable-next-line no-console
-    if (import.meta.env.DEV) console.debug('[PixiWorld] snapshot', snapshot)
+    if (this._destroyed) return
+    if (!this._ready) {
+      this._pendingSnapshot = snapshot
+      return
+    }
+    this._applySnapshot(snapshot)
   }
 
-  /**
-   * Tear down the Pixi application and detach its canvas. Idempotent. Safe
-   * to call before mount() resolves (the in-flight mount detects the flag
-   * and skips the appendChild).
-   */
   destroy(): void {
     if (this._destroyed) return
     this._destroyed = true
 
     if (this.app) {
-      // Pass true / true so the canvas is removed AND all GPU resources
-      // (textures, geometry, contexts) are freed. Without this, repeated
-      // mount/unmount under StrictMode leaks WebGL contexts.
       this.app.destroy({ removeView: true }, true)
       this.app = null
     }
+    this.bgLayer = null
+    this.terrainLayer = null
+    this.weatherTintLayer = null
+    this.timeTintLayer = null
+    this.terrainSheet = null
   }
 
   // ── private ─────────────────────────────────────────────────────────────
 
   /**
-   * Build the initial scene. PR B renders a single tiled grass field as a
-   * smoke test for the renderer + asset loader. Replaced by the biome /
-   * proc-gen generator in the next PR.
+   * Apply a snapshot to the scene. Cheap path (tints only) when the node id
+   * hasn't changed; full path (regenerate tiles) when it has. Null snapshot
+   * → render the empty-state scene with the default profile.
    */
-  private async _buildScene(): Promise<void> {
-    if (!this.app) return
+  private _applySnapshot(snapshot: WorldSnapshot | null): void {
+    if (!this.app || !this.terrainLayer || !this.bgLayer) return
 
-    const terrainLayer = new Container()
-    terrainLayer.label = 'terrain'
-    this.app.stage.addChild(terrainLayer)
+    const profile = snapshot
+      ? resolveBiome(snapshot.ambientTags, snapshot.activeAmbient)
+      : resolveBiome([], [])
 
-    const assets = await loadWorldAssets()
-    if (this._destroyed || !this.app) return
+    const seed = snapshot?.currentNodeId ? seedFromString(snapshot.currentNodeId) : FALLBACK_SEED
 
-    if (!assets.terrain) {
-      // No atlas yet — leave the background colour visible. PR B's smoke
-      // test still works (you see a dark blue rectangle), and the loader
-      // logs the failure so dev can spot the missing atlas.
-      return
+    // Tile regen is the expensive bit — only do it when seed has changed.
+    if (seed !== this._lastRenderedSeed) {
+      this._renderTiles(seed, profile)
+      this._lastRenderedSeed = seed
     }
 
-    const grassFrameNames = Object.keys(assets.terrain.textures).filter(n =>
-      n.startsWith('grass-')
-    )
-    if (grassFrameNames.length === 0) return
+    this._updateBg(profile)
+    this._updateTints(profile)
 
-    // Tile a deterministic grid based on a fixed seed. PR C will swap the
-    // seed for one derived from the current node id so each location has a
-    // stable, repeatable layout.
-    const rng = mulberry32(0xbeef)
+    // Dev log so we can see snapshots driving the scene without opening
+    // Pixi devtools. Stays in dev only; production builds strip it.
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.debug(
+        '[PixiWorld] apply',
+        snapshot ? snapshot.currentNodeName : '(empty)',
+        profile,
+      )
+    }
+  }
+
+  private _renderTiles(seed: number, profile: BiomeProfile): void {
+    if (!this.terrainLayer) return
+
+    // Clear old tiles + free GPU resources. Sprite.destroy() with default
+    // options keeps the underlying texture cached on the sheet — only the
+    // per-sprite allocation is reclaimed.
+    for (const child of this.terrainLayer.removeChildren()) {
+      child.destroy()
+    }
+
+    if (!this.terrainSheet) return
+
+    const availableFrames = Object.keys(this.terrainSheet.textures)
     const cols = Math.floor(this.opts.width / TILE_SIZE)
     const rows = Math.floor(this.opts.height / TILE_SIZE)
+    const tilemap: TileMap = generateMap(seed, profile, { cols, rows, availableFrames })
 
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < cols; col++) {
-        const name = grassFrameNames[Math.floor(rng() * grassFrameNames.length)]
-        const sprite = new Sprite(assets.terrain.textures[name])
-        sprite.x = col * TILE_SIZE
-        sprite.y = row * TILE_SIZE
-        terrainLayer.addChild(sprite)
+    if (tilemap.tiles.length === 0) return  // indoor + no terrain frames → bg only
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const tile = tilemap.tiles[r * cols + c]
+        const texture = this.terrainSheet.textures[tile.frame]
+        if (!texture) continue  // frame name no longer in atlas (shouldn't happen)
+        const sprite = new Sprite(texture)
+        sprite.x = c * TILE_SIZE
+        sprite.y = r * TILE_SIZE
+        this.terrainLayer.addChild(sprite)
       }
     }
   }
-}
 
-// ── helpers ───────────────────────────────────────────────────────────────
+  private _updateBg(profile: BiomeProfile): void {
+    if (!this.bgLayer) return
+    const color = profile.isIndoor ? INDOOR_BG : OUTDOOR_BG
+    this.bgLayer
+      .clear()
+      .rect(0, 0, this.opts.width, this.opts.height)
+      .fill({ color, alpha: 1 })
+  }
 
-/**
- * Tiny seeded PRNG (Mulberry32). Good enough for cosmetic tile placement —
- * deterministic for a given seed, very small, no allocations per call.
- * Same algorithm we'll use in PR C for per-node proc-gen seeds.
- */
-function mulberry32(seed: number): () => number {
-  let a = seed >>> 0
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0
-    let t = a
-    t = Math.imul(t ^ (t >>> 15), t | 1)
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  private _updateTints(profile: BiomeProfile): void {
+    if (!this.timeTintLayer || !this.weatherTintLayer) return
+    const t = TIME_TINTS[profile.timeOfDay]
+    const w = WEATHER_TINTS[profile.weather]
+    this.timeTintLayer
+      .clear()
+      .rect(0, 0, this.opts.width, this.opts.height)
+      .fill({ color: t.color, alpha: t.alpha })
+    this.weatherTintLayer
+      .clear()
+      .rect(0, 0, this.opts.width, this.opts.height)
+      .fill({ color: w.color, alpha: w.alpha })
   }
 }
