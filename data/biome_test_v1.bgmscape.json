@@ -1,0 +1,68 @@
+{
+  "version": "1",
+  "name": "Biome Test v1",
+  "game_slug": "biome-test",
+  "game_title": "Biome Test",
+  "_notes": [
+    "Deliberately constructed graph for visually testing the listener-page",
+    "world simulation across the canonical biome / time-of-day combinations.",
+    "Every node carries a clean ambient_tags combo and intentionally has no",
+    "audio — the wander engine falls back to a 30-second dwell so the visual",
+    "swap happens fast enough to inspect each scene. Click any node in the",
+    "graph view or use Teleport to jump arbitrarily.",
+    "",
+    "Layout: 4x4 grid. Rows correspond to themed groups:",
+    "  row 0  forest at dawn / day / dusk / night",
+    "  row 1  outdoor habitats (field, mountain, desert, snowy plain)",
+    "  row 2  water + indoor (river, coast, cave, dungeon)",
+    "  row 3  weather + combinations (urban day/night, rainy field, winter night forest)",
+    "",
+    "Edges: a ring through all 16 nodes (weight 1.0, bidirectional) plus a",
+    "few diagonals (weight 0.5) so the graph reads visually but auto-wander",
+    "still prefers the systematic cycle."
+  ],
+  "nodes": [
+    { "id": "n01", "name": "Forest at Dawn",   "region": "Time of Day", "canvas_x": 150, "canvas_y": 100, "loop_start": null, "loop_end": null, "ambient_tags": ["forest", "dawn"] },
+    { "id": "n02", "name": "Forest at Day",    "region": "Time of Day", "canvas_x": 300, "canvas_y": 100, "loop_start": null, "loop_end": null, "ambient_tags": ["forest", "day"] },
+    { "id": "n03", "name": "Forest at Dusk",   "region": "Time of Day", "canvas_x": 450, "canvas_y": 100, "loop_start": null, "loop_end": null, "ambient_tags": ["forest", "dusk"] },
+    { "id": "n04", "name": "Forest at Night",  "region": "Time of Day", "canvas_x": 600, "canvas_y": 100, "loop_start": null, "loop_end": null, "ambient_tags": ["forest", "night"] },
+
+    { "id": "n05", "name": "Field",            "region": "Habitats",    "canvas_x": 150, "canvas_y": 250, "loop_start": null, "loop_end": null, "ambient_tags": ["field", "day"] },
+    { "id": "n06", "name": "Mountain",         "region": "Habitats",    "canvas_x": 300, "canvas_y": 250, "loop_start": null, "loop_end": null, "ambient_tags": ["mountain", "day"] },
+    { "id": "n07", "name": "Desert",           "region": "Habitats",    "canvas_x": 450, "canvas_y": 250, "loop_start": null, "loop_end": null, "ambient_tags": ["desert", "day"] },
+    { "id": "n08", "name": "Snowy Plain",      "region": "Habitats",    "canvas_x": 600, "canvas_y": 250, "loop_start": null, "loop_end": null, "ambient_tags": ["snow", "winter", "day"] },
+
+    { "id": "n09", "name": "River Banks",      "region": "Water + Indoor", "canvas_x": 150, "canvas_y": 400, "loop_start": null, "loop_end": null, "ambient_tags": ["river", "day"] },
+    { "id": "n10", "name": "Coastline",        "region": "Water + Indoor", "canvas_x": 300, "canvas_y": 400, "loop_start": null, "loop_end": null, "ambient_tags": ["ocean", "day"] },
+    { "id": "n11", "name": "Cave",             "region": "Water + Indoor", "canvas_x": 450, "canvas_y": 400, "loop_start": null, "loop_end": null, "ambient_tags": ["cave"] },
+    { "id": "n12", "name": "Dungeon",          "region": "Water + Indoor", "canvas_x": 600, "canvas_y": 400, "loop_start": null, "loop_end": null, "ambient_tags": ["dungeon"] },
+
+    { "id": "n13", "name": "Settlement (Day)",     "region": "Weather + Combos", "canvas_x": 150, "canvas_y": 550, "loop_start": null, "loop_end": null, "ambient_tags": ["urban", "day"] },
+    { "id": "n14", "name": "Settlement (Night)",   "region": "Weather + Combos", "canvas_x": 300, "canvas_y": 550, "loop_start": null, "loop_end": null, "ambient_tags": ["urban", "night"] },
+    { "id": "n15", "name": "Rainy Field",          "region": "Weather + Combos", "canvas_x": 450, "canvas_y": 550, "loop_start": null, "loop_end": null, "ambient_tags": ["field", "rain", "day"] },
+    { "id": "n16", "name": "Winter Forest Night",  "region": "Weather + Combos", "canvas_x": 600, "canvas_y": 550, "loop_start": null, "loop_end": null, "ambient_tags": ["forest", "winter", "snow", "night", "rain"] }
+  ],
+  "edges": [
+    { "id": "e01", "source_node_id": "n01", "target_node_id": "n02", "weight": 1.0, "bidirectional": true },
+    { "id": "e02", "source_node_id": "n02", "target_node_id": "n03", "weight": 1.0, "bidirectional": true },
+    { "id": "e03", "source_node_id": "n03", "target_node_id": "n04", "weight": 1.0, "bidirectional": true },
+    { "id": "e04", "source_node_id": "n04", "target_node_id": "n08", "weight": 1.0, "bidirectional": true },
+    { "id": "e05", "source_node_id": "n08", "target_node_id": "n07", "weight": 1.0, "bidirectional": true },
+    { "id": "e06", "source_node_id": "n07", "target_node_id": "n06", "weight": 1.0, "bidirectional": true },
+    { "id": "e07", "source_node_id": "n06", "target_node_id": "n05", "weight": 1.0, "bidirectional": true },
+    { "id": "e08", "source_node_id": "n05", "target_node_id": "n09", "weight": 1.0, "bidirectional": true },
+    { "id": "e09", "source_node_id": "n09", "target_node_id": "n10", "weight": 1.0, "bidirectional": true },
+    { "id": "e10", "source_node_id": "n10", "target_node_id": "n11", "weight": 1.0, "bidirectional": true },
+    { "id": "e11", "source_node_id": "n11", "target_node_id": "n12", "weight": 1.0, "bidirectional": true },
+    { "id": "e12", "source_node_id": "n12", "target_node_id": "n16", "weight": 1.0, "bidirectional": true },
+    { "id": "e13", "source_node_id": "n16", "target_node_id": "n15", "weight": 1.0, "bidirectional": true },
+    { "id": "e14", "source_node_id": "n15", "target_node_id": "n14", "weight": 1.0, "bidirectional": true },
+    { "id": "e15", "source_node_id": "n14", "target_node_id": "n13", "weight": 1.0, "bidirectional": true },
+    { "id": "e16", "source_node_id": "n13", "target_node_id": "n01", "weight": 1.0, "bidirectional": true },
+
+    { "id": "e17", "source_node_id": "n01", "target_node_id": "n09", "weight": 0.5, "bidirectional": true },
+    { "id": "e18", "source_node_id": "n05", "target_node_id": "n13", "weight": 0.5, "bidirectional": true },
+    { "id": "e19", "source_node_id": "n04", "target_node_id": "n16", "weight": 0.5, "bidirectional": true },
+    { "id": "e20", "source_node_id": "n08", "target_node_id": "n12", "weight": 0.5, "bidirectional": true }
+  ]
+}
