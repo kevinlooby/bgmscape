@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Search, X, Zap } from 'lucide-react'
-import { Button } from '@/ui/Button'
 import { IconButton, iconSize } from '@/ui/IconButton'
 import { color, font, fontSize, radius, shadow, space, weight } from '@/ui/tokens'
 import type { Node } from '../../types'
 
-interface TeleportButtonProps {
+interface TeleportIconButtonProps {
   /** All graph nodes except the current one — destinations to choose from. */
   nodes: Node[]
   /** True while the engine is mid-crossfade — block teleports. */
@@ -14,18 +13,19 @@ interface TeleportButtonProps {
   onTeleport: (nodeId: string) => void
 }
 
-/** Single button that opens the teleport modal. Keeps the listener page tidy
- *  by not rendering one chip per node — important once a graph has 50+ nodes. */
-export function TeleportButton({ nodes, transitioning, onTeleport }: TeleportButtonProps) {
+/** Header-mounted icon button that opens the teleport modal. The modal is a
+ *  search-filtered list of every other node in the graph — much tidier than
+ *  rendering one chip per node, especially as graphs grow past ~50 nodes. */
+export function TeleportIconButton({ nodes, transitioning, onTeleport }: TeleportIconButtonProps) {
   const [open, setOpen] = useState(false)
   const disabled = transitioning || nodes.length === 0
 
   return (
     <>
-      <Button
-        variant="secondary"
+      <IconButton
+        aria-label="Teleport to any location"
         size="md"
-        leading={<Zap size={16} />}
+        variant="secondary"
         disabled={disabled}
         onClick={() => setOpen(true)}
         title={
@@ -34,8 +34,8 @@ export function TeleportButton({ nodes, transitioning, onTeleport }: TeleportBut
             : 'Jump to any location'
         }
       >
-        Teleport…
-      </Button>
+        <Zap size={iconSize.md} />
+      </IconButton>
 
       {open && (
         <TeleportModal

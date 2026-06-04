@@ -1,23 +1,21 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Pencil, Play, Settings, Volume2 } from 'lucide-react'
+import { Loader2, Pencil, Settings, Volume2 } from 'lucide-react'
 import { usePlayback } from '../store/playback'
 import * as gamesApi from '../api/games'
 import ListenerGraphView from '../components/listener/ListenerGraphView'
-import LookaheadQueue from '../components/listener/LookaheadQueue'
 import { NowPlayingCard } from '../components/listener/NowPlayingCard'
 import { PlaybackControls } from '../components/listener/PlaybackControls'
 import { AtmosphereCard } from '../components/listener/AtmosphereCard'
 import { SteerCard } from '../components/listener/SteerCard'
 import { TrailCard } from '../components/listener/TrailCard'
-import { TeleportButton } from '../components/listener/TeleportModal'
+import { TeleportIconButton } from '../components/listener/TeleportModal'
+import { UpNextIconButton } from '../components/listener/UpNextModal'
 import { CountdownBar } from '../components/listener/CountdownBar'
 import { Button } from '@/ui/Button'
-import { Card } from '@/ui/Card'
-import { CollapsiblePanel } from '@/ui/CollapsiblePanel'
 import { IconButton, iconSize } from '@/ui/IconButton'
 import { PageHeader } from '@/ui/PageHeader'
-import { breakpoint, color, font, fontSize, space, weight } from '@/ui/tokens'
+import { breakpoint, color, font, fontSize, space } from '@/ui/tokens'
 import { useMediaQuery } from '../hooks/useMediaQuery'
 import type { Game, Node } from '../types'
 
@@ -31,7 +29,6 @@ export default function ListenerPage() {
     startSession, advance, setPlaying, setWanderActive, steerTo, teleportTo, reset, setVolume,
   } = usePlayback()
 
-  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [volume, setVolumeLocal] = useState(1)
   const [game, setGame] = useState<Game | null>(null)
@@ -76,18 +73,30 @@ export default function ListenerPage() {
     return () => { cancelled = true }
   }, [gameSlug, directGraphId])
 
-  const handleStart = async () => {
-    if (!resolvedGraphId) return
-    setLoading(true)
+  // Auto-start the session once we know which graph to play. Replaces the
+  // old "Ready to listen?" splash — that was an unnecessary click.
+  //
+  // The ref keeps StrictMode (and any other re-render-induced effect re-runs)
+  // from double-firing startSession during the brief window when sessionId is
+  // still null. We track *which* graphId we already started so switching games
+  // without unmounting (e.g. URL change /listen/oot → /listen/sm64) still
+  // triggers a fresh start.
+  //
+  // Audio doesn't actually play until the user interacts — App.tsx installs a
+  // click/keydown handler that resumes the AudioContext on first input — so
+  // browser autoplay policies are respected even though we kick off the
+  // session without user input.
+  const startedForGraphRef = useRef<string | null>(null)
+  useEffect(() => {
+    if (resolveError || !resolvedGraphId) return
+    if (sessionId) return
+    if (startedForGraphRef.current === resolvedGraphId) return
+    startedForGraphRef.current = resolvedGraphId
     setError(null)
-    try {
-      await startSession(resolvedGraphId)
-    } catch (e) {
+    startSession(resolvedGraphId).catch(e => {
       setError(e instanceof Error ? e.message : 'Failed to start session')
-    } finally {
-      setLoading(false)
-    }
-  }
+    })
+  }, [resolvedGraphId, sessionId, resolveError, startSession])
 
   const handleVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = parseFloat(e.target.value)
@@ -121,11 +130,11 @@ export default function ListenerPage() {
   const headerSubtitle = game?.name ?? graph?.name ?? undefined
   const editHref = game ? `/games/${game.slug}/edit` : null
 
-  // ── Header (shared between splash and now-playing) ────────────────────────
+  // ── Header ────────────────────────────────────────────────────────────────
 
-  const header = (showVolume: boolean) => (
+  const header = (
     <PageHeader title="bgmscape" subtitle={headerSubtitle}>
-      {showVolume && (
+      {sessionId && (
         <label style={{
           display: 'inline-flex', alignItems: 'center', gap: space.sm,
           color: color.textFaint, fontFamily: font.sans, fontSize: fontSize.sm,
@@ -138,6 +147,22 @@ export default function ListenerPage() {
             aria-label="Volume"
           />
         </label>
+      )}
+
+      {/* "What's coming next" — read-only peek at the upcoming queue. */}
+      <UpNextIconButton
+        sessionId={sessionId}
+        currentNodeId={currentNode?.id ?? null}
+        currentNodeName={currentNode?.name ?? null}
+      />
+
+      {/* Jump-to-anywhere modal. */}
+      {sessionId && (
+        <TeleportIconButton
+          nodes={allOtherNodes}
+          transitioning={transitioning}
+          onTeleport={teleportTo}
+        />
       )}
 
       <IconButton
@@ -162,73 +187,76 @@ export default function ListenerPage() {
     </PageHeader>
   )
 
-  // ── Splash (no session yet) ───────────────────────────────────────────────
+  // ── Error fallback (bad slug, no default graph, etc.) ────────────────────
 
-  if (!sessionId) {
+  if (resolveError) {
     return (
       <div style={{
         display: 'flex', flexDirection: 'column', minHeight: '100vh', background: color.bg,
       }}>
-        {header(false)}
+        {header}
         <div style={{
           flex: 1, display: 'flex', flexDirection: 'column',
-          alignItems: 'center', justifyContent: 'center', gap: space.xl, padding: space.xl,
+          alignItems: 'center', justifyContent: 'center', gap: space.lg, padding: space.xl,
         }}>
           <div style={{
-            fontFamily: font.sans, fontSize: fontSize.xs, color: color.textDim,
-            letterSpacing: '0.3em', textTransform: 'uppercase',
+            maxWidth: 480, textAlign: 'center',
+            fontFamily: font.sans, fontSize: fontSize.md, color: color.danger,
           }}>
-            bgmscape
+            {resolveError}
           </div>
-          <h1 style={{
-            margin: 0,
-            fontFamily: font.sans, fontSize: fontSize.hero, color: color.textPrimary,
-            fontWeight: weight.bold, textAlign: 'center', lineHeight: 1.15,
-            letterSpacing: '-0.02em',
-          }}>
-            {game ? `Ready to listen to ${game.name}?` : 'Ready to listen?'}
-          </h1>
-
-          {resolveError && (
-            <div style={{ maxWidth: 480, textAlign: 'center' }}>
-              <div style={{
-                fontFamily: font.sans, fontSize: fontSize.md, color: color.danger,
-                marginBottom: space.md,
-              }}>
-                {resolveError}
-              </div>
-              {gameSlug && (
-                <Button
-                  variant="primary"
-                  size="md"
-                  onClick={() => navigate(`/games/${gameSlug}/edit`)}
-                >
-                  Open editor →
-                </Button>
-              )}
-            </div>
+          {gameSlug && (
+            <Button
+              variant="primary"
+              size="md"
+              onClick={() => navigate(`/games/${gameSlug}/edit`)}
+            >
+              Open editor →
+            </Button>
           )}
+        </div>
+      </div>
+    )
+  }
 
-          {error && (
+  // ── Loading state (between mount and first node arriving) ───────────────
+  //
+  // Replaces the old splash. Shows a small spinner + "Starting session…" so
+  // there's *something* on screen while resolvedGraphId loads and startSession
+  // sets up the first node. Usually visible for a few hundred milliseconds.
+  // Once both sessionId and currentNode are set, the full layout takes over.
+
+  if (!sessionId || !currentNode) {
+    return (
+      <div style={{
+        display: 'flex', flexDirection: 'column', minHeight: '100vh', background: color.bg,
+      }}>
+        {header}
+        <div style={{
+          flex: 1, display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center', gap: space.md, padding: space.xl,
+        }}>
+          {error ? (
             <div style={{
               fontFamily: font.sans, fontSize: fontSize.md, color: color.danger,
-              maxWidth: 360, textAlign: 'center',
+              maxWidth: 480, textAlign: 'center',
             }}>
               {error}
             </div>
-          )}
-
-          {!resolveError && (
-            <Button
-              variant="primary"
-              size="lg"
-              disabled={loading || !resolvedGraphId}
-              leading={<Play size={iconSize.lg} fill="currentColor" />}
-              onClick={handleStart}
-              style={{ padding: `${space.md}px ${space.xxl}px` }}
-            >
-              {loading ? 'Starting…' : !resolvedGraphId ? 'Loading…' : 'Start listening'}
-            </Button>
+          ) : (
+            <>
+              <Loader2
+                size={28}
+                color={color.textMuted}
+                style={{ animation: 'spin 1s linear infinite' }}
+              />
+              <div style={{
+                fontFamily: font.sans, fontSize: fontSize.sm, color: color.textMuted,
+              }}>
+                Starting session…
+              </div>
+              <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+            </>
           )}
         </div>
       </div>
@@ -241,7 +269,7 @@ export default function ListenerPage() {
     <div style={{
       display: 'flex', flexDirection: 'column', minHeight: '100vh', background: color.bg,
     }}>
-      {header(true)}
+      {header}
 
       <div style={{
         flex: 1,
@@ -250,7 +278,9 @@ export default function ListenerPage() {
         margin: '0 auto',
         padding: `${space.xl}px ${space.lg}px ${space.xxl}px`,
         display: 'grid',
-        gridTemplateColumns: isWide ? 'minmax(0, 0.85fr) minmax(0, 1.15fr)' : 'minmax(0, 1fr)',
+        // After moving Up Next + Teleport to the header, the right column
+        // holds just the graph — give it more horizontal room to breathe.
+        gridTemplateColumns: isWide ? 'minmax(0, 0.7fr) minmax(0, 1.3fr)' : 'minmax(0, 1fr)',
         gap: space.xl,
         alignItems: 'start',
       }}>
@@ -259,14 +289,12 @@ export default function ListenerPage() {
           display: 'flex',
           flexDirection: 'column',
           gap: space.lg,
-          // Sticky on wide screens so controls stay accessible while the world
-          // column scrolls. `top` accounts for header height + breathing room.
           position: isWide ? 'sticky' : 'static',
           top: isWide ? space.xl : undefined,
         }}>
           <NowPlayingCard
-            nodeName={currentNode?.name ?? null}
-            region={currentNode?.region ?? null}
+            nodeName={currentNode.name}
+            region={currentNode.region}
             transitioning={transitioning}
             nominatedName={nominatedNode?.name ?? null}
           />
@@ -313,38 +341,7 @@ export default function ListenerPage() {
 
         {/* ── Right column ─ "World" ──────────────────────────────────────── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: space.lg }}>
-          {graph && currentNode && <ListenerGraphView />}
-
-          {sessionId && currentNode && (
-            <CollapsiblePanel
-              title="Up next"
-              storageKey="listener-lookahead"
-              defaultOpen={false}
-            >
-              <LookaheadQueue
-                sessionId={sessionId}
-                currentNodeId={currentNode.id}
-                currentNodeName={currentNode.name}
-              />
-            </CollapsiblePanel>
-          )}
-
-          {/* Teleport button — lives alongside the graph, since picking a
-              destination is a 'where in the world' action. */}
-          <Card variant="subtle" padding={space.md}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: space.md, flexWrap: 'wrap' }}>
-              <TeleportButton
-                nodes={allOtherNodes}
-                transitioning={transitioning}
-                onTeleport={teleportTo}
-              />
-              <span style={{
-                fontFamily: font.sans, fontSize: fontSize.xs, color: color.textFaint,
-              }}>
-                Jump anywhere on the map, immediately.
-              </span>
-            </div>
-          </Card>
+          {graph && <ListenerGraphView />}
         </div>
       </div>
     </div>
