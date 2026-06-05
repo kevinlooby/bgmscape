@@ -1,0 +1,474 @@
+{
+  "frames": {
+    "tree-01": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 160,
+        "h": 214
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 160,
+        "h": 214
+      },
+      "sourceSize": {
+        "w": 160,
+        "h": 214
+      }
+    },
+    "tree-00": {
+      "frame": {
+        "x": 160,
+        "y": 0,
+        "w": 136,
+        "h": 206
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 136,
+        "h": 206
+      },
+      "sourceSize": {
+        "w": 136,
+        "h": 206
+      }
+    },
+    "tree-02": {
+      "frame": {
+        "x": 296,
+        "y": 0,
+        "w": 66,
+        "h": 194
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 66,
+        "h": 194
+      },
+      "sourceSize": {
+        "w": 66,
+        "h": 194
+      }
+    },
+    "bush-04": {
+      "frame": {
+        "x": 362,
+        "y": 0,
+        "w": 61,
+        "h": 44
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 61,
+        "h": 44
+      },
+      "sourceSize": {
+        "w": 61,
+        "h": 44
+      }
+    },
+    "bush-03": {
+      "frame": {
+        "x": 423,
+        "y": 0,
+        "w": 44,
+        "h": 42
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 44,
+        "h": 42
+      },
+      "sourceSize": {
+        "w": 44,
+        "h": 42
+      }
+    },
+    "rock-00": {
+      "frame": {
+        "x": 0,
+        "y": 214,
+        "w": 57,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 57,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 57,
+        "h": 40
+      }
+    },
+    "bush-05": {
+      "frame": {
+        "x": 57,
+        "y": 214,
+        "w": 40,
+        "h": 35
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 35
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 35
+      }
+    },
+    "rock-01": {
+      "frame": {
+        "x": 97,
+        "y": 214,
+        "w": 40,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 34
+      }
+    },
+    "bush-02": {
+      "frame": {
+        "x": 137,
+        "y": 214,
+        "w": 24,
+        "h": 31
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 31
+      },
+      "sourceSize": {
+        "w": 24,
+        "h": 31
+      }
+    },
+    "rock-04": {
+      "frame": {
+        "x": 161,
+        "y": 214,
+        "w": 45,
+        "h": 27
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 45,
+        "h": 27
+      },
+      "sourceSize": {
+        "w": 45,
+        "h": 27
+      }
+    },
+    "rock-05": {
+      "frame": {
+        "x": 206,
+        "y": 214,
+        "w": 14,
+        "h": 27
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 14,
+        "h": 27
+      },
+      "sourceSize": {
+        "w": 14,
+        "h": 27
+      }
+    },
+    "bush-01": {
+      "frame": {
+        "x": 220,
+        "y": 214,
+        "w": 27,
+        "h": 25
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 27,
+        "h": 25
+      },
+      "sourceSize": {
+        "w": 27,
+        "h": 25
+      }
+    },
+    "bush-00": {
+      "frame": {
+        "x": 247,
+        "y": 214,
+        "w": 22,
+        "h": 19
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 22,
+        "h": 19
+      },
+      "sourceSize": {
+        "w": 22,
+        "h": 19
+      }
+    },
+    "rock-02": {
+      "frame": {
+        "x": 269,
+        "y": 214,
+        "w": 40,
+        "h": 19
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 19
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 19
+      }
+    },
+    "rock-03": {
+      "frame": {
+        "x": 309,
+        "y": 214,
+        "w": 34,
+        "h": 19
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 34,
+        "h": 19
+      },
+      "sourceSize": {
+        "w": 34,
+        "h": 19
+      }
+    },
+    "tuft-03": {
+      "frame": {
+        "x": 343,
+        "y": 214,
+        "w": 15,
+        "h": 11
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 15,
+        "h": 11
+      },
+      "sourceSize": {
+        "w": 15,
+        "h": 11
+      }
+    },
+    "tuft-01": {
+      "frame": {
+        "x": 358,
+        "y": 214,
+        "w": 16,
+        "h": 10
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 10
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 10
+      }
+    },
+    "tuft-02": {
+      "frame": {
+        "x": 374,
+        "y": 214,
+        "w": 15,
+        "h": 10
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 15,
+        "h": 10
+      },
+      "sourceSize": {
+        "w": 15,
+        "h": 10
+      }
+    },
+    "tuft-04": {
+      "frame": {
+        "x": 389,
+        "y": 214,
+        "w": 12,
+        "h": 10
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 10
+      },
+      "sourceSize": {
+        "w": 12,
+        "h": 10
+      }
+    },
+    "tuft-00": {
+      "frame": {
+        "x": 401,
+        "y": 214,
+        "w": 17,
+        "h": 9
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 17,
+        "h": 9
+      },
+      "sourceSize": {
+        "w": 17,
+        "h": 9
+      }
+    },
+    "tuft-05": {
+      "frame": {
+        "x": 418,
+        "y": 214,
+        "w": 13,
+        "h": 9
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 13,
+        "h": 9
+      },
+      "sourceSize": {
+        "w": 13,
+        "h": 9
+      }
+    },
+    "tuft-06": {
+      "frame": {
+        "x": 431,
+        "y": 214,
+        "w": 13,
+        "h": 9
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 13,
+        "h": 9
+      },
+      "sourceSize": {
+        "w": 13,
+        "h": 9
+      }
+    },
+    "tuft-07": {
+      "frame": {
+        "x": 444,
+        "y": 214,
+        "w": 14,
+        "h": 7
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 14,
+        "h": 7
+      },
+      "sourceSize": {
+        "w": 14,
+        "h": 7
+      }
+    }
+  },
+  "meta": {
+    "image": "props.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 467,
+      "h": 254
+    },
+    "scale": "1",
+    "source": "Cainos \u2014 Pixel Art Top Down - Basic v1.2.3 (derivative composition)"
+  }
+}

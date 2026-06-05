@@ -26,10 +26,27 @@ export interface BiomeProfile {
 
   /**
    * 0..1. Bias toward "decorated" terrain frames vs the plain base. With our
-   * current 5-frame grass set: 0.0 = all grass-00, 1.0 = uniformly random
-   * over the decorated variants. Will later drive prop placement density.
+   * grass set: 0.0 = all grass-00, 1.0 = uniformly random over the decorated
+   * variants. Drives ground-tile texture only; overlay scatter uses the
+   * per-kind chances below.
    */
   foliageDensity: number
+
+  /**
+   * Per-tile probability of placing a tree at this tile, 0..1. Trees are the
+   * largest overlays — the generator enforces a minimum spacing so a forest
+   * scene of ~325 tiles ends up with ~6-10 trees rather than dozens.
+   */
+  treeChance: number
+
+  /** Per-tile probability of placing a bush. Smaller than trees, no spacing rule. */
+  bushChance: number
+
+  /** Per-tile probability of placing a grass tuft. Smallest overlay; fine to clump. */
+  tuftChance: number
+
+  /** Per-tile probability of placing a rock cluster. Works in any outdoor biome. */
+  rockChance: number
 
   /** Drives the global tint overlay (see TIME_TINTS). */
   timeOfDay: TimeOfDay
@@ -59,6 +76,10 @@ export interface BiomeProfile {
 export const DEFAULT_PROFILE: BiomeProfile = {
   primaryTerrain: 'grass',
   foliageDensity: 0.15,
+  treeChance: 0,
+  bushChance: 0.02,
+  tuftChance: 0.05,
+  rockChance: 0.02,
   timeOfDay: 'day',
   weather: 'clear',
   isIndoor: false,
@@ -77,21 +98,38 @@ export const DEFAULT_PROFILE: BiomeProfile = {
  * the renderer (pixiWorld) to consume it.
  */
 export const TAG_RULES: ReadonlyArray<readonly [string, Partial<BiomeProfile>]> = [
-  // Habitat — sets primaryTerrain + a baseline foliage density
-  ['forest',    { primaryTerrain: 'grass', foliageDensity: 0.5 }],
-  ['field',     { primaryTerrain: 'grass', foliageDensity: 0.2 }],
-  ['mountain',  { primaryTerrain: 'rock',  foliageDensity: 0.08 }],
-  ['desert',    { primaryTerrain: 'sand',  foliageDensity: 0.03 }],
-  ['snow',      { primaryTerrain: 'snow',  foliageDensity: 0.08 }],
-  ['winter',    { primaryTerrain: 'snow',  foliageDensity: 0.05, weather: 'snow' }],
-  ['river',     { primaryTerrain: 'grass', foliageDensity: 0.3 }],
-  ['ocean',     { primaryTerrain: 'sand',  foliageDensity: 0.05 }],
-  ['urban',     { isUrban: true, foliageDensity: 0.08 }],
+  // Habitat — sets primaryTerrain + baseline foliage densities. The four
+  // per-kind chances are calibrated against a 25x13 = 325-tile scene so
+  // forest ends up dense (with min-spacing capping trees), field reads as
+  // grassland with some shrubs, mountain/desert show mostly rocks, etc.
+  ['forest',    { primaryTerrain: 'grass', foliageDensity: 0.5,
+                  treeChance: 0.03, bushChance: 0.10, tuftChance: 0.15, rockChance: 0.02 }],
+  ['field',     { primaryTerrain: 'grass', foliageDensity: 0.2,
+                  treeChance: 0,    bushChance: 0.04, tuftChance: 0.10, rockChance: 0.02 }],
+  ['mountain',  { primaryTerrain: 'rock',  foliageDensity: 0.08,
+                  treeChance: 0,    bushChance: 0.02, tuftChance: 0.03, rockChance: 0.15 }],
+  ['desert',    { primaryTerrain: 'sand',  foliageDensity: 0.03,
+                  treeChance: 0,    bushChance: 0,    tuftChance: 0.01, rockChance: 0.10 }],
+  ['snow',      { primaryTerrain: 'snow',  foliageDensity: 0.08,
+                  treeChance: 0,    bushChance: 0,    tuftChance: 0.02, rockChance: 0.05 }],
+  ['winter',    { primaryTerrain: 'snow',  foliageDensity: 0.05, weather: 'snow',
+                  treeChance: 0,    bushChance: 0,    tuftChance: 0.02, rockChance: 0.04 }],
+  ['river',     { primaryTerrain: 'grass', foliageDensity: 0.3,
+                  treeChance: 0.02, bushChance: 0.06, tuftChance: 0.12, rockChance: 0.04 }],
+  ['ocean',     { primaryTerrain: 'sand',  foliageDensity: 0.05,
+                  treeChance: 0,    bushChance: 0,    tuftChance: 0.02, rockChance: 0.08 }],
+  ['urban',     { isUrban: true, foliageDensity: 0.08,
+                  treeChance: 0,    bushChance: 0.03, tuftChance: 0.03, rockChance: 0.03 }],
 
-  // Indoor flags — these suppress sky, weather, and the foliage layer
-  ['cave',      { primaryTerrain: 'rock',  isIndoor: true, foliageDensity: 0 }],
-  ['dungeon',   { primaryTerrain: 'stone', isIndoor: true, foliageDensity: 0 }],
-  ['indoor',    { isIndoor: true, foliageDensity: 0 }],
+  // Indoor flags — these suppress sky, weather, and ALL overlays. Indoor
+  // biomes render only the bg fill (and tiles, if their TerrainKind has
+  // matching atlas frames — currently it doesn't, hence dark void).
+  ['cave',      { primaryTerrain: 'rock',  isIndoor: true, foliageDensity: 0,
+                  treeChance: 0, bushChance: 0, tuftChance: 0, rockChance: 0 }],
+  ['dungeon',   { primaryTerrain: 'stone', isIndoor: true, foliageDensity: 0,
+                  treeChance: 0, bushChance: 0, tuftChance: 0, rockChance: 0 }],
+  ['indoor',    { isIndoor: true, foliageDensity: 0,
+                  treeChance: 0, bushChance: 0, tuftChance: 0, rockChance: 0 }],
 
   // Weather
   ['rain',      { weather: 'rain' }],

@@ -31,15 +31,24 @@ have not yet been packed into atlases or committed to `frontend/public/world/`.
   **Redistribution of the raw asset files is not permitted** — bundled
   spritesheets under `frontend/public/world/` are derivative compositions
   used inside the app, not redistribution of the original pack.
-- **Used for**: foundation terrain tiles. Initial revision ships only 5
-  grass variants (plain grass and decorated grass with small leaves /
-  flowers / tufts) composed into `frontend/public/world/terrain.png` +
-  `terrain.json`. Stone paths and stone-floor tiles are deferred to a
-  follow-up that adds proper autotile rendering and supplemental packs
-  for solid stone floors. See `scripts/build_world_atlas.py` for the
-  exact source-coordinate map (`EXTRACTS`).
-- **Frames shipped**: `grass-00` … `grass-04`
-- **Status**: shipped (terrain atlas only — plants/props/path deferred)
+- **Used for**: foundation terrain tiles plus overlay sprites (plants and
+  rocks) for the procedural world simulation. Two derivative atlases are
+  composed by `scripts/build_world_atlas.py`:
+  - `terrain.png` + `terrain.json`: 10 ground-tile variants pulled from
+    `TX Tileset Grass.png` (top half only).
+  - `props.png` + `props.json`: 23 irregular-size overlay sprites — trees,
+    bushes, and grass tufts from `TX Plant.png`, plus rocks from
+    `TX Props.png`.
+  Stone paths (autotile cluster in the bottom half of TX Tileset Grass)
+  and stone-floor tiles for indoor biomes are still deferred to follow-up
+  PRs. See `scripts/build_world_atlas.py` for the exact source-coordinate
+  map (`TERRAIN_EXTRACTS` and `PROPS_EXTRACTS`).
+- **Frames shipped**:
+  - terrain: `grass-00` … `grass-09` (10 frames)
+  - props: `tree-00` … `tree-02`, `bush-00` … `bush-05`,
+    `tuft-00` … `tuft-07`, `rock-00` … `rock-05` (23 frames total)
+- **Status**: shipped (terrain + props atlases — autotile paths and
+  stone-floor tiles still deferred)
 
 #### Kenney — Tiny Dungeon
 - **Creator**: Kenney

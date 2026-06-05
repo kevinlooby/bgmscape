@@ -23,6 +23,13 @@ export interface WorldAssets {
   ready: boolean
   /** Foundation terrain spritesheet (Cainos Top Down – Basic, flat subset). */
   terrain: Spritesheet | null
+  /**
+   * Overlay sprites that sit *on top* of the terrain tiles — trees, bushes,
+   * grass tufts, rocks, etc. Variable-size frames, generally larger than a
+   * tile. Renderer anchors at bottom-center so the sprite "plants" naturally
+   * on its source tile.
+   */
+  props: Spritesheet | null
   /** Birds + ambient creatures. */
   critters: Spritesheet | null
   /** Weather + particle textures. */
@@ -44,6 +51,14 @@ export interface WorldAssets {
  */
 const MANIFEST: Record<keyof Omit<WorldAssets, 'ready'>, string | null> = {
   terrain: '/world/terrain.json',
+  /**
+   * Plants (trees / bushes / tufts) and rocks composed from the Cainos pack
+   * by the same `scripts/build_world_atlas.py --atlas props` invocation that
+   * produces terrain. Frame names follow the convention `<kind>-NN`
+   * (`tree-00`, `bush-03`, `tuft-07`, `rock-02`) — the procedural generator
+   * filters by prefix to decide what category each frame belongs to.
+   */
+  props: '/world/props.json',
   critters: null,  // → '/world/critters.json' once bird + critter pack is packed
   effects: null,   // → '/world/effects.json' once weather + VFX pack is packed
 }
@@ -65,6 +80,7 @@ export function loadWorldAssets(): Promise<WorldAssets> {
     const result: WorldAssets = {
       ready: false,
       terrain: null,
+      props: null,
       critters: null,
       effects: null,
     }
