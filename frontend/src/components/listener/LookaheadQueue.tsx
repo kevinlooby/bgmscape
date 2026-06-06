@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { lookaheadSession } from '../../api/sessions'
+import { usePlayback } from '../../store/playback'
 import type { LookaheadStep } from '../../types'
 
 // Simple region → color palette (same 8 colors cycling)
@@ -29,6 +30,10 @@ export default function LookaheadQueue({
   currentNodeId,
   currentNodeName,
 }: LookaheadQueueProps) {
+  // Used only to visually flag upcoming steps that share the current
+  // node's audio_file_path (those are the "same-track cluster" the dwell
+  // scheduler treats as one continuous listening run).
+  const currentAudio = usePlayback(s => s.currentNode?.audio_file_path ?? null)
   const [steps, setSteps] = useState<LookaheadStep[] | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -100,23 +105,36 @@ export default function LookaheadQueue({
         <span style={{ fontSize: 10, color: '#4a6a8a' }}>(current)</span>
       </div>
 
-      {/* Future steps */}
-      {steps?.map((step, i) => (
-        <div key={`${step.node_id}-${i}`} style={{
-          display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, opacity: loading ? 0.5 : 1,
-        }}>
-          <span style={{ fontSize: 10, color: '#2d4a6e', flexShrink: 0, width: 8 }}>→</span>
-          {step.region && (
-            <span style={{
-              width: 7, height: 7, borderRadius: '50%',
-              background: regionColor(step.region), flexShrink: 0,
-            }} />
-          )}
-          <span style={{ fontSize: 11, color: '#8a9bb0', flex: 1 }}>
-            {step.node_name}
-          </span>
-        </div>
-      ))}
+      {/* Future steps. We mark a step as "continuing the same track" if its
+       *  audio_file_path matches the immediately preceding item shown — the
+       *  current node for step 0, or the previous step otherwise. The arrow
+       *  glyph swaps from "→" (new track) to "♪" (still on the same track) so
+       *  a 3-node castle cluster reads as one continuous listening run. */}
+      {steps?.map((step, i) => {
+        const prevAudio = i === 0 ? currentAudio : steps[i - 1].audio_file_path
+        const continuesAudio = !!(step.audio_file_path && step.audio_file_path === prevAudio)
+        return (
+          <div key={`${step.node_id}-${i}`} style={{
+            display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, opacity: loading ? 0.5 : 1,
+          }}>
+            <span
+              style={{ fontSize: 10, color: continuesAudio ? '#4a90d9' : '#2d4a6e', flexShrink: 0, width: 8 }}
+              title={continuesAudio ? 'same track as above' : undefined}
+            >
+              {continuesAudio ? '♪' : '→'}
+            </span>
+            {step.region && (
+              <span style={{
+                width: 7, height: 7, borderRadius: '50%',
+                background: regionColor(step.region), flexShrink: 0,
+              }} />
+            )}
+            <span style={{ fontSize: 11, color: '#8a9bb0', flex: 1 }}>
+              {step.node_name}
+            </span>
+          </div>
+        )
+      })}
 
       {steps && steps.length === 0 && (
         <div style={{ fontSize: 11, color: '#4a6a8a', fontStyle: 'italic' }}>

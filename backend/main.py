@@ -48,6 +48,12 @@ def startup():
     })
     _ensure_columns("playback_sessions", {
         "lookahead_queue": "JSON",
+        # Novelty / LRU bookkeeping for the wander engine. Old sessions
+        # start with an empty map and a 0 step counter — i.e. the first
+        # advance after a restart treats every node as fresh, which is
+        # the desired "new listening run" behavior.
+        "node_last_visited": "JSON NOT NULL DEFAULT '{}'",
+        "step_index": "INTEGER NOT NULL DEFAULT 0",
     })
     # Add the game_id column to graphs if a pre-game-entity DB is being opened.
     # The migrate_to_games.py script then backfills the values and assigns defaults.

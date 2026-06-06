@@ -127,6 +127,15 @@ export interface PlaybackSession {
   wander_active: boolean
   nominated_next_node_id: string | null
   wander_history: string[]
+  /**
+   * Per-session visit log used by the server-side novelty wander engine:
+   * node id → step index when most recently visited. Exposed for debugging /
+   * inspection; the frontend doesn't read this for routing (the lookahead
+   * queue already reflects the planner's decisions).
+   */
+  node_last_visited?: Record<string, number>
+  /** Monotonic step counter incremented on each advance. */
+  step_index?: number
   created_at: string
   updated_at: string
 }
@@ -154,6 +163,14 @@ export interface LookaheadStep {
   node_id: string
   node_name: string
   region: string | null
+  /**
+   * Audio file path for this upcoming node. Used by the playback store's
+   * cluster-aware dwell scheduler: contiguous lookahead steps sharing one
+   * audio_file_path are treated as a same-track cluster and given a
+   * compressed total listening budget instead of each node getting its
+   * own full loop.
+   */
+  audio_file_path: string | null
 }
 
 export interface LookaheadResponse {

@@ -194,14 +194,122 @@ function cancelWanderTimer() {
 // resolves), use 30s so the timer neither fires instantly nor stalls forever.
 const DWELL_FALLBACK_MS = 30_000
 
-function _scheduleWander() {
+// ── Same-audio cluster dwell ──────────────────────────────────────────────
+//
+// When the next several lookahead nodes share the current node's
+// audio_file_path, we treat them as a contiguous "cluster" and budget the
+// total listening time as `trackLen × (1 + ln n)` (logarithmic decay), then
+// split that budget evenly across the cluster's n nodes. So a 3-cluster
+// lasts ~2.1× the track instead of 3×; a 1-cluster (no shared neighbors)
+// uses today's per-node dwell.
+//
+// The cluster is set up at the *first* node of the run via a lookahead API
+// call, then consumed by each subsequent same-audio entry. It's cleared on
+// teleport / steer / reset (all of which invalidate the prior lookahead).
+type AudioCluster = {
+  audioFilePath: string
+  perNodeDwellMs: number
+  perNodeVarianceMs: number
+  /** Cluster nodes still to be entered after the current one. Decremented per arrival. */
+  remainingNodes: number
+}
+
+let _audioCluster: AudioCluster | null = null
+
+function _clearCluster(): void {
+  _audioCluster = null
+}
+
+/**
+ * Fetch the current lookahead queue and, if the upcoming nodes share the
+ * current node's audio_file_path, build a cluster descriptor with the
+ * logarithmic per-node dwell budget. Sets `_audioCluster` to null when
+ * there's no run (single-node listening — today's behavior).
+ */
+async function _setupClusterFromLookahead(
+  currentNode: Node,
+  baseTrackMs: number,
+  dwellVarianceMs: number,
+): Promise<void> {
+  const { sessionId } = usePlayback.getState()
+  _audioCluster = null
+  if (!sessionId || !currentNode.audio_file_path) return
+
+  let steps: Awaited<ReturnType<typeof sessionsApi.lookaheadSession>>['steps']
+  try {
+    const resp = await sessionsApi.lookaheadSession(sessionId, 16)
+    steps = resp.steps
+  } catch {
+    return  // backend hiccup — fall back to single-node dwell
+  }
+
+  // Count contiguous upcoming nodes that share this node's audio.
+  let matching = 0
+  for (const step of steps) {
+    if (step.audio_file_path === currentNode.audio_file_path) matching += 1
+    else break
+  }
+  if (matching === 0) return  // single-node case: leave _audioCluster null
+
+  const n = 1 + matching
+  const totalDwellMs = baseTrackMs * (1 + Math.log(n))
+  _audioCluster = {
+    audioFilePath: currentNode.audio_file_path,
+    perNodeDwellMs: totalDwellMs / n,
+    // Variance is also split so the user's overall dwellVariance setting
+    // isn't multiplied n× across the cluster.
+    perNodeVarianceMs: dwellVarianceMs / n,
+    remainingNodes: matching,  // current node consumes the first slot inline below
+  }
+
+  if (import.meta.env.DEV) {
+    // eslint-disable-next-line no-console
+    console.debug(
+      '[wander] cluster setup',
+      { audio: currentNode.audio_file_path, n, perNodeMs: Math.round(_audioCluster.perNodeDwellMs) },
+    )
+  }
+}
+
+async function _scheduleWander() {
   const { currentNode, dwellVarianceMs } = usePlayback.getState()
   const url = currentNode?.audio_file_path ? audioUrl(currentNode.audio_file_path) : null
   const durationSec = url ? getAudio().getDuration(url) : null
   const baseMs = durationSec != null ? durationSec * 1000 : DWELL_FALLBACK_MS
-  const dwell = currentNode?.is_transition
-    ? baseMs
-    : baseMs + Math.random() * dwellVarianceMs
+
+  let dwell: number
+
+  if (!currentNode) {
+    dwell = baseMs
+  } else if (currentNode.is_transition) {
+    // Transition nodes bypass clustering: track plays exactly once, no variance.
+    _clearCluster()
+    dwell = baseMs
+  } else if (
+    _audioCluster &&
+    _audioCluster.audioFilePath === currentNode.audio_file_path &&
+    _audioCluster.remainingNodes > 0
+  ) {
+    // Mid-cluster: use the share already budgeted at first-node setup.
+    dwell = _audioCluster.perNodeDwellMs + Math.random() * _audioCluster.perNodeVarianceMs
+    _audioCluster.remainingNodes -= 1
+    if (_audioCluster.remainingNodes <= 0) _clearCluster()
+  } else {
+    // Fresh entry: try to set up a cluster from the upcoming lookahead.
+    const nodeAtStart = currentNode
+    await _setupClusterFromLookahead(currentNode, baseMs, dwellVarianceMs)
+    // If user steered / teleported / stopped during the await, abort the schedule.
+    const after = usePlayback.getState()
+    if (after.currentNode !== nodeAtStart || !after.wanderActive || !after.playing) return
+    if (_audioCluster) {
+      dwell = _audioCluster.perNodeDwellMs + Math.random() * _audioCluster.perNodeVarianceMs
+      // First node of the cluster is being scheduled now; rest follow.
+      // remainingNodes already counts only the *additional* cluster nodes,
+      // so don't decrement here — the next entry will consume the first slot.
+    } else {
+      dwell = baseMs + Math.random() * dwellVarianceMs
+    }
+  }
 
   const firesAt = Date.now() + dwell
   usePlayback.setState({ nextAdvanceAt: firesAt })
@@ -209,7 +317,7 @@ function _scheduleWander() {
     const { wanderActive, playing, transitioning, advance } = usePlayback.getState()
     if (!wanderActive || !playing) return
     if (!transitioning) await advance()
-    _scheduleWander()
+    void _scheduleWander()
   }, dwell)
 }
 
@@ -282,6 +390,7 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
 
   reset: () => {
     cancelWanderTimer()
+    _clearCluster()
     _audioManager?.fadeOut(0.5).catch(() => {})
     _ambientEngine?.stopAll()
     set({
@@ -349,7 +458,9 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
     })
 
     await sessionsApi.updateSession(session.id, { wander_active: true })
-    _scheduleWander()
+    // Fresh session — no cluster context carried over from a previous run.
+    _clearCluster()
+    void _scheduleWander()
   },
 
   advance: async () => {
@@ -412,7 +523,7 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
       _ambientEngine?.resume()
       set({ playing: true })
       const { wanderActive } = get()
-      if (wanderActive) _scheduleWander()
+      if (wanderActive) void _scheduleWander()
     } else {
       cancelWanderTimer()
       set({ playing: false, nextAdvanceAt: null })
@@ -429,7 +540,7 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
     set({ wanderActive: active })
 
     if (active && playing) {
-      _scheduleWander()
+      void _scheduleWander()
     } else {
       cancelWanderTimer()
       set({ nextAdvanceAt: null })
@@ -440,6 +551,8 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
     const { sessionId } = get()
     if (!sessionId) return
     await sessionsApi.updateSession(sessionId, { nominated_next_node_id: nodeId })
+    // Steer invalidates the lookahead → invalidate any cluster built from it.
+    _clearCluster()
     set({ nominatedNextNodeId: nodeId })
   },
 
@@ -460,6 +573,8 @@ export const usePlayback = create<PlaybackState & PlaybackActions>((set, get) =>
     )
 
     set({ transitioning: true })
+    // Teleport clears the server lookahead → invalidate any cluster built from it.
+    _clearCluster()
     try {
       await sessionsApi.teleportSession(sessionId, nodeId)
       if (!sameAudio) {

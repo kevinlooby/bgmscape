@@ -27,12 +27,30 @@ import type {
   PlaybackSession,
 } from '../types'
 import { loadSnapshot } from './snapshot'
-import { appendHistory, buildLookahead, getNextNode } from './wanderEngine'
+import { appendHistory, planPath, planStep } from './wanderEngine'
 
 const LOOKAHEAD_TARGET = 16
 
 interface SessionState extends PlaybackSession {
   lookahead_queue: string[]
+  /** Mirrors backend's PlaybackSession.node_last_visited (id → step index). */
+  node_last_visited: Record<string, number>
+  /** Mirrors backend's PlaybackSession.step_index (monotonic counter). */
+  step_index: number
+}
+
+function _markVisited(session: SessionState, nodeId: string): void {
+  session.step_index += 1
+  session.node_last_visited[nodeId] = session.step_index
+}
+
+function _sessionVisitedState(session: SessionState): {
+  visited: Set<string>
+  lru: Map<string, number>
+} {
+  const visited = new Set<string>(Object.keys(session.node_last_visited))
+  const lru = new Map<string, number>(Object.entries(session.node_last_visited))
+  return { visited, lru }
 }
 
 const _sessions: Map<string, SessionState> = new Map()
@@ -115,6 +133,10 @@ export async function createSession(
     nominated_next_node_id: null,
     wander_history: [startNodeId],
     lookahead_queue: [],
+    // The starting node counts as the first visit so the planner won't
+    // immediately suggest it again.
+    node_last_visited: { [startNodeId]: 1 },
+    step_index: 1,
     created_at: now,
     updated_at: now,
   }
@@ -138,11 +160,8 @@ export async function advanceSession(sessionId: string): Promise<AdvanceResponse
   } else if (session.lookahead_queue.length > 0) {
     nextNodeId = session.lookahead_queue.shift()!
   } else {
-    nextNodeId = getNextNode(
-      session.current_node_id,
-      graph.edges,
-      session.wander_history,
-    )
+    const { visited, lru } = _sessionVisitedState(session)
+    nextNodeId = planStep(session.current_node_id, graph.edges, visited, lru)
   }
 
   const nextNode = graph.nodes.find(n => n.id === nextNodeId)
@@ -152,6 +171,7 @@ export async function advanceSession(sessionId: string): Promise<AdvanceResponse
 
   session.current_node_id = nextNodeId
   session.wander_history = appendHistory(session.wander_history, nextNodeId)
+  _markVisited(session, nextNodeId)
   session.updated_at = _nowIso()
 
   return {
@@ -172,6 +192,11 @@ export async function updateSession(
   }
   if ('nominated_next_node_id' in data) {
     session.nominated_next_node_id = data.nominated_next_node_id ?? null
+    // A steer invalidates the pre-planned path — clear it so the next
+    // lookahead call replans from the steered destination.
+    if (data.nominated_next_node_id) {
+      session.lookahead_queue = []
+    }
   }
   session.updated_at = _nowIso()
   return session
@@ -191,6 +216,9 @@ export async function teleportSession(
   session.nominated_next_node_id = null
   session.lookahead_queue = []
   session.wander_history = appendHistory(session.wander_history, nodeId)
+  // Teleport is intentional user steering — count it as a visit for
+  // novelty purposes (matches backend behavior).
+  _markVisited(session, nodeId)
   session.updated_at = _nowIso()
   return session
 }
@@ -206,19 +234,27 @@ export async function lookaheadSession(
   }
   const clampedSteps = Math.max(1, Math.min(steps, 50))
   const graph = await _getGraphOrThrow(session.graph_id)
-  const nodeIds = new Set(graph.nodes.map(n => n.id))
 
   if (session.lookahead_queue.length < LOOKAHEAD_TARGET) {
     const simStart =
       session.lookahead_queue.length > 0
         ? session.lookahead_queue[session.lookahead_queue.length - 1]
         : session.current_node_id
-    const additions = buildLookahead(
+    // Project the current visited / LRU state forward across the already-
+    // queued items so the planner doesn't re-suggest them.
+    const { visited, lru } = _sessionVisitedState(session)
+    let step = session.step_index
+    for (const id of session.lookahead_queue) {
+      step += 1
+      visited.add(id)
+      lru.set(id, step)
+    }
+    const additions = planPath(
       simStart,
-      session.wander_history,
-      session.lookahead_queue,
-      nodeIds,
       graph.edges,
+      visited,
+      lru,
+      step + 1,
       LOOKAHEAD_TARGET - session.lookahead_queue.length,
     )
     session.lookahead_queue.push(...additions)
@@ -232,6 +268,7 @@ export async function lookaheadSession(
       node_id: id,
       node_name: node.name,
       region: node.region,
+      audio_file_path: node.audio_file_path,
     })
   }
   return { steps: result }
