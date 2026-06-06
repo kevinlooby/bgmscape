@@ -201,17 +201,24 @@ export class AmbientEngine {
   // ── Lifecycle: pause / resume ──────────────────────────────────────────────
 
   /**
-   * Suspend ambient playback by ducking the bus to silence. Scheduled
-   * end-times advance with currentTime; on resume() the engine reads how much
-   * AudioContext time elapsed during pause and shifts each play's endTimeS by
-   * that delta so a paused play resumes with the same remaining duration.
+   * Suspend ambient: duck the bus to silence AND clear all pending rest
+   * timers. The rest timers are wall-clock setTimeouts so they'd otherwise
+   * keep ticking during pause and either fire uselessly (skipped via the
+   * `_paused` guard inside `_maybeRequeueCategory`) or expire while paused
+   * and leave the category stranded with no active / pending / rest entry —
+   * never coming back until the next node change.
    *
-   * Simpler than restarting the BufferSource from an offset, which would
-   * require remembering each source's play position too.
+   * Active source playback freezes naturally because AudioManager.pause()
+   * suspends the shared AudioContext once its fade-out completes — so we
+   * don't need to stop or remember offsets for the source nodes themselves.
+   * When the context resumes, the playing sources pick up exactly where
+   * they left off.
    */
   pause(): void {
     if (this._paused) return
     this._paused = true
+    for (const timer of this.restTimers.values()) clearTimeout(timer)
+    this.restTimers.clear()
     if (!this.ambientBus || !this.context) return
     const now = this.context.currentTime
     this.ambientBus.gain.cancelScheduledValues(now)
@@ -219,14 +226,28 @@ export class AmbientEngine {
     this.ambientBus.gain.linearRampToValueAtTime(0, now + 0.15)
   }
 
+  /**
+   * Resume ambient: ramp the bus back up. Any source nodes that were
+   * playing when we paused continue from where they left off (the
+   * AudioContext was suspended; their playheads are frozen). Re-evaluate
+   * the current node tags so categories whose rest timers we cleared on
+   * pause get a chance to repopulate instead of staying empty.
+   */
   resume(): void {
     if (!this._paused) return
     this._paused = false
-    if (!this.ambientBus || !this.context) return
-    const now = this.context.currentTime
-    this.ambientBus.gain.cancelScheduledValues(now)
-    this.ambientBus.gain.setValueAtTime(this.ambientBus.gain.value, now)
-    this.ambientBus.gain.linearRampToValueAtTime(this._busVolume, now + 0.15)
+    if (this.ambientBus && this.context) {
+      const now = this.context.currentTime
+      this.ambientBus.gain.cancelScheduledValues(now)
+      this.ambientBus.gain.setValueAtTime(this.ambientBus.gain.value, now)
+      this.ambientBus.gain.linearRampToValueAtTime(this._busVolume, now + 0.15)
+    }
+    // Repopulate any category whose rest timer we cleared on pause.
+    // onNodeChange skips slots that are already active/pending, so this
+    // doesn't disturb sources that resumed from suspension.
+    if (this.currentNodeTags.length > 0) {
+      this.onNodeChange(this.currentNodeTags)
+    }
   }
 
   /** Stop everything immediately — used when the listener leaves the page. */

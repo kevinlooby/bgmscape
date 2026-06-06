@@ -49,6 +49,15 @@ export class AudioManager {
   // master gain instead and leave _volume alone.
   private _volume = 1
 
+  // Pending AudioContext suspend after the pause fade-out completes.
+  // Tracked so a quick pause → unpause cycle within the fade window can
+  // cancel it before the context actually suspends.
+  private _pendingSuspendTimer: ReturnType<typeof setTimeout> | null = null
+  // How long the fade-to-silence on pause takes (matches the ramp below),
+  // plus a small slack so we suspend *after* the ramp has finished applying.
+  private static readonly PAUSE_FADE_MS = 150
+  private static readonly PAUSE_FADE_SLACK_MS = 50
+
   // ── Context lifecycle ────────────────────────────────────────────────────
 
   /** Create or resume the AudioContext. Must be called from a user gesture. */
@@ -237,27 +246,63 @@ export class AudioManager {
   }
 
   /**
-   * Ramp the master gain to silence — mutes BOTH music and ambient until
-   * unpause(). The per-bus volumes (music, ambient) are preserved so they
-   * come back at their previous levels.
+   * Pause everything: fade the master gain to silence, then suspend the
+   * AudioContext so the music BufferSource actually freezes (instead of
+   * silently advancing under the muted gain). The per-bus volumes are
+   * preserved so they come back at their previous levels on unpause.
+   *
+   * The suspend is deferred until after the gain ramp completes — a
+   * suspended context can't render the ramp, so we'd hear a click otherwise.
+   * If unpause() fires during the fade window it cancels the pending suspend.
    */
   pause(): void {
-    if (!this.masterGain) return
-    const ctx = this.getContext()
+    if (!this.masterGain || !this.context) return
+    const ctx = this.context
     const now = ctx.currentTime
     this.masterGain.gain.cancelScheduledValues(now)
     this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now)
-    this.masterGain.gain.linearRampToValueAtTime(0, now + 0.15)
+    this.masterGain.gain.linearRampToValueAtTime(0, now + AudioManager.PAUSE_FADE_MS / 1000)
+
+    if (this._pendingSuspendTimer) clearTimeout(this._pendingSuspendTimer)
+    this._pendingSuspendTimer = setTimeout(() => {
+      this._pendingSuspendTimer = null
+      if (this.context?.state === 'running') {
+        void this.context.suspend()
+      }
+    }, AudioManager.PAUSE_FADE_MS + AudioManager.PAUSE_FADE_SLACK_MS)
   }
 
-  /** Ramp master gain back to unity. The per-bus volumes carry through. */
+  /**
+   * Unpause: cancel any pending suspend, resume the context if it's
+   * suspended, then ramp master gain back to unity. The per-bus volumes
+   * carry through unchanged.
+   */
   unpause(): void {
-    if (!this.masterGain) return
-    const ctx = this.getContext()
-    const now = ctx.currentTime
-    this.masterGain.gain.cancelScheduledValues(now)
-    this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now)
-    this.masterGain.gain.linearRampToValueAtTime(1, now + 0.15)
+    if (this._pendingSuspendTimer) {
+      clearTimeout(this._pendingSuspendTimer)
+      this._pendingSuspendTimer = null
+    }
+    if (!this.masterGain || !this.context) return
+    const ctx = this.context
+
+    const rampUp = () => {
+      // Guard against the racy unpause → pause → (resume resolves) sequence.
+      // If pause() ran again while ctx.resume() was in flight, a pending
+      // suspend timer is now set; let pause's gain ramp win.
+      if (this._pendingSuspendTimer) return
+      if (!this.masterGain || !this.context) return
+      const now = this.context.currentTime
+      this.masterGain.gain.cancelScheduledValues(now)
+      this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now)
+      this.masterGain.gain.linearRampToValueAtTime(1, now + AudioManager.PAUSE_FADE_MS / 1000)
+    }
+
+    if (ctx.state === 'suspended') {
+      // Resume first so the scheduled gain ramp can actually be processed.
+      void ctx.resume().then(rampUp)
+    } else {
+      rampUp()
+    }
   }
 
   // ── Internal helpers ─────────────────────────────────────────────────────
