@@ -1,58 +1,112 @@
 /**
- * TypeScript port of `backend/services/wander.py::get_next_node` and the
- * lookahead simulator inside `backend/api/routes/sessions.py`.
+ * TypeScript port of `backend/services/wander.py`. Kept structurally close
+ * to the Python so behaviour matches HTTP mode exactly.
  *
- * Kept structurally identical to the Python so behaviour matches HTTP
- * mode exactly — same recency window (last 5), same dead-end handling
- * (stay), same weighted random sample.
+ * The two routing rules:
+ *   1. Hard-avoid revisits while any unvisited neighbour exists (novelty
+ *      preferred).
+ *   2. When every neighbour has been visited, fall back to least-recently-
+ *      visited (smallest step index wins). Ties broken by weighted random
+ *      sample of the edge weights.
  *
  * If the backend wander logic changes, this file must be updated in
- * lockstep. The python test suite (`backend/tests/test_wander.py`)
+ * lockstep. The Python test suite (`backend/tests/test_wander.py`)
  * exercises edge cases we should consider mirroring as Vitest specs.
  */
 import type { Edge } from '../types'
 
 const HISTORY_CAP = 10
-const RECENCY_WINDOW = 5
 
-/**
- * Pick the next wander destination given the current node, the graph's
- * edges, and the recent history. Returns the current node id if there
- * are no outbound edges (dead end → stay).
- */
-export function getNextNode(
-  currentNodeId: string,
-  edges: Edge[],
-  wanderHistory: string[],
-): string {
-  // Collect reachable neighbors with their base weights.
-  const candidates: Array<{ id: string; weight: number }> = []
+interface Candidate {
+  id: string
+  weight: number
+}
+
+function _reachable(currentNodeId: string, edges: Edge[]): Candidate[] {
+  const out: Candidate[] = []
   for (const edge of edges) {
     if (edge.source_node_id === currentNodeId) {
-      candidates.push({ id: edge.target_node_id, weight: edge.weight })
+      out.push({ id: edge.target_node_id, weight: edge.weight })
     } else if (edge.bidirectional && edge.target_node_id === currentNodeId) {
-      candidates.push({ id: edge.source_node_id, weight: edge.weight })
+      out.push({ id: edge.source_node_id, weight: edge.weight })
     }
   }
+  return out
+}
 
-  if (candidates.length === 0) return currentNodeId
-
-  // Recency penalty using the last 5 entries of history.
-  const recencyWindow = wanderHistory.slice(-RECENCY_WINDOW)
-  const effective = candidates.map(({ id, weight }) => {
-    const recencyCount = recencyWindow.filter(h => h === id).length
-    return { id, weight: weight / (recencyCount + 1) }
-  })
-
-  // Weighted random sample.
-  const total = effective.reduce((s, c) => s + c.weight, 0)
-  if (total <= 0) return currentNodeId
+function _weightedSample(candidates: Candidate[]): string {
+  const total = candidates.reduce((s, c) => s + Math.max(0, c.weight), 0)
+  if (total <= 0) {
+    // All weights non-positive — fall back to uniform pick.
+    return candidates[Math.floor(Math.random() * candidates.length)].id
+  }
   let r = Math.random() * total
-  for (const { id, weight } of effective) {
-    r -= weight
+  for (const { id, weight } of candidates) {
+    r -= Math.max(0, weight)
     if (r <= 0) return id
   }
-  return effective[effective.length - 1].id
+  return candidates[candidates.length - 1].id
+}
+
+/**
+ * Pick the next node under novelty + LRU rules. Returns currentNodeId on
+ * a true dead end.
+ */
+export function planStep(
+  currentNodeId: string,
+  edges: Edge[],
+  visited: Set<string>,
+  lastVisitedStep: Map<string, number>,
+): string {
+  const candidates = _reachable(currentNodeId, edges)
+  if (candidates.length === 0) return currentNodeId
+
+  const fresh = candidates.filter(c => !visited.has(c.id))
+  if (fresh.length > 0) return _weightedSample(fresh)
+
+  // All visited → LRU. Smallest last_visited_step wins (-1 for missing,
+  // so a never-tracked neighbour is preferred just in case).
+  let minStep = Infinity
+  for (const c of candidates) {
+    const s = lastVisitedStep.has(c.id) ? lastVisitedStep.get(c.id)! : -1
+    if (s < minStep) minStep = s
+  }
+  const oldest = candidates.filter(c => {
+    const s = lastVisitedStep.has(c.id) ? lastVisitedStep.get(c.id)! : -1
+    return s === minStep
+  })
+  return _weightedSample(oldest)
+}
+
+/**
+ * Plan a horizon-N path starting *after* currentNodeId. Uses local copies
+ * of the session's visited set / LRU map so the plan accounts for nodes
+ * the plan itself will mark as seen.
+ */
+export function planPath(
+  currentNodeId: string,
+  edges: Edge[],
+  visited: Set<string>,
+  lastVisitedStep: Map<string, number>,
+  startStep: number,
+  horizon: number,
+): string[] {
+  if (horizon <= 0) return []
+  const simVisited = new Set(visited)
+  const simLru = new Map(lastVisitedStep)
+  let step = startStep
+  let current = currentNodeId
+  const path: string[] = []
+  for (let i = 0; i < horizon; i++) {
+    const next = planStep(current, edges, simVisited, simLru)
+    if (next === current) break  // dead end
+    path.push(next)
+    simVisited.add(next)
+    simLru.set(next, step)
+    step += 1
+    current = next
+  }
+  return path
 }
 
 /**
@@ -66,11 +120,26 @@ export function appendHistory(history: string[], nodeId: string): string[] {
     : updated
 }
 
-/**
- * Simulate `n` future wander steps from `startId`, returning the
- * pre-committed sequence of node ids. Mirrors `_build_lookahead` in the
- * backend sessions route.
- */
+// ── Legacy entry points (kept for any caller that hasn't migrated) ────────────
+
+/** @deprecated Use planStep with explicit visited / lastVisitedStep state. */
+export function getNextNode(
+  currentNodeId: string,
+  edges: Edge[],
+  wanderHistory: string[],
+): string {
+  // Translate the bounded history into the new framework: every node
+  // ever in the history is "visited", later list position = more recent.
+  const visited = new Set<string>()
+  const lastVisitedStep = new Map<string, number>()
+  wanderHistory.forEach((id, i) => {
+    visited.add(id)
+    lastVisitedStep.set(id, i)
+  })
+  return planStep(currentNodeId, edges, visited, lastVisitedStep)
+}
+
+/** @deprecated Use planPath with explicit visited / lastVisitedStep state. */
 export function buildLookahead(
   startId: string,
   baseHistory: string[],
@@ -79,18 +148,16 @@ export function buildLookahead(
   edges: Edge[],
   n: number,
 ): string[] {
-  let history = [...baseHistory]
-  for (const nodeId of queuePrefix) {
-    history = appendHistory(history, nodeId)
+  const visited = new Set<string>(baseHistory)
+  const lastVisitedStep = new Map<string, number>()
+  baseHistory.forEach((id, i) => lastVisitedStep.set(id, i))
+  let step = baseHistory.length
+  for (const id of queuePrefix) {
+    visited.add(id)
+    step += 1
+    lastVisitedStep.set(id, step)
   }
-  let currentId = startId
-  const result: string[] = []
-  for (let i = 0; i < n; i++) {
-    if (!nodeIds.has(currentId)) break
-    const nextId = getNextNode(currentId, edges, history)
-    result.push(nextId)
-    history = appendHistory(history, nextId)
-    currentId = nextId
-  }
-  return result
+  // Guard against a stale start id (node deleted from snapshot).
+  if (!nodeIds.has(startId)) return []
+  return planPath(startId, edges, visited, lastVisitedStep, step + 1, n)
 }

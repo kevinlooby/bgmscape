@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Boolean, Float, ForeignKey, JSON, String, DateTime
+from sqlalchemy import Boolean, Float, ForeignKey, Integer, JSON, String, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.db.base import Base
@@ -106,6 +106,16 @@ class PlaybackSession(Base):
     nominated_next_node_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("nodes.id"), nullable=True)
     wander_history: Mapped[list] = mapped_column(JSON, default=list)
     lookahead_queue: Mapped[list] = mapped_column(JSON, default=list)
+    # Node ID → step index when the wander engine most recently arrived at
+    # that node during this session. Drives the novelty + LRU rules in the
+    # wander service: nodes absent from this dict are "fresh"; among visited
+    # ones the smallest value wins under LRU fallback. Grows linearly with
+    # distinct nodes visited (bounded by graph size).
+    node_last_visited: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False, server_default="{}")
+    # Monotonic counter incremented once per advance (i.e. once per node
+    # arrival after the start). Used as the value written into
+    # node_last_visited so LRU comparisons are cheap integer compares.
+    step_index: Mapped[int] = mapped_column(Integer, default=0, nullable=False, server_default="0")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

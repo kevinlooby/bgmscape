@@ -120,6 +120,11 @@ class PlaybackSessionSchema(BaseModel):
     wander_active: bool
     nominated_next_node_id: Optional[str]
     wander_history: list[str]
+    # Novelty + LRU state exposed for debugging / API inspection. The
+    # frontend doesn't need these — the planner runs server-side — but
+    # surfacing them keeps the session model transparent.
+    node_last_visited: dict[str, int] = {}
+    step_index: int = 0
     created_at: datetime
     updated_at: datetime
 
@@ -184,6 +189,12 @@ class LookaheadStep(BaseModel):
     node_id: str
     node_name: str
     region: Optional[str]
+    # Needed by the frontend's cluster-aware dwell scheduler: when several
+    # adjacent lookahead steps share the same audio_file_path they're
+    # treated as one "cluster" and given a compressed total listening
+    # budget (logarithmic) split evenly across the nodes. Without this on
+    # the step payload, the scheduler can't see clusters ahead of time.
+    audio_file_path: Optional[str] = None
 
 
 class LookaheadResponse(BaseModel):
