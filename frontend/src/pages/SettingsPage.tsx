@@ -99,7 +99,7 @@ export default function SettingsPage() {
           <SectionTitle>Music</SectionTitle>
           <SliderRow
             label="Volume"
-            tooltip="Master volume for the music track. Same slider as the speaker icon in the listener header — they stay in sync."
+            tooltip="Volume for the music track only. Independent of the ambient layer. Same slider as the music-note icon in the listener header — they stay in sync."
             value={musicVolume}
             min={0} max={1} step={0.05}
             format={v => v.toFixed(2)}
@@ -167,7 +167,7 @@ export default function SettingsPage() {
           <SectionTitle>Ambient layer</SectionTitle>
           <SliderRow
             label="Volume"
-            tooltip="Master volume for the ambient/atmospheric layer (wind, water, fauna, …). Multiplicative with the overall master volume."
+            tooltip="Volume for the ambient/atmospheric layer (wind, water, fauna, …). Independent of the music slider. Same control as the cloud icon in the listener header — they stay in sync."
             value={ambientBusVolume}
             min={0} max={1} step={0.05}
             format={v => v.toFixed(2)}

@@ -9,7 +9,17 @@ const DEFAULT_FADE_OUT_DURATION  = 1.5  // seconds
 
 export class AudioManager {
   private context: AudioContext | null = null
+  // Signal chain:
+  //   music source ─> currentGain ─> musicBus ─> masterGain ─> destination
+  //   ambient ────────────────────> ambientBus ─┘
+  //
+  // masterGain is the pause/fade chokepoint — it stays at unity (1.0) during
+  // normal playback and ramps to 0 on pause / back to 1 on unpause. The
+  // per-stream volume sliders scale their own bus instead so that pulling
+  // "music" to 0 does not also silence ambient (and vice versa). The
+  // AmbientEngine attaches its own bus to masterGain via getEngineHandles().
   private masterGain: GainNode | null = null
+  private musicBus: GainNode | null = null
   private fetcher: AudioFetcher
 
   /**
@@ -34,9 +44,10 @@ export class AudioManager {
   // Buffer cache keyed by URL
   private bufferCache: Map<string, AudioBuffer> = new Map()
 
-  // Master volume tracking (separate from the muted state)
+  // Music-bus volume tracking. Restored to the music bus whenever the audio
+  // context (re)comes up. Independent of pause/unpause, which ramp the
+  // master gain instead and leave _volume alone.
   private _volume = 1
-  private _muted = false
 
   // ── Context lifecycle ────────────────────────────────────────────────────
 
@@ -45,7 +56,18 @@ export class AudioManager {
     if (!this.context) {
       this.context = new AudioContext()
       this.masterGain = this.context.createGain()
+      // Master starts at unity. Pause/unpause ramp it to 0 / back to 1 —
+      // they no longer use the music-volume value, since that's the
+      // music bus's job now.
+      this.masterGain.gain.setValueAtTime(1, this.context.currentTime)
       this.masterGain.connect(this.context.destination)
+      // Music bus sits between music sources and master. Its gain reflects
+      // the user's music-volume slider value at the time the context comes
+      // up (which may have been adjusted before any session started — e.g.
+      // on the Settings page).
+      this.musicBus = this.context.createGain()
+      this.musicBus.gain.setValueAtTime(this._volume, this.context.currentTime)
+      this.musicBus.connect(this.masterGain)
     }
     if (this.context.state === 'suspended') {
       await this.context.resume()
@@ -57,9 +79,9 @@ export class AudioManager {
     return this.context
   }
 
-  private getMasterGain(): GainNode {
-    if (!this.masterGain) throw new Error('Master gain not initialised — call resume() first')
-    return this.masterGain
+  private getMusicBus(): GainNode {
+    if (!this.musicBus) throw new Error('Music bus not initialised — call resume() first')
+    return this.musicBus
   }
 
   // ── Buffer loading ───────────────────────────────────────────────────────
@@ -137,7 +159,7 @@ export class AudioManager {
     const gain = ctx.createGain()
     gain.gain.setValueAtTime(0, ctx.currentTime)
     gain.gain.linearRampToValueAtTime(1, ctx.currentTime + fadeInDuration)
-    gain.connect(this.getMasterGain())
+    gain.connect(this.getMusicBus())
 
     const source = this.createSource(buffer, { loop, loopStart, loopEnd })
     source.connect(gain)
@@ -178,7 +200,7 @@ export class AudioManager {
     const inGain = ctx.createGain()
     inGain.gain.setValueAtTime(0, ctx.currentTime)
     inGain.gain.linearRampToValueAtTime(1, ctx.currentTime + fadeInDuration)
-    inGain.connect(this.getMasterGain())
+    inGain.connect(this.getMusicBus())
 
     const inSource = this.createSource(buffer, { loop, loopStart, loopEnd })
     inSource.connect(inGain)
@@ -202,17 +224,24 @@ export class AudioManager {
     await this._teardownCurrent(duration)
   }
 
-  /** Set master output volume (0.0 – 1.0). Remembered across pause/unpause. */
+  /**
+   * Set the music-bus output gain (0.0 – 1.0). Affects the music track only —
+   * ambient mixes through its own bus and is unaffected. Value is remembered
+   * so it's reapplied when the audio context is (re)created.
+   */
   setVolume(gain: number): void {
     this._volume = Math.max(0, Math.min(1, gain))
-    if (!this._muted && this.masterGain) {
-      this.masterGain.gain.setValueAtTime(this._volume, this.getContext().currentTime)
+    if (this.musicBus && this.context) {
+      this.musicBus.gain.setValueAtTime(this._volume, this.context.currentTime)
     }
   }
 
-  /** Fade master gain to silence quickly. Audio processing continues underneath. */
+  /**
+   * Ramp the master gain to silence — mutes BOTH music and ambient until
+   * unpause(). The per-bus volumes (music, ambient) are preserved so they
+   * come back at their previous levels.
+   */
   pause(): void {
-    this._muted = true
     if (!this.masterGain) return
     const ctx = this.getContext()
     const now = ctx.currentTime
@@ -221,15 +250,14 @@ export class AudioManager {
     this.masterGain.gain.linearRampToValueAtTime(0, now + 0.15)
   }
 
-  /** Fade master gain back to the stored volume. */
+  /** Ramp master gain back to unity. The per-bus volumes carry through. */
   unpause(): void {
-    this._muted = false
     if (!this.masterGain) return
     const ctx = this.getContext()
     const now = ctx.currentTime
     this.masterGain.gain.cancelScheduledValues(now)
     this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now)
-    this.masterGain.gain.linearRampToValueAtTime(this._volume, now + 0.15)
+    this.masterGain.gain.linearRampToValueAtTime(1, now + 0.15)
   }
 
   // ── Internal helpers ─────────────────────────────────────────────────────

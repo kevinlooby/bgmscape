@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
-import { Loader2, Map, Network, Pencil, Settings, Volume2 } from 'lucide-react'
+import { CloudFog, Loader2, Map, Music, Network, Pencil, Settings } from 'lucide-react'
 import { usePlayback } from '../store/playback'
 import * as gamesApi from '../api/games'
 import ListenerGraphView from '../components/listener/ListenerGraphView'
@@ -43,8 +43,9 @@ export default function ListenerPage() {
 
   const {
     sessionId, graph, currentNode, playing, wanderActive, transitioning, nominatedNextNodeId,
-    wanderHistory, musicVolume,
-    startSession, advance, setPlaying, setWanderActive, steerTo, teleportTo, reset, setMusicVolume,
+    wanderHistory, musicVolume, ambientBusVolume,
+    startSession, advance, setPlaying, setWanderActive, steerTo, teleportTo, reset,
+    setMusicVolume, setAmbientBusVolume,
   } = usePlayback()
 
   const [error, setError] = useState<string | null>(null)
@@ -115,8 +116,11 @@ export default function ListenerPage() {
     })
   }, [resolvedGraphId, sessionId, resolveError, startSession])
 
-  const handleVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMusicVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMusicVolume(parseFloat(e.target.value))
+  }
+  const handleAmbientVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAmbientBusVolume(parseFloat(e.target.value))
   }
 
   const neighbors = useMemo((): Node[] => {
@@ -149,19 +153,43 @@ export default function ListenerPage() {
 
   const header = (
     <PageHeader title="bgmscape" subtitle={headerSubtitle}>
+      {/* Music + ambient volume sliders. The two buses are independent (see
+       *  AudioManager): music routes through musicBus, ambient through
+       *  ambientBus, and both feed masterGain. Pulling one to zero leaves the
+       *  other audible. The Settings page surfaces the same two values. */}
       {sessionId && (
-        <label style={{
-          display: 'inline-flex', alignItems: 'center', gap: space.sm,
-          color: color.textFaint, fontFamily: font.sans, fontSize: fontSize.sm,
-        }}>
-          <Volume2 size={14} />
-          <input
-            type="range" min={0} max={1} step={0.05} value={musicVolume}
-            onChange={handleVolume}
-            style={{ width: 88, cursor: 'pointer', accentColor: color.accent }}
-            aria-label="Music volume"
-          />
-        </label>
+        <>
+          <label
+            title="Music volume"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: space.sm,
+              color: color.textFaint, fontFamily: font.sans, fontSize: fontSize.sm,
+            }}
+          >
+            <Music size={14} />
+            <input
+              type="range" min={0} max={1} step={0.05} value={musicVolume}
+              onChange={handleMusicVolume}
+              style={{ width: 88, cursor: 'pointer', accentColor: color.accent }}
+              aria-label="Music volume"
+            />
+          </label>
+          <label
+            title="Ambient volume"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: space.sm,
+              color: color.textFaint, fontFamily: font.sans, fontSize: fontSize.sm,
+            }}
+          >
+            <CloudFog size={14} />
+            <input
+              type="range" min={0} max={1} step={0.05} value={ambientBusVolume}
+              onChange={handleAmbientVolume}
+              style={{ width: 88, cursor: 'pointer', accentColor: color.accent }}
+              aria-label="Ambient volume"
+            />
+          </label>
+        </>
       )}
 
       {/* "What's coming next" — read-only peek at the upcoming queue. */}
